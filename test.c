@@ -1010,7 +1010,6 @@ void editorProcessKeypress() {
       }
       break;
 
-
     case ARROW_UP:
     case ARROW_DOWN:
     case ARROW_LEFT:

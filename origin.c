@@ -3,6 +3,8 @@
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
 
 void raw() {
   struct termios raw = E.orig_termios;

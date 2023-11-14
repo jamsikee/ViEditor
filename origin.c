@@ -7,7 +7,6 @@
 #include <sys/ioctl.h>
 
 void raw() {
-  struct termios raw = E.orig_termios;
   raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
   raw.c_oflag &= ~(OPOST);
   raw.c_cflag |= (CS8);

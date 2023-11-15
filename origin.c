@@ -35,7 +35,6 @@ void Raw() {
 
 void presskey(){
     char c;
-    read(STDIN_FILENO, &c, 1);
     switch (c)
     {
     case CONTROL('q'):
@@ -79,6 +78,7 @@ int main(){
     char c;
     while (1) {
     presskey();
+    read(STDIN_FILENO, &c, 1);
   }
   return 0;
 }

@@ -22,7 +22,7 @@ enum P_key{
     PgDn
 };
 
-void disableRawMode() {
+void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
 
@@ -39,7 +39,7 @@ void Raw() {
     raw.c_cc[VTIME] = 1;
     
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-    atexit(disableRawMode);
+    atexit(disRaw);
 }
 
 

@@ -35,7 +35,7 @@ void Raw() {
 
 void presskey(){
     char c;
-    read(STDIN_FILENO, &c, 1)
+    read(STDIN_FILENO, &c, 1);
     switch (c)
     {
     case CONTROL('q'):

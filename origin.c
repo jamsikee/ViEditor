@@ -1,84 +1,76 @@
+/*** includes ***/
+
+#include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <termios.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <ctype.h>
-#define CONTROL(k) ((k) & 0x1f)  // 문자의 아스키코드 지정 ctrl-A = 1
 
-enum P_key{
-    B_space = 10000,
-    left,
-    right,
-    up,
-    down,
-    Del,
-    End,
-    Home,
-    PgUp,
-    PgDn
-};
+/*** defines ***/
 
-void Raw() {
-    struct termios raw;
-    tcgetattr(STDIN_FILENO, &raw);
-    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-    raw.c_oflag &= ~(OPOST);
-    raw.c_cflag |= (CS8);
-    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
-    raw.c_cc[VMIN] = 0;
-    raw.c_cc[VTIME] = 1;
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+#define CTRL_KEY(k) ((k) & 0x1f)
+
+/*** data ***/
+
+struct termios orig_termios;
+
+/*** terminal ***/
+
+void die(const char *s) {
+  perror(s);
+  exit(1);
 }
 
-void presskey(){
-    char c;
-    switch (c)
-    {
-    case CONTROL('q'):
-        exit(0); // 프로그램 종료
-        break;
-        /*
-    case CONTROL('s'):
-        break;
-    case CONTROL('f'):
-        break;    
-    case Home:
-        break;
-    case B_space:
-        break;
-    case Del:
-        break;
-    case left:
-        break;
-    case right:
-        break;
-    case up:
-        break;
-    case down:
-        break;
-    case End:
-        break;
-    case Home:
-        break;
-    case PgUp:
-        break;
-    case PgDn:
-        break;
-    default:
-        break;
-        */
-    }
+void disableRawMode() {
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1)
+    die("tcsetattr");
 }
 
-int main(){
-    Raw();
-    char c;
-    while (1) {
-    presskey();
-    read(STDIN_FILENO, &c, 1);
+void enableRawMode() {
+  if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
+  atexit(disableRawMode);
+
+  struct termios raw = orig_termios;
+  raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+  raw.c_oflag &= ~(OPOST);
+  raw.c_cflag |= (CS8);
+  raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+  raw.c_cc[VMIN] = 0;
+  raw.c_cc[VTIME] = 1;
+
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr");
+}
+
+char editorReadKey() {
+  int nread;
+  char c;
+  while ((nread = read(STDIN_FILENO, &c, 1)) != 1) {
+    if (nread == -1 && errno != EAGAIN) die("read");
   }
+  return c;
+}
+
+/*** input ***/
+
+void editorProcessKeypress() {
+  char c = editorReadKey();
+
+  switch (c) {
+    case CTRL_KEY('q'):
+      exit(0);
+      break;
+  }
+}
+
+/*** init ***/
+
+int main() {
+  enableRawMode();
+
+  while (1) {
+    editorProcessKeypress();
+  }
+
   return 0;
 }

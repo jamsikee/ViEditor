@@ -38,6 +38,7 @@ void presskey(){
     case CONTROL('q'):
         exit(0); // 프로그램 종료
         break;
+        /*
     case CONTROL('s'):
         break;
     case CONTROL('f'):
@@ -64,9 +65,9 @@ void presskey(){
         break;
     case PgDn:
         break;
-
     default:
         break;
+        */
     }
 }
 

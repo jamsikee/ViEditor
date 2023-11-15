@@ -23,6 +23,7 @@ enum P_key{
 
 void Raw() {
     struct termios raw;
+    tcgetattr(STDIN_FILENO, &raw);
     
     raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
     raw.c_oflag &= ~(OPOST);
@@ -30,15 +31,17 @@ void Raw() {
     raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
     raw.c_cc[VMIN] = 0;
     raw.c_cc[VTIME] = 1;
-   
+    
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
+
 
 void presskey(){
      char c;
     if (read(STDIN_FILENO, &c, 1) != 1) {
         return; // 입력이 없을 경우 함수 종료
     }
-    
+
     switch (c)
     {
     case CONTROL('q'):

@@ -9,7 +9,7 @@
 #define CONTROL(k) ((k) & 0x1f)  // 문자의 아스키코드 지정 ctrl-A = 1
 
 enum P_key{
-    B_space,
+    B_space = 10000,
     left,
     right,
     up,

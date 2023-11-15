@@ -7,6 +7,7 @@
 #include <sys/ioctl.h>
 #include <ctype.h>
 #define CONTROL(k) ((k) & 0x1f)  // 문자의 아스키코드 지정 ctrl-A = 1
+struct termios orig_termios;
 
 enum P_key{
     B_space = 10000,
@@ -21,10 +22,15 @@ enum P_key{
     PgDn
 };
 
+void disableRawMode() {
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+}
+
 void Raw() {
     struct termios raw;
+    tcgetattr(STDIN_FILENO, &orig_termios);
     tcgetattr(STDIN_FILENO, &raw);
-    
+
     raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
     raw.c_oflag &= ~(OPOST);
     raw.c_cflag |= (CS8);
@@ -33,6 +39,7 @@ void Raw() {
     raw.c_cc[VTIME] = 1;
     
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    atexit(disableRawMode);
 }
 
 
@@ -82,7 +89,6 @@ void presskey(){
 
 int main(){
     Raw();
-    char c;
     while (1) {
     presskey();
     }

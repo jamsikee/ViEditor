@@ -27,7 +27,7 @@ enum P_key{
 struct Cursor
 {
     int cx, cy;
-    int rows
+    int rows;
     int cols;
     int currentrows;
 };

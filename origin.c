@@ -7,6 +7,7 @@
 #include <sys/ioctl.h>
 #include <ctype.h>
 #include <ncurses.h>
+#include <signal.h>
 #define CONTROL(k) ((k) & 0x1f)  // 문자의 아스키코드 지정 ctrl-A = 1
 struct termios orig_termios;
 

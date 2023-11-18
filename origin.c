@@ -45,7 +45,6 @@ void Raw() {  // raw mode 기능 켜기
 }
 
 void tilde() {
-    initscr();  // ncurses 초기화
 
     int rows, cols;
     getmaxyx(stdscr, rows, cols); // 현재 터미널 창의 크기를 가져옴
@@ -111,8 +110,8 @@ void presskey(){
 
 int main(){
     Raw();
-    tilde();
     initscr();
+    tilde();
     signal(SIGWINCH, change);
     while (1) {
     presskey();

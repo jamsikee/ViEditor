@@ -103,6 +103,8 @@ void editorDrawRows(struct editorBuffer *ab) {
 void editorRefreshScreen(struct editorBuffer *ab) {
     clear();
     editorDrawRows(ab);
+    move(0, 0);
+    refresh();
 }
 
 void presskey(){

@@ -91,9 +91,11 @@ void editorDrawRows(struct editorRow *row) {
     getmaxyx(stdscr, rows, cols);
     rows -= 2;
 
-    for (y = 0; y < rows; y++) {
+     for (y = 0; y < rows; y++) {
         if (row && y == rows / 3) {
-            mvprintw(y, 0, "%.*s", row->size, row->chars);
+            int text_length = strlen(row->chars);
+            int x = (cols - text_length) / 2;
+            mvprintw(y, x > 0 ? x : 0, "%s", row->chars);
             row = row->next;
         } else {
             mvprintw(y, 0, "~");
@@ -155,7 +157,7 @@ int main() {
     Raw();
     initscr();
     struct editorRow *row = NULL;
-    row = editorAppendRow(row, "Kilo editor -- version 0.0.1", strlen("Kilo editor -- version 0.0.1"));
+    row = editorAppendRow(row, "visual text editor -- version 0.0.1", strlen("visual text editor -- version 0.0.1"));
     editorRefreshScreen(row);
     
     while (1) {

@@ -1,188 +1,160 @@
-/*** includes ***/
-
-#include <ctype.h>
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <ctype.h>
+#include <ncurses.h>
+#include <signal.h>
+#define CONTROL(k) ((k) & 0x1f)  // 문자의 아스키코드 지정 ctrl-A = 1
+struct termios orig_termios;
 
-/*** defines ***/
-
-#define KILO_VERSION "0.0.1"
-
-#define CTRL_KEY(k) ((k) & 0x1f)
-
-/*** data ***/
-
-struct editorConfig {
-  int screenrows;
-  int screencols;
-  struct termios orig_termios;
+enum P_key{
+    B_space = 10000,
+    left,
+    right,
+    up,
+    down,
+    Del,
+    End,
+    Home,
+    PgUp,
+    PgDn
 };
 
-struct editorConfig E;
-
-/*** terminal ***/
-
-void die(const char *s) {
-  write(STDOUT_FILENO, "\x1b[2J", 4);
-  write(STDOUT_FILENO, "\x1b[H", 3);
-
-  perror(s);
-  exit(1);
-}
-
-void disableRawMode() {
-  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.orig_termios) == -1)
-    die("tcsetattr");
-}
-
-void enableRawMode() {
-  if (tcgetattr(STDIN_FILENO, &E.orig_termios) == -1) die("tcgetattr");
-  atexit(disableRawMode);
-
-  struct termios raw = E.orig_termios;
-  raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-  raw.c_oflag &= ~(OPOST);
-  raw.c_cflag |= (CS8);
-  raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
-  raw.c_cc[VMIN] = 0;
-  raw.c_cc[VTIME] = 1;
-
-  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr");
-}
-
-char editorReadKey() {
-  int nread;
-  char c;
-  while ((nread = read(STDIN_FILENO, &c, 1)) != 1) {
-    if (nread == -1 && errno != EAGAIN) die("read");
-  }
-  return c;
-}
-
-int getCursorPosition(int *rows, int *cols) {
-  char buf[32];
-  unsigned int i = 0;
-
-  if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4) return -1;
-
-  while (i < sizeof(buf) - 1) {
-    if (read(STDIN_FILENO, &buf[i], 1) != 1) break;
-    if (buf[i] == 'R') break;
-    i++;
-  }
-  buf[i] = '\0';
-
-  if (buf[0] != '\x1b' || buf[1] != '[') return -1;
-  if (sscanf(&buf[2], "%d;%d", rows, cols) != 2) return -1;
-
-  return 0;
-}
-
-int getWindowSize(int *rows, int *cols) {
-  struct winsize ws;
-
-  if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
-    if (write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12) return -1;
-    return getCursorPosition(rows, cols);
-  } else {
-    *cols = ws.ws_col;
-    *rows = ws.ws_row;
-    return 0;
-  }
-}
-
-/*** append buffer ***/
-
-struct abuf {
-  char *b;
-  int len;
+struct Cursor
+{
+    int cx, cy;
+    int rows;
+    int cols;
+    int currentrows;
 };
 
-#define ABUF_INIT {NULL, 0}
+struct editorRow {
+    char *chars;
+    int size;
+    struct editorRow *next;
+};
 
-void abAppend(struct abuf *ab, const char *s, int len) {
-  char *new = realloc(ab->b, ab->len + len);
+struct editorBuffer {
+    struct editorRow *head;
+    struct editorRow *tail;
+};
 
-  if (new == NULL) return;
-  memcpy(&new[ab->len], s, len);
-  ab->b = new;
-  ab->len += len;
+void disRaw() {  // raw mode 기능 해제
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
 
-void abFree(struct abuf *ab) {
-  free(ab->b);
+void Raw() {  // raw mode 기능 켜기
+    struct termios raw;
+    tcgetattr(STDIN_FILENO, &orig_termios);
+    tcgetattr(STDIN_FILENO, &raw);
+
+    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+    raw.c_oflag &= ~(OPOST);
+    raw.c_cflag |= (CS8);
+    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+    raw.c_cc[VMIN] = 0;
+    raw.c_cc[VTIME] = 1;
+    
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    atexit(disRaw);
 }
 
-/*** output ***/
+void abAppend(struct editorBuffer *ab, const char *s, int len) {
+    struct editorRow *newRow = malloc(sizeof(struct editorRow));
+    newRow->chars = malloc(len + 1);
+    memcpy(newRow->chars, s, len);
+    newRow->chars[len] = '\0';
+    newRow->size = len;
+    newRow->next = NULL;
 
-void editorDrawRows(struct abuf *ab) {
-  int y;
-  for (y = 0; y < E.screenrows; y++) {
-    if (y == E.screenrows / 3) {
-      char welcome[80];
-      int welcomelen = snprintf(welcome, sizeof(welcome),
-        "Kilo editor -- version %s", KILO_VERSION);
-      if (welcomelen > E.screencols) welcomelen = E.screencols;
-      abAppend(ab, welcome, welcomelen);
+    if (ab->tail == NULL) {
+        ab->head = ab->tail = newRow;
     } else {
-      abAppend(ab, "~", 1);
+        ab->tail->next = newRow;
+        ab->tail = newRow;
     }
+}
 
-    abAppend(ab, "\x1b[K", 3);
-    if (y < E.screenrows - 1) {
-      abAppend(ab, "\r\n", 2);
+void editorDrawRows() {
+    int rows, cols;
+    getmaxyx(stdscr, rows, cols);
+
+    rows -= 2;
+
+    for (int y = 0; y < rows; y++) {
+        move(y, 0);
+        if (y == rows / 3) {
+            char welcome[80];
+            int welcomelen = snprintf(welcome, sizeof(welcome),
+                "Kilo editor -- version %s", "0.0.1"); // 여기에 버전을 넣으세요
+            if (welcomelen > cols) welcomelen = cols;
+            editorBufferAppendRow(welcome, welcomelen);
+            printw("%.*s", welcomelen, welcome);
+        } else {
+            editorBufferAppendRow("~", 1);
+            printw("~");
+        }
     }
-  }
+    refresh();
 }
 
 void editorRefreshScreen() {
-  struct abuf ab = ABUF_INIT;
-
-  abAppend(&ab, "\x1b[?25l", 6);
-  abAppend(&ab, "\x1b[H", 3);
-
-  editorDrawRows(&ab);
-
-  abAppend(&ab, "\x1b[H", 3);
-  abAppend(&ab, "\x1b[?25h", 6);
-
-  write(STDOUT_FILENO, ab.b, ab.len);
-  abFree(&ab);
+    clear();
+    editorDrawRows();
 }
 
-/*** input ***/
+void presskey(){
+    int c = getch();
 
-void editorProcessKeypress() {
-  char c = editorReadKey();
-
-  switch (c) {
-    case CTRL_KEY('q'):
-      write(STDOUT_FILENO, "\x1b[2J", 4);
-      write(STDOUT_FILENO, "\x1b[H", 3);
-      exit(0);
-      break;
-  }
+    switch (c)
+    {
+    case CONTROL('q'):
+        endwin();
+        exit(0); // 프로그램 종료
+        break;
+        /*
+    case CONTROL('s'):
+        break;
+    case CONTROL('f'):
+        break;    
+    case Home:
+        break;
+    case B_space:
+        break;
+    case Del:
+        break;
+    case left:
+        break;
+    case right:
+        break;
+    case up:
+        break;
+    case down:
+        break;
+    case End:
+        break;
+    case Home:
+        break;
+    case PgUp:
+        break;
+    case PgDn:
+        break;
+    default:
+        break;
+        */
+    }
 }
 
-/*** init ***/
-
-void initEditor() {
-  if (getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
-}
-
-int main() {
-  enableRawMode();
-  initEditor();
-
-  while (1) {
-    editorRefreshScreen();
-    editorProcessKeypress();
-  }
-
+int main(){
+    Raw();
+    initscr();
+    tilde();
+    while (1) {
+    presskey();
+    }
   return 0;
 }

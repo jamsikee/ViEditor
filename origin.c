@@ -101,6 +101,7 @@ void t
 
 int main(){
     Raw();
+    tilde();
     while (1) {
     presskey();
     }

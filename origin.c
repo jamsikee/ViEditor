@@ -91,20 +91,11 @@ void editorDrawRows(struct editorRow *row) {
     getmaxyx(stdscr, rows, cols);
     rows -= 2;
 
-    for (y = 0; y < rows; y++) {
+     for (y = 0; y < rows; y++) {
         if (row && y == rows / 3) {
             int text_length = strlen(row->chars);
             int x = (cols - text_length) / 2;
-
-            if (text_length > cols) {
-                mvprintw(y, 0, "%s", row->chars);
-            } else {
-                int padding = (cols - text_length) / 2;
-                while (padding-- > 0) {
-                    mvprintw(y, x++, "~");
-                }
-                mvprintw(y, x > 0 ? x : 0, "%s", row->chars);
-            }
+            mvprintw(y, x > 0 ? x : 0, "%s", row->chars);
             row = row->next;
         } else {
             mvprintw(y, 0, "~");

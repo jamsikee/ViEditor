@@ -152,7 +152,7 @@ void presskey(){
 int main(){
     Raw();
     initscr();
-    tilde();
+    editorRefreshScreen();
     while (1) {
     presskey();
     }

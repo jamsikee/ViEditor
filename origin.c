@@ -79,32 +79,30 @@ void abAppend(struct editorBuffer *ab, const char *s, int len) {
     }
 }
 
-void editorDrawRows() {
-    int rows, cols;
+void editorDrawRows(struct editorBuffer *ab) {
+    int y, rows, cols;
     getmaxyx(stdscr, rows, cols);
-
     rows -= 2;
 
-    for (int y = 0; y < rows; y++) {
-        move(y, 0);
+    for (y = 0; y < rows; y++) {
         if (y == rows / 3) {
             char welcome[80];
             int welcomelen = snprintf(welcome, sizeof(welcome),
-                "Kilo editor -- version %s", "0.0.1"); // 여기에 버전을 넣으세요
+                                      "Kilo editor -- version %s", "0.0.1");
             if (welcomelen > cols) welcomelen = cols;
-            editorBufferAppendRow(welcome, welcomelen);
-            printw("%.*s", welcomelen, welcome);
+            abAppend(ab, welcome, welcomelen);
+            mvprintw(y, 0, "%.*s", welcomelen, welcome);
         } else {
-            editorBufferAppendRow("~", 1);
-            printw("~");
+            abAppend(ab, "~", 1);
+            mvprintw(y, 0, "~");
         }
     }
     refresh();
 }
 
-void editorRefreshScreen() {
+void editorRefreshScreen(struct editorBuffer *ab) {
     clear();
-    editorDrawRows();
+    editorDrawRows(ab);
 }
 
 void presskey(){
@@ -149,12 +147,15 @@ void presskey(){
     }
 }
 
-int main(){
+int main() {
     Raw();
     initscr();
-    editorRefreshScreen();
+    struct editorBuffer ab;
+    ab.head = ab.tail = NULL;
+    editorRefreshScreen(&ab);
+    
     while (1) {
-    presskey();
+        presskey(&ab);
     }
-  return 0;
+    return 0;
 }

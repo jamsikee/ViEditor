@@ -45,7 +45,7 @@ void Raw() {  // raw mode 기능 켜기
 }
 
 void tilde() {
-
+    move(0, 0);
     int rows, cols;
     getmaxyx(stdscr, rows, cols); // 현재 터미널 창의 크기를 가져옴
     rows -= 2;

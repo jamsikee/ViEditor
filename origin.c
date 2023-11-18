@@ -11,7 +11,7 @@
 #define CONTROL(k) ((k) & 0x1f)  // 문자의 아스키코드 지정 ctrl-A = 1
 struct termios orig_termios;
 
-enum P_key{
+enum P_key {
     B_space = 10000,
     left,
     right,
@@ -24,8 +24,7 @@ enum P_key{
     PgDn
 };
 
-struct Cursor
-{
+struct Cursor {
     int cx, cy;
     int rows;
     int cols;
@@ -36,11 +35,6 @@ struct editorRow {
     char *chars;
     int size;
     struct editorRow *next;
-};
-
-struct editorBuffer {
-    struct editorRow *head;
-    struct editorRow *tail;
 };
 
 void disRaw() {  // raw mode 기능 해제
@@ -63,56 +57,64 @@ void Raw() {  // raw mode 기능 켜기
     atexit(disRaw);
 }
 
-void abAppend(struct editorBuffer *ab, const char *s, int len) {
+struct editorRow *editorAppendRow(struct editorRow *row, const char *s, int len) {
+    row = malloc(sizeof(struct editorRow));
+    row->chars = malloc(len + 1);
+    memcpy(row->chars, s, len);
+    row->chars[len] = '\0';
+    row->size = len;
+    row->next = NULL;
+    return row;
+}
+
+struct editorRow *editorInsertRow(struct editorRow *row, const char *s, int len) {
     struct editorRow *newRow = malloc(sizeof(struct editorRow));
     newRow->chars = malloc(len + 1);
     memcpy(newRow->chars, s, len);
     newRow->chars[len] = '\0';
     newRow->size = len;
-    newRow->next = NULL;
+    newRow->next = row;
+    return newRow;
+}
 
-    if (ab->tail == NULL) {
-        ab->head = ab->tail = newRow;
-    } else {
-        ab->tail->next = newRow;
-        ab->tail = newRow;
+void editorFreeRows(struct editorRow *row) {
+    while (row) {
+        struct editorRow *temp = row->next;
+        free(row->chars);
+        free(row);
+        row = temp;
     }
 }
 
-void editorDrawRows(struct editorBuffer *ab) {
+void editorDrawRows(struct editorRow *row) {
     int y, rows, cols;
     getmaxyx(stdscr, rows, cols);
     rows -= 2;
 
     for (y = 0; y < rows; y++) {
-        if (y == rows / 3) {
-            char welcome[80];
-            int welcomelen = snprintf(welcome, sizeof(welcome),
-                                      "Kilo editor -- version %s", "0.0.1");
-            if (welcomelen > cols) welcomelen = cols;
-            abAppend(ab, welcome, welcomelen);
-            mvprintw(y, 0, "%.*s", welcomelen, welcome);
+        if (row && y == rows / 3) {
+            mvprintw(y, 0, "%.*s", row->size, row->chars);
+            row = row->next;
         } else {
-            abAppend(ab, "~", 1);
             mvprintw(y, 0, "~");
         }
     }
     refresh();
 }
 
-void editorRefreshScreen(struct editorBuffer *ab) {
+void editorRefreshScreen(struct editorRow *row) {
     clear();
-    editorDrawRows(ab);
+    editorDrawRows(row);
     move(0, 0);
     refresh();
 }
 
-void presskey(){
+void presskey(struct editorRow **row) {
     int c = getch();
 
-    switch (c)
-    {
+    switch (c) {
     case CONTROL('q'):
+        editorFreeRows(*row);
         endwin();
         exit(0); // 프로그램 종료
         break;
@@ -152,12 +154,12 @@ void presskey(){
 int main() {
     Raw();
     initscr();
-    struct editorBuffer ab;
-    ab.head = ab.tail = NULL;
-    editorRefreshScreen(&ab);
+    struct editorRow *row = NULL;
+    row = editorAppendRow(row, "Kilo editor -- version 0.0.1", strlen("Kilo editor -- version 0.0.1"));
+    editorRefreshScreen(row);
     
     while (1) {
-        presskey(&ab);
+        presskey(&row);
     }
     return 0;
 }

@@ -759,7 +759,9 @@ void editorDrawRows(struct abuf *ab) {
           padding--;
         }
         while (padding--) abAppend(ab, " ", 1);
-        abAppend(ab, welcome, welcomelen);
+        abAppend
+        
+        (ab, welcome, welcomelen);
       } else {
         abAppend(ab, "~", 1);
       }

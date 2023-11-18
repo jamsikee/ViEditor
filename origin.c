@@ -24,6 +24,15 @@ enum P_key{
     PgDn
 };
 
+struct Cursor
+{
+    int cx, cy;
+    int rows
+    int cols;
+    int currentrows;
+};
+
+
 void disRaw() {  // raw mode 기능 해제
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
@@ -45,14 +54,21 @@ void Raw() {  // raw mode 기능 켜기
 }
 
 void tilde() {
-    move(0, 0);
     int rows, cols;
-    getmaxyx(stdscr, rows, cols); // 현재 터미널 창의 크기를 가져옴
+    getmaxyx(stdscr, rows, cols);
+
     rows -= 2;
 
     for (int y = 0; y < rows; y++) {
-        printw("~\n");
+        move(y, 0);
+        printw("~");
     }
+
+    char* version = "My Editor Version";
+    int len = strlen(version);
+    int padding = (cols - len) / 2;
+    move(rows / 3, padding > 0 ? padding : 0);
+    printw(version);
 
     refresh();
 }

@@ -95,17 +95,23 @@ void editorDrawRows(struct editorRow *row) {
         if (row && y == rows / 3) {
             int text_length = strlen(row->chars);
             int x = (cols - text_length) / 2;
-            mvprintw(y, x > 0 ? x : 0, "%s", row->chars);
+
+            if (text_length > cols) {
+                mvprintw(y, 0, "%s", row->chars);
+            } else {
+                int padding = (cols - text_length) / 2;
+                while (padding-- > 0) {
+                    mvprintw(y, x++, "~");
+                }
+                mvprintw(y, x > 0 ? x : 0, "%s", row->chars);
+            }
             row = row->next;
         } else {
-            int text_length = strlen(row->chars);
-            int x = (cols - text_length) / 2;
-            mvprintw(y, x > 0 ? x : 0, "~");
+            mvprintw(y, 0, "~");
         }
     }
     refresh();
 }
-
 
 void editorRefreshScreen(struct editorRow *row) {
     clear();

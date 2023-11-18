@@ -58,10 +58,7 @@ void tilde() {
 }
 
 void presskey(){
-     char c;
-    if (read(STDIN_FILENO, &c, 1) != 1) {
-        return; // 입력이 없을 경우 함수 종료
-    }
+    int c = getch();
 
     switch (c)
     {

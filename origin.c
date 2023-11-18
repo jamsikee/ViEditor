@@ -112,6 +112,7 @@ void presskey(){
 int main(){
     Raw();
     tilde();
+    initscr();
     signal(SIGWINCH, change);
     while (1) {
     presskey();

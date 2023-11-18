@@ -111,6 +111,7 @@ void presskey(){
 
 int main(){
     Raw();
+    tilde();
     signal(SIGWINCH, change);
     while (1) {
     presskey();

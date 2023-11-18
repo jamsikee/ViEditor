@@ -43,16 +43,18 @@ void Raw() {  // raw mode 기능 켜기
     atexit(disRaw);
 }
 
-void tilde(){
-    int rows, cols;
-        getmaxyx(stdscr, rows, cols); // 현재 터미널 창의 크기를 가져옴
-        rows -= 2; // 터미널 하단에 정보를 보여줄 공간을 확보하기 위해 2줄 제외
+void tilde() {
+    initscr();  // ncurses 초기화
 
-        // 터미널 크기에 따라 행 출력
-        for (int y = 0; y < rows; y++) {
-            printw("~\n");
-        }
-        refresh(); // 화면 갱신
+    int rows, cols;
+    getmaxyx(stdscr, rows, cols); // 현재 터미널 창의 크기를 가져옴
+    rows -= 2;
+
+    for (int y = 0; y < rows; y++) {
+        printw("~\n");
+    }
+
+    refresh();
 }
 
 void presskey(){
@@ -64,6 +66,7 @@ void presskey(){
     switch (c)
     {
     case CONTROL('q'):
+        endwin();
         exit(0); // 프로그램 종료
         break;
         /*

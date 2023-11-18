@@ -1,11 +1,13 @@
 CC = gcc
 TARGET = vite
-OBJS = origin.c
-$(TARGET) : origin.o
-	$(CC) -o $(TARGET) $(OBJS) -lm
-origin.o : origin.c
-	$(CC) -c -o origin.o origin.c
-clean :
-	rm *.o vite
+OBJS = origin.o
+LIBS = -lm -lncurses
 
- 
+$(TARGET) : $(OBJS)
+	$(CC) -o $(TARGET) $(OBJS) $(LIBS)
+
+$(OBJS) : origin.c
+	$(CC) -c -o $(OBJS) origin.c
+
+clean :
+	rm -f $(OBJS) $(TARGET)

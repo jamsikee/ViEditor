@@ -42,6 +42,7 @@ void Raw() {  // raw mode 기능 켜기
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
     atexit(disRaw);
 }
+
 void tilde(){
     int rows, cols;
         getmaxyx(stdscr, rows, cols); // 현재 터미널 창의 크기를 가져옴
@@ -53,6 +54,7 @@ void tilde(){
         }
         refresh(); // 화면 갱신
 }
+
 void presskey(){
      char c;
     if (read(STDIN_FILENO, &c, 1) != 1) {
@@ -96,8 +98,6 @@ void presskey(){
         */
     }
 }
-
-void t
 
 int main(){
     Raw();

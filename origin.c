@@ -57,6 +57,12 @@ void tilde() {
     refresh();
 }
 
+void change(int sig) {
+    endwin();
+    refresh();
+    tilde();
+}
+
 void presskey(){
      char c;
     if (read(STDIN_FILENO, &c, 1) != 1) {
@@ -104,7 +110,7 @@ void presskey(){
 
 int main(){
     Raw();
-    tilde();
+    signal(SIGWINCH, change);
     while (1) {
     presskey();
     }

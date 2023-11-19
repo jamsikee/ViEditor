@@ -256,15 +256,14 @@ void init() {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
-        return 1;
-    }
 
     struct editorRow *row = NULL;
     init();
     editorOpen(argv[1], &row);
     editorDrawRows(row);
+    if (argc >= 2) {
+    editorOpen(argv[1]);
+    }
 
     while (1) {
         presskey(&row);

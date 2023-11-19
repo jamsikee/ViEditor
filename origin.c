@@ -164,35 +164,35 @@ void presskey(struct editorRow **row) {
     int c = getch();
 
     switch (c) {
-    case CONTROL('q'):
-        freeRow(*row);
-        endwin();
-        exit(0);
-        break;
-    case left:
-    case right:
-    case up:
-    case down:
-        Move(c);
-        break;
-    case End:
-        C.x = C.cols - 1;
-        break;
-    case Home:
-        C.x = 0;
-        break;
-    case PgUp:
-    case PgDn:
-        {
-            int temprows = C.rows;
-            while (temprows--){
-                if (c == PgUp)
-                    Move(up);
-                else if (c == PgDn)
-                    Move(down);
+        case CONTROL('q'):
+            freeRow(*row);
+            endwin();
+            exit(0);
+            break;
+        case KEY_LEFT: // 왼쪽 화살표 키
+        case KEY_RIGHT: // 오른쪽 화살표 키
+        case KEY_UP: // 위쪽 화살표 키
+        case KEY_DOWN: // 아래쪽 화살표 키
+            Move(c);
+            break;
+        case KEY_END: // End 키
+            C.x = C.cols - 1;
+            break;
+        case KEY_HOME: // Home 키
+            C.x = 0;
+            break;
+        case KEY_NPAGE: // Page Down 키
+        case KEY_PPAGE: // Page Up 키
+            {
+                int temprows = C.rows;
+                while (temprows--){
+                    if (c == KEY_PPAGE)
+                        Move(up);
+                    else if (c == KEY_NPAGE)
+                        Move(down);
+                }
             }
-        }
-        break;
+            break;
     }
 }
 

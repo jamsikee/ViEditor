@@ -103,42 +103,28 @@ void freeRow(struct editorRow *row) {
     }
 }
 
-void editorDrawRows(struct editorRow *ab) {
+void editorDrawRows() {
     int y, rows, cols;
     getmaxyx(stdscr, rows, cols);
     rows -= 2;
 
-        for (y = 0; y < rows; y++) {
-            if (y == rows / 3) {
-                char welcome[80];
-                int welcomelen = snprintf(welcome, sizeof(welcome),"Visual Text editor -- version 0.0.1");
-                if (welcomelen > cols) welcomelen = cols;
-                int padding = (cols - welcomelen) / 2;
-                if (padding > 0) {
-                    Append(&ab, "~", 1);
-                    padding--;
-                }
-                while (padding--) Append(&ab, " ", 1);
-                Append(&ab, welcome, welcomelen);
-                break;
-            } else {
-                Append(&ab, "~", 1);
-            }
-        }
-
     for (y = 0; y < rows; y++) {
-        if (ab && y == rows / 3) {
-            int text_length = strlen(ab->chars);
-            int x = (cols - text_length) / 2;
-            mvprintw(y, x > 0 ? x : 0, "%s", ab->chars);
-            ab = ab->next;
+        if (y == rows / 3) {
+            char welcome[80];
+            int welcomelen = snprintf(welcome, sizeof(welcome),
+                                      "Visual Text editor -- version 0.0.1");
+            if (welcomelen > cols) welcomelen = cols;
+            int padding = (cols - welcomelen) / 2;
+            if (padding) {
+                mvprintw(y, 0, "~");
+            }
+            mvprintw(y, 0, "%s", welcome);
         } else {
             mvprintw(y, 0, "~");
         }
     }
     refresh();
 }
-
 
 
 void editorRefreshScreen(struct editorRow *row) {

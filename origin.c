@@ -77,7 +77,7 @@ struct editorRow *Insert(struct editorRow *row, const char *s, int len) {
     return newRow;
 }
 
-void free(struct editorRow *row) {
+void freeRow(struct editorRow *row) {
     while (row) {
         struct editorRow *temp = row->next;
         free(row->chars);
@@ -116,7 +116,7 @@ void presskey(struct editorRow **row) {
 
     switch (c) {
     case CONTROL('q'):
-        free(*row);
+        freeRow(*row);
         endwin();
         exit(0); // 프로그램 종료
         break;

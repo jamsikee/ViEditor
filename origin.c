@@ -109,7 +109,6 @@ void freeRow(struct editorRow *row) {
 
 void editorDrawRows(struct editorRow *row) {
     int y;
-    clear();
     for (y = 0; y < C.rows; y++) {
         mvprintw(y, 0, "~");
     }
@@ -211,6 +210,7 @@ int main() {
     
     while (1) {
         presskey(&row);
+        editorDrawRows(row);
     }
     return 0;
 }

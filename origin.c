@@ -87,20 +87,23 @@ void freeRow(struct editorRow *row) {
 }
 
 void editorDrawRows(struct editorRow *row) {
-    int y, rows, cols;
+    int y, rows, cols, x, len;
     getmaxyx(stdscr, rows, cols);
     rows -= 2;
 
     for (y = 0; y < rows; y++) {
-        if (row && y == rows / 3) {
-            int text_length = strlen(row->chars);
-            int x = (cols - text_length) / 2;
-            mvprintw(y, x > 0 ? x : 0, "%s", row->chars);
-            row = row->next;
+        if (y == rows / 3) {
+            mvprintw(y, 0, "~");  
+        } else if (y == rows / 3 + 1) {
+            if (row) {
+                len = strlen(row->chars);
+                x = (cols - len) / 2;
+                if (x < 0) x = 0;  
+                mvprintw(y, x, "%s", row->chars);  /
+                row = row->next;
+            }
         } else {
-            int text_length = strlen("~");
-            int x = (cols - text_length) / 2;
-            mvprintw(y, x > 0 ? x : 0, "~");
+            mvprintw(y, 0, "~");
         }
     }
     refresh();

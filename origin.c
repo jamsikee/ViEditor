@@ -208,6 +208,7 @@ void init(){
 int main() {
     struct editorRow *row = NULL;
     init();
+    editorDrawRows(row);
     
     while (1) {
         presskey(&row);

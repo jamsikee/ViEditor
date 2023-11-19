@@ -99,7 +99,7 @@ void editorDrawRows(struct editorRow *row) {
                 len = strlen(row->chars);
                 x = (cols - len) / 2;
                 if (x < 0) x = 0;  
-                mvprintw(y, x, "%s", row->chars);  /
+                mvprintw(y, x, "%s", row->chars);  
                 row = row->next;
             }
         } else {

@@ -57,14 +57,31 @@ void Raw() {  // raw mode 기능 켜기
     atexit(disRaw);
 }
 
-struct editorRow *Append(struct editorRow *row, const char *s, int len) {
-    row = malloc(sizeof(struct editorRow));
-    row->chars = malloc(len + 1);
-    memcpy(row->chars, s, len);
-    row->chars[len] = '\0';
-    row->size = len;
-    row->next = NULL;
-    return row;
+void Append(struct editorRow **row, const char *s, int len) {
+    struct editorRow *newRow = malloc(sizeof(struct editorRow));
+    if (newRow == NULL) return;
+
+    newRow->chars = malloc(len + 1);
+    if (newRow->chars == NULL) {
+        free(newRow);
+        return;
+    }
+
+    memcpy(newRow->chars, s, len);
+    newRow->chars[len] = '\0';
+    newRow->size = len;
+    newRow->next = NULL;
+
+    if (*row == NULL) { // 비어 있으면 현재 행을 첫번쨰 행으로 인지
+        *row = newRow;
+        return;
+    }
+
+    struct editorRow *current = *row;
+    while (current->next != NULL) {  // 마지막 노드까지 찾아가기
+        current = current->next;
+    }
+    current->next = newRow; // 마지막 노드의 다음을 새로운 노드로 인지
 }
 
 struct editorRow *Insert(struct editorRow *row, const char *s, int len) {
@@ -86,29 +103,45 @@ void freeRow(struct editorRow *row) {
     }
 }
 
-void editorDrawRows() {
+void editorDrawRows(struct editorRow *ab) {
     int y, rows, cols;
     getmaxyx(stdscr, rows, cols);
     rows -= 2;
 
-    for (y = 0; y < rows; y++) {
-        if (y == rows / 3) {
-            char welcome[80];
-            int welcomelen = snprintf(welcome, sizeof(welcome),
-                                      "Visual Text editor -- version 0.0.1");
-            if (welcomelen > cols) welcomelen = cols;
-            int padding = (cols - welcomelen) / 2;
-            if (padding > 0) {
-                mvprintw(y, padding, "%s", welcome);
+    if (E.numrows == 0) {
+        for (y = 0; y < rows; y++) {
+            if (y == rows / 3) {
+                char welcome[80];
+                int welcomelen = snprintf(welcome, sizeof(welcome),
+                                          "Visual Text editor -- version %s", KILO_VERSION);
+                if (welcomelen > cols) welcomelen = cols;
+                int padding = (cols - welcomelen) / 2;
+                if (padding > 0) {
+                    Append(&ab, "~", 1);
+                    padding--;
+                }
+                while (padding--) Append(&ab, " ", 1);
+                Append(&ab, welcome, welcomelen);
+                break;
             } else {
-                mvprintw(y, 0, "%s", welcome);
+                Append(&ab, "~", 1);
             }
+        }
+    }
+
+    for (y = 0; y < rows; y++) {
+        if (ab && y == rows / 3) {
+            int text_length = strlen(ab->chars);
+            int x = (cols - text_length) / 2;
+            mvprintw(y, x > 0 ? x : 0, "%s", ab->chars);
+            ab = ab->next;
         } else {
             mvprintw(y, 0, "~");
         }
     }
     refresh();
 }
+
 
 
 void editorRefreshScreen(struct editorRow *row) {

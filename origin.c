@@ -29,7 +29,9 @@ struct Cursor {
     int rows;
     int cols;
     int currentrows;
-} typedef Cursor C;
+};
+
+struct Cursor C;
 
 struct editorRow {
     char *chars;

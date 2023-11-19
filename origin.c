@@ -167,7 +167,6 @@ void presskey(struct editorRow **row) {
         case CONTROL('q'):
             freeRow(*row);
             endwin();
-            disRaw();
             exit(0);
             break;
         case KEY_LEFT: // 왼쪽 화살표 키
@@ -201,7 +200,7 @@ void init(){
     initscr();
     Raw();
     getmaxyx(stdscr, C.rows, C.cols);
-    keypad(stdscr, TRUE);
+    
     C.x = 0;
     C.y = 0;
 }

@@ -108,12 +108,10 @@ void editorDrawRows(struct editorRow *ab) {
     getmaxyx(stdscr, rows, cols);
     rows -= 2;
 
-    if (E.numrows == 0) {
         for (y = 0; y < rows; y++) {
             if (y == rows / 3) {
                 char welcome[80];
-                int welcomelen = snprintf(welcome, sizeof(welcome),
-                                          "Visual Text editor -- version %s", KILO_VERSION);
+                int welcomelen = snprintf(welcome, sizeof(welcome),"Visual Text editor -- version 0.0.1");
                 if (welcomelen > cols) welcomelen = cols;
                 int padding = (cols - welcomelen) / 2;
                 if (padding > 0) {
@@ -127,7 +125,6 @@ void editorDrawRows(struct editorRow *ab) {
                 Append(&ab, "~", 1);
             }
         }
-    }
 
     for (y = 0; y < rows; y++) {
         if (ab && y == rows / 3) {

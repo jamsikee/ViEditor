@@ -200,7 +200,7 @@ void init(){
     initscr();
     getmaxyx(stdscr, C.rows, C.cols);
     keypad(stdscr, TRUE);
-    C.x = 0;
+    C.x = 1;
     C.y = 0;
 }
 

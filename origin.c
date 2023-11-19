@@ -9,7 +9,7 @@
 #include <ncurses.h>
 #include <signal.h>
 
-#define CONTROL(k) ((k) & 0x1f)  
+#define CONTROL(k) ((k) & 0x1f)
 
 struct termios orig_termios;
 
@@ -56,7 +56,7 @@ void Raw() {
     raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
     raw.c_cc[VMIN] = 0;
     raw.c_cc[VTIME] = 1;
-    
+
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
     atexit(disRaw);
 }
@@ -116,7 +116,7 @@ void editorDrawRows(struct editorRow *row) {
 
     if (C.rows / 3 >= 0 && C.rows / 3 < C.rows) {
         char welcome[80];
-        int welcomelen = snprintf(welcome, sizeof(welcome),"Visual Text editor -- version 0.0.1");
+        int welcomelen = snprintf(welcome, sizeof(welcome), "Visual Text editor -- version 0.0.1");
         if (welcomelen > C.cols) welcomelen = C.cols;
         int padding = (C.cols - welcomelen) / 2;
         mvprintw(C.rows / 3, padding > 0 ? padding : 0, "%s", welcome);
@@ -142,17 +142,17 @@ void Move(int key) {
             }
             break;
         case right:
-            if (C.x != C.cols - 1){
+            if (C.x != C.cols - 1) {
                 C.x++;
             }
             break;
         case up:
-             if (C.y != 0) {
+            if (C.y != 0) {
                 C.y--;
             }
             break;
         case down:
-             if (C.y != C.rows - 1) {
+            if (C.y != C.rows - 1) {
                 C.y++;
             }
             break;
@@ -182,26 +182,71 @@ void presskey(struct editorRow **row) {
             break;
         case KEY_NPAGE: // Page Down 키
         case KEY_PPAGE: // Page Up 키
-            {
-                int temprows = C.rows;
-                while (temprows--){
-                    if (c == KEY_PPAGE)
-                        Move(up);
-                    else if (c == KEY_NPAGE)
-                        Move(down);
-                }
+        {
+            int temprows = C.rows;
+            while (temprows--) {
+                if (c == KEY_PPAGE)
+                    Move(up);
+                else if (c == KEY_NPAGE)
+                    Move(down);
             }
-        break;
+        }
+            break;
         default:
             attron(A_REVERSE); // 흰색 바탕으로 설정
             move(C.y, C.x);
             addch(' '); // 현재 커서 위치에 공백 문자 출력
             attroff(A_REVERSE); // 흰색 바탕 해제
-        break;
+            break;
     }
 }
 
-void init(){
+void editorOpen(char *filename, struct editorRow **row) {
+    FILE *fp = fopen(filename, "r");
+    if (!fp) {
+        perror("fopen");
+        exit(1);
+    }
+
+    char *line = NULL;
+    size_t linecap = 0;
+    ssize_t linelen;
+
+    while ((linelen = getline(&line, &linecap, fp)) != -1) {
+        while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r')) {
+            linelen--;
+        }
+
+        struct editorRow *newRow = malloc(sizeof(struct editorRow));
+        if (!newRow) {
+            fclose(fp);
+            free(line);
+            exit(1);
+        }
+
+        newRow->chars = malloc(linelen + 1);
+        if (!newRow->chars) {
+            fclose(fp);
+            free(line);
+            free(newRow);
+            exit(1);
+        }
+
+        memcpy(newRow->chars, line, linelen);
+        newRow->chars[linelen] = '\0';
+        newRow->size = linelen;
+        newRow->next = NULL;
+
+        Append(row, newRow->chars, newRow->size);
+
+        C.currentrows++;
+    }
+
+    free(line);
+    fclose(fp);
+}
+
+void init() {
     Raw();
     initscr();
     getmaxyx(stdscr, C.rows, C.cols);
@@ -210,11 +255,17 @@ void init(){
     C.y = 0;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
     struct editorRow *row = NULL;
     init();
+    editorOpen(argv[1], &row);
     editorDrawRows(row);
-    
+
     while (1) {
         presskey(&row);
         editorDrawRows(row);

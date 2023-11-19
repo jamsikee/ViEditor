@@ -109,22 +109,21 @@ void editorDrawRows() {
     rows -= 2;
 
     for (y = 0; y < rows; y++) {
-        if (y == rows / 3) {
-            char welcome[80];
-            int welcomelen = snprintf(welcome, sizeof(welcome),
-                                      "Visual Text editor -- version 0.0.1");
-            if (welcomelen > cols) welcomelen = cols;
-            int padding = (cols - welcomelen) / 2;
-            if (padding) {
-                mvprintw(y, 0, "~");
-            }
-            mvprintw(y, 0, "%s", welcome);
-        } else {
-            mvprintw(y, 0, "~");
-        }
+        mvprintw(y, 0, "~"); // 전체적으로 ~을 그립니다.
     }
+
+    if (rows / 3 >= 0 && rows / 3 < rows) {
+        char welcome[80];
+        int welcomelen = snprintf(welcome, sizeof(welcome),
+                                  "Visual Text editor -- version 0.0.1");
+        if (welcomelen > cols) welcomelen = cols;
+        int padding = (cols - welcomelen) / 2;
+        mvprintw(rows / 3, padding > 0 ? padding : 0, "%s", welcome); // 중앙에 출력합니다.
+    }
+
     refresh();
 }
+
 
 
 void editorRefreshScreen(struct editorRow *row) {

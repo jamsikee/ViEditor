@@ -160,41 +160,42 @@ void Move(int key) {
     }
 }
 
-void presskey(struct editorRow **row) {
+void processKeyPress(struct editorRow **row) {
     int c = getch();
 
     switch (c) {
-    case CONTROL('q'):
-        freeRow(*row);
-        endwin();
-        exit(0);
-        break;
-    case left:
-    case right:
-    case up:
-    case down:
-        Move(c);
-        break;
-    case End:
-        C.x = C.cols - 1;
-        break;
-    case Home:
-        C.x = 0;
-        break;
-    case PgUp:
-    case PgDn:
-        {
-            int temprows = C.rows;
-            while (temprows--){
-                if (c == PgUp)
-                    Move(up);
-                else if (c == PgDn)
-                    Move(down);
+        case CONTROL('q'):
+            freeRow(*row);
+            endwin();
+            exit(0);
+            break;
+        case KEY_LEFT:
+        case KEY_RIGHT:
+        case KEY_UP:
+        case KEY_DOWN:
+            Move(c);
+            break;
+        case KEY_END:
+            C.x = C.cols - 1;
+            break;
+        case KEY_HOME:
+            C.x = 0;
+            break;
+        case KEY_PPAGE: // Page Up
+        case KEY_NPAGE: // Page Down
+            {
+                int temprows = C.rows;
+                while (temprows--){
+                    if (c == KEY_PPAGE)
+                        Move(up);
+                    else if (c == KEY_NPAGE)
+                        Move(down);
+                }
             }
-        }
-        break;
+            break;
     }
 }
+
 
 void init(){
     initscr();

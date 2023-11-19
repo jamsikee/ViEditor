@@ -201,7 +201,7 @@ void presskey(struct editorRow **row) {
     }
 }
 
-void editorOpen(char *filename) {
+void editorOpen(char *filename, struct editorRow **row) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
         perror("fopen");
@@ -261,7 +261,7 @@ int main(int argc, char *argv[]) {
     init();
     editorDrawRows(row);
     if (argc >= 2) {
-    editorOpen(argv[1]);
+    editorOpen(argv[1], &row);
     }
 
     while (1) {

@@ -8,7 +8,9 @@
 #include <ctype.h>
 #include <ncurses.h>
 #include <signal.h>
-#define CONTROL(k) ((k) & 0x1f)  // 문자의 아스키코드 지정 ctrl-A = 1
+
+#define CONTROL(k) ((k) & 0x1f)  
+
 struct termios orig_termios;
 
 enum P_key {
@@ -39,11 +41,11 @@ struct editorRow {
     struct editorRow *next;
 };
 
-void disRaw() {  // raw mode 기능 해제
+void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
 
-void Raw() {  // raw mode 기능 켜기
+void Raw() {
     struct termios raw;
     tcgetattr(STDIN_FILENO, &orig_termios);
     tcgetattr(STDIN_FILENO, &raw);
@@ -74,16 +76,16 @@ void Append(struct editorRow **row, const char *s, int len) {
     newRow->size = len;
     newRow->next = NULL;
 
-    if (*row == NULL) { // 비어 있으면 현재 행을 첫번쨰 행으로 인지
+    if (*row == NULL) {
         *row = newRow;
         return;
     }
 
     struct editorRow *current = *row;
-    while (current->next != NULL) {  // 마지막 노드까지 찾아가기
+    while (current->next != NULL) {
         current = current->next;
     }
-    current->next = newRow; // 마지막 노드의 다음을 새로운 노드로 인지
+    current->next = newRow;
 }
 
 struct editorRow *Insert(struct editorRow *row, const char *s, int len) {
@@ -105,30 +107,31 @@ void freeRow(struct editorRow *row) {
     }
 }
 
-void editorDrawRows() {
-    int y, rows, cols;
-    getmaxyx(stdscr, rows, cols);
-    rows -= 2;
-
-    for (y = 0; y < rows; y++) {
-        mvprintw(y, 0, "~"); // 전체적으로 ~을 그립니다.
+void editorDrawRows(struct editorRow *row) {
+    int y;
+    clear();
+    for (y = 0; y < C.rows; y++) {
+        mvprintw(y, 0, "~");
     }
 
-    if (rows / 3 >= 0 && rows / 3 < rows) {
+    if (C.rows / 3 >= 0 && C.rows / 3 < C.rows) {
         char welcome[80];
         int welcomelen = snprintf(welcome, sizeof(welcome),
                                   "Visual Text editor -- version 0.0.1");
-        if (welcomelen > cols) welcomelen = cols;
-        int padding = (cols - welcomelen) / 2;
-        mvprintw(rows / 3, padding > 0 ? padding : 0, "%s", welcome); // 중앙에 출력합니다.
+        if (welcomelen > C.cols) welcomelen = C.cols;
+        int padding = (C.cols - welcomelen) / 2;
+        mvprintw(C.rows / 3, padding > 0 ? padding : 0, "%s", welcome);
     }
-    refresh();
-}
 
-void editorRefreshScreen(struct editorRow *row) {
-    clear();
-    editorDrawRows(row);
-    move(0, 0);
+    struct editorRow *current = row;
+    int row_count = 0;
+    while (current != NULL && row_count < C.rows) {
+        mvprintw(row_count, 0, current->chars);
+        current = current->next;
+        row_count++;
+    }
+
+    move(C.y, C.x);
     refresh();
 }
 
@@ -140,7 +143,7 @@ void Move(int key) {
             }
             break;
         case right:
-            if (C.x != cols - 1){
+            if (C.x != C.cols - 1){
                 C.x++;
             }
             break;
@@ -150,7 +153,7 @@ void Move(int key) {
             }
             break;
         case down:
-             if (C.y != rows - 1) {
+             if (C.y != C.rows - 1) {
                 C.y++;
             }
             break;
@@ -164,19 +167,8 @@ void presskey(struct editorRow **row) {
     case CONTROL('q'):
         freeRow(*row);
         endwin();
-        exit(0); // 프로그램 종료
+        exit(0);
         break;
-        /*
-    case CONTROL('s'):
-        break;
-    case CONTROL('f'):
-        break;    
-        
-    case B_space:
-        break;
-    case Del:
-        break;
-        */
     case left:
     case right:
     case up:
@@ -184,7 +176,7 @@ void presskey(struct editorRow **row) {
         Move(c);
         break;
     case End:
-        C.x = cols - 1;
+        C.x = C.cols - 1;
         break;
     case Home:
         C.x = 0;
@@ -201,22 +193,24 @@ void presskey(struct editorRow **row) {
             }
         }
         break;
-    //default:
-        //break;
-        
     }
 }
 
-int main() {
-    Raw();
+void init(){
     initscr();
-    curs_set(1);
+    Raw();
+    getmaxyx(stdscr, C.rows, C.cols);
+    C.x = 0;
+    C.y = 0;
+}
 
+int main() {
     struct editorRow *row = NULL;
-    editorRefreshScreen(row);
+    init();
     
     while (1) {
         presskey(&row);
+        editorDrawRows(row);
     }
     return 0;
 }

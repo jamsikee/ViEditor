@@ -25,7 +25,7 @@ enum P_key {
 };
 
 struct Cursor {
-    int cx, cy;
+    int x, y;
     int rows;
     int cols;
     int currentrows;
@@ -135,39 +135,26 @@ void editorRefreshScreen(struct editorRow *row) {
 void Move(int key) {
     switch (key) {
         case left:
-            // Move cursor left
-            wmove(stdscr, getcury(stdscr), getcurx(stdscr) - 1);
+            if (C.x != 0) {
+                C.x--;
+            }
             break;
         case right:
-            // Move cursor right
-            wmove(stdscr, getcury(stdscr), getcurx(stdscr) + 1);
+            if (C.x != cols - 1){
+                C.x++;
+            }
             break;
         case up:
-            // Move cursor up
-            wmove(stdscr, getcury(stdscr) - 1, getcurx(stdscr));
+             if (C.y != 0) {
+                C.y--;
+            }
             break;
         case down:
-            // Move cursor down
-            wmove(stdscr, getcury(stdscr) + 1, getcurx(stdscr));
-            break;
-        case Home:
-            // Move cursor to the beginning of the line
-            wmove(stdscr, getcury(stdscr), 0);
-            break;
-        case End:
-            // Move cursor to the end of the line
-            wmove(stdscr, getcury(stdscr), COLS - 1);
-            break;
-        case PgUp:
-            // Move cursor up by the number of rows in the window
-            wmove(stdscr, getcury(stdscr) - LINES, getcurx(stdscr));
-            break;
-        case PgDn:
-            // Move cursor down by the number of rows in the window
-            wmove(stdscr, getcury(stdscr) + LINES, getcurx(stdscr));
+             if (C.y != rows - 1) {
+                C.y++;
+            }
             break;
     }
-    wrefresh(stdscr);
 }
 
 void presskey(struct editorRow **row) {
@@ -191,28 +178,28 @@ void presskey(struct editorRow **row) {
         break;
         */
     case left:
-        Move(left);
-        break;
     case right:
-        Move(right);
-        break;
     case up:
-        Move(up);
-        break;
     case down:
-        Move(down);
+        Move(c);
         break;
     case End:
-        Move(End);
+        C.x = cols - 1;
         break;
     case Home:
-        Move(Home);
+        C.x = 0;
         break;
     case PgUp:
-        Move(PgUp);
-        break;
     case PgDn:
-        Move(PgDn);
+        {
+            int temprows = C.rows;
+            while (temprows--){
+                if (c == PgUp)
+                    Move(up);
+                else if (c == PgDn)
+                    Move(down);
+            }
+        }
         break;
     //default:
         //break;
@@ -224,7 +211,7 @@ int main() {
     Raw();
     initscr();
     curs_set(1);
-    
+
     struct editorRow *row = NULL;
     editorRefreshScreen(row);
     

@@ -57,7 +57,7 @@ void Raw() {  // raw mode 기능 켜기
     atexit(disRaw);
 }
 
-struct editorRow *editorAppendRow(struct editorRow *row, const char *s, int len) {
+struct editorRow *Append(struct editorRow *row, const char *s, int len) {
     row = malloc(sizeof(struct editorRow));
     row->chars = malloc(len + 1);
     memcpy(row->chars, s, len);
@@ -67,7 +67,7 @@ struct editorRow *editorAppendRow(struct editorRow *row, const char *s, int len)
     return row;
 }
 
-struct editorRow *editorInsertRow(struct editorRow *row, const char *s, int len) {
+struct editorRow *Insert(struct editorRow *row, const char *s, int len) {
     struct editorRow *newRow = malloc(sizeof(struct editorRow));
     newRow->chars = malloc(len + 1);
     memcpy(newRow->chars, s, len);
@@ -77,7 +77,7 @@ struct editorRow *editorInsertRow(struct editorRow *row, const char *s, int len)
     return newRow;
 }
 
-void editorFreeRows(struct editorRow *row) {
+void free(struct editorRow *row) {
     while (row) {
         struct editorRow *temp = row->next;
         free(row->chars);
@@ -116,7 +116,7 @@ void presskey(struct editorRow **row) {
 
     switch (c) {
     case CONTROL('q'):
-        editorFreeRows(*row);
+        free(*row);
         endwin();
         exit(0); // 프로그램 종료
         break;
@@ -157,7 +157,7 @@ int main() {
     Raw();
     initscr();
     struct editorRow *row = NULL;
-    row = editorAppendRow(row, "visual text editor -- version 0.0.1", strlen("visual text editor -- version 0.0.1"));
+    row = Append(row, "visual text editor -- version 0.0.1", strlen("visual text editor -- version 0.0.1"));
     editorRefreshScreen(row);
     
     while (1) {

@@ -136,37 +136,38 @@ void Move(int key) {
     switch (key) {
         case left:
             // Move cursor left
-            move(getcury(stdscr), getcurx(stdscr) - 1);
+            wmove(stdscr, getcury(stdscr), getcurx(stdscr) - 1);
             break;
         case right:
             // Move cursor right
-            move(getcury(stdscr), getcurx(stdscr) + 1);
+            wmove(stdscr, getcury(stdscr), getcurx(stdscr) + 1);
             break;
         case up:
             // Move cursor up
-            move(getcury(stdscr) - 1, getcurx(stdscr));
+            wmove(stdscr, getcury(stdscr) - 1, getcurx(stdscr));
             break;
         case down:
             // Move cursor down
-            move(getcury(stdscr) + 1, getcurx(stdscr));
+            wmove(stdscr, getcury(stdscr) + 1, getcurx(stdscr));
             break;
         case Home:
             // Move cursor to the beginning of the line
-            move(getcury(stdscr), 0);
+            wmove(stdscr, getcury(stdscr), 0);
             break;
         case End:
             // Move cursor to the end of the line
-            move(getcury(stdscr), COLS - 1);
+            wmove(stdscr, getcury(stdscr), COLS - 1);
             break;
         case PgUp:
             // Move cursor up by the number of rows in the window
-            move(getcury(stdscr) - LINES, getcurx(stdscr));
+            wmove(stdscr, getcury(stdscr) - LINES, getcurx(stdscr));
             break;
         case PgDn:
             // Move cursor down by the number of rows in the window
-            move(getcury(stdscr) + LINES, getcurx(stdscr));
+            wmove(stdscr, getcury(stdscr) + LINES, getcurx(stdscr));
             break;
     }
+    wrefresh(stdscr);
 }
 
 void presskey(struct editorRow **row) {
@@ -222,6 +223,8 @@ void presskey(struct editorRow **row) {
 int main() {
     Raw();
     initscr();
+    curs_set(1);
+    
     struct editorRow *row = NULL;
     editorRefreshScreen(row);
     

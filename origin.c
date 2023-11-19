@@ -95,7 +95,7 @@ void editorDrawRows() {
         if (y == rows / 3) {
             char welcome[80];
             int welcomelen = snprintf(welcome, sizeof(welcome),
-                                      "Visual Text editor -- version %s", KILO_VERSION);
+                                      "Visual Text editor -- version 0.0.1");
             if (welcomelen > cols) welcomelen = cols;
             int padding = (cols - welcomelen) / 2;
             if (padding > 0) {

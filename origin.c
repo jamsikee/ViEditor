@@ -91,18 +91,21 @@ void editorDrawRows(struct editorRow *row) {
     getmaxyx(stdscr, rows, cols);
     rows -= 2;
 
-     for (y = 0; y < rows; y++) {
+    for (y = 0; y < rows; y++) {
         if (row && y == rows / 3) {
             int text_length = strlen(row->chars);
             int x = (cols - text_length) / 2;
             mvprintw(y, x > 0 ? x : 0, "%s", row->chars);
             row = row->next;
         } else {
-            mvprintw(y, 0, "~");
+            int text_length = strlen("~");
+            int x = (cols - text_length) / 2;
+            mvprintw(y, x > 0 ? x : 0, "~");
         }
     }
     refresh();
 }
+
 
 void editorRefreshScreen(struct editorRow *row) {
     clear();

@@ -197,10 +197,10 @@ void presskey(struct editorRow **row) {
 }
 
 void init(){
-    initscr();
     Raw();
+    initscr();
     getmaxyx(stdscr, C.rows, C.cols);
-    
+    keypad(stdscr, TRUE);
     C.x = 0;
     C.y = 0;
 }
@@ -211,7 +211,6 @@ int main() {
     
     while (1) {
         presskey(&row);
-        editorDrawRows(row);
     }
     return 0;
 }

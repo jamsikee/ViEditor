@@ -116,8 +116,7 @@ void editorDrawRows(struct editorRow *row) {
 
     if (C.rows / 3 >= 0 && C.rows / 3 < C.rows) {
         char welcome[80];
-        int welcomelen = snprintf(welcome, sizeof(welcome),
-                                  "Visual Text editor -- version 0.0.1");
+        int welcomelen = snprintf(welcome, sizeof(welcome),"Visual Text editor -- version 0.0.1");
         if (welcomelen > C.cols) welcomelen = C.cols;
         int padding = (C.cols - welcomelen) / 2;
         mvprintw(C.rows / 3, padding > 0 ? padding : 0, "%s", welcome);
@@ -192,7 +191,13 @@ void presskey(struct editorRow **row) {
                         Move(down);
                 }
             }
-            break;
+        break;
+        default:
+            attron(A_REVERSE); // 흰색 바탕으로 설정
+            move(C.y, C.x);
+            addch(' '); // 현재 커서 위치에 공백 문자 출력
+            attroff(A_REVERSE); // 흰색 바탕 해제
+        break;
     }
 }
 

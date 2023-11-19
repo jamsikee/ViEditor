@@ -86,21 +86,22 @@ void freeRow(struct editorRow *row) {
     }
 }
 
-void editorDrawRows(struct editorRow *row) {
-    int y, rows, cols, x, len;
+void editorDrawRows() {
+    int y, rows, cols;
     getmaxyx(stdscr, rows, cols);
     rows -= 2;
 
     for (y = 0; y < rows; y++) {
         if (y == rows / 3) {
-            mvprintw(y, 0, "~");  
-        } else if (y == rows / 3 + 1) {
-            if (row) {
-                len = strlen(row->chars);
-                x = (cols - len) / 2;
-                if (x < 0) x = 0;  
-                mvprintw(y, x, "%s", row->chars);  
-                row = row->next;
+            char welcome[80];
+            int welcomelen = snprintf(welcome, sizeof(welcome),
+                                      "Visual Text editor -- version %s", KILO_VERSION);
+            if (welcomelen > cols) welcomelen = cols;
+            int padding = (cols - welcomelen) / 2;
+            if (padding > 0) {
+                mvprintw(y, padding, "%s", welcome);
+            } else {
+                mvprintw(y, 0, "%s", welcome);
             }
         } else {
             mvprintw(y, 0, "~");
@@ -163,7 +164,6 @@ int main() {
     Raw();
     initscr();
     struct editorRow *row = NULL;
-    row = Append(row, "visual text editor -- version 0.0.1", strlen("visual text editor -- version 0.0.1"));
     editorRefreshScreen(row);
     
     while (1) {

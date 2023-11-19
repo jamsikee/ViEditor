@@ -160,7 +160,7 @@ void Move(int key) {
     }
 }
 
-void processKeyPress(struct editorRow **row) {
+void presskey(struct editorRow **row) {
     int c = getch();
 
     switch (c) {

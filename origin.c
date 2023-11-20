@@ -238,7 +238,7 @@ int main(int argc, char *argv[]) {
 
     while (1) {
         move(C.x, C.y); 
-        printw("%s", &gb.buf); 
+        printw("%c", &gb.buf); 
         presskey();
         editorDrawRows(&gb);
         refresh();

@@ -16,14 +16,14 @@ struct termios orig_termios;
 enum P_key {
     B_space = 127,
     left = 1000,
-    right,
-    up,
-    down,
-    Del,
-    End,
-    Home,
-    PgUp,
-    PgDn
+    right = 2000,
+    up = 3000,
+    down = 4000,
+    Del = 5000,
+    End = 6000,
+    Home = 7000,
+    PgUp = 8000,
+    PgDn = 9000
 };
 
 struct Cursor {
@@ -190,7 +190,7 @@ void presskey(struct gapbuf *gb) {
             break;
     }
 }
-
+/*
 void editorOpen(char *filename, struct gapbuf *gb) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
@@ -215,6 +215,7 @@ void editorOpen(char *filename, struct gapbuf *gb) {
     free(line);
     fclose(fp);
 }
+*/
 
 void init() {
     Raw();
@@ -233,15 +234,16 @@ int main(int argc, char *argv[]) {
 
     init();
     editorDrawRows(&gb);
+    /*
     if (argc >= 2) {
         editorOpen(argv[1], &gb);
     }
+    */
 
     while (1) {
         presskey(&gb);
         editorDrawRows(&gb);
     }
 
-    gapbufFree(&gb); // 프로그램 종료 전에 메모리 해제
     return 0;
 }

@@ -126,6 +126,7 @@ void editorDrawRows(struct gapbuf *gb) {
     }
     gapbufAppend(gb, "", 1);
     move(C.x, C.y); 
+    printw("%s", gb->buf);
     refresh(); 
 }
 
@@ -229,7 +230,7 @@ void init() {
 int main(int argc, char *argv[]) {
 
     struct gapbuf gb;
-    gapbufInit(&gb, 1024); // 예를 들어, 초기 사이즈를 1024로 설정
+    gapbufInit(&gb, 0); // 예를 들어, 초기 사이즈를 1024로 설정
 
     init();
     editorDrawRows(&gb);

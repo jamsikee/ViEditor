@@ -125,9 +125,6 @@ void editorDrawRows(struct gapbuf *gb) {
         }
     }
     gapbufAppend(gb, "", 1);
-    move(C.x, C.y); 
-    printw("%s", gb->buf);
-    refresh(); 
 }
 
 void Move(int key) {
@@ -240,8 +237,11 @@ int main(int argc, char *argv[]) {
     */
 
     while (1) {
+        move(C.x, C.y); 
+        printw("%s", &gb.buf); 
         presskey();
         editorDrawRows(&gb);
+        refresh();
     }
 
     return 0;

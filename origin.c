@@ -61,24 +61,32 @@ void Raw() {
     atexit(disRaw);
 }
 
-void abAppend(struct abuf *ab, const char *s, int len) {
-    char *new = malloc(ab->len + len + 1); // +1 for the null terminator
+void Append(struct editorRow **row, const char *s, int len) {
+    struct editorRow *newRow = malloc(sizeof(struct editorRow));
+    if (newRow == NULL) return;
 
-    if (new == NULL) return;
-    
-    // 버퍼에 있는 데이터 복사
-    if (ab->b != NULL) {
-        memcpy(new, ab->b, ab->len);
-        free(ab->b); // 이전 버퍼 해제
+    newRow->chars = malloc(len + 1);
+    if (newRow->chars == NULL) {
+        free(newRow);
+        return;
     }
 
-    // 새 데이터 추가
-    memcpy(&new[ab->len], s, len);
-    new[ab->len + len] = '\0';
-    ab->b = new;
-    ab->len += len;
-}
+    memcpy(newRow->chars, s, len);
+    newRow->chars[len] = '\0';
+    newRow->size = len;
+    newRow->next = NULL;
 
+    if (*row == NULL) {
+        *row = newRow;
+        return;
+    }
+
+    struct editorRow *current = *row;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    current->next = newRow;
+}
 
 struct editorRow *Insert(struct editorRow *row, const char *s, int len) {
     struct editorRow *newRow = malloc(sizeof(struct editorRow));
@@ -184,6 +192,12 @@ void presskey(struct editorRow **row) {
                     Move(down);
             }
         }
+            break;
+        default:
+            attron(A_REVERSE); // 흰색 바탕으로 설정
+            move(C.y, C.x);
+            addch(' '); // 현재 커서 위치에 공백 문자 출력
+            attroff(A_REVERSE); // 흰색 바탕 해제
             break;
     }
 }

@@ -191,7 +191,7 @@ void presskey(struct editorRow **row) {
     }
 }
 
-void editorOpen(char *filename, struct editorRow **row) {
+void editorOpen(char *filename, struct gapbuf *gb) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
         perror("fopen");
@@ -207,27 +207,7 @@ void editorOpen(char *filename, struct editorRow **row) {
             linelen--;
         }
 
-        struct editorRow *newRow = malloc(sizeof(struct editorRow));
-        if (!newRow) {
-            fclose(fp);
-            free(line);
-            exit(1);
-        }
-
-        newRow->chars = malloc(linelen + 1);
-        if (!newRow->chars) {
-            fclose(fp);
-            free(line);
-            free(newRow);
-            exit(1);
-        }
-
-        memcpy(newRow->chars, line, linelen);
-        newRow->chars[linelen] = '\0';
-        newRow->size = linelen;
-        newRow->next = NULL;
-
-        gapbufAppend(row, newRow->chars, newRow->size);
+        gapbufAppend(gb, line, linelen);
 
         C.currentrows++;
     }
@@ -248,16 +228,20 @@ void init() {
 
 int main(int argc, char *argv[]) {
 
-    struct editorRow *row = NULL;
+    struct gapbuf gb;
+    gapbufInit(&gb, 1024); // 예를 들어, 초기 사이즈를 1024로 설정
+
     init();
-    editorDrawRows(row);
+    editorDrawRows(&gb);
     if (argc >= 2) {
-    editorOpen(argv[1], &row);
+        editorOpen(argv[1], &gb);
     }
 
     while (1) {
-        presskey(&row);
-        editorDrawRows(row);
+        presskey(&gb);
+        editorDrawRows(&gb);
     }
+
+    gapbufFree(&gb); // 프로그램 종료 전에 메모리 해제
     return 0;
 }

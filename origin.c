@@ -155,12 +155,11 @@ void Move(int key) {
     }
 }
 
-void presskey(struct gapbuf *gb) {
+void presskey() {
     int c = getch();
 
     switch (c) {
         case CONTROL('q'):
-            gapbufFree(gb);
             endwin();
             exit(0);
             break;
@@ -230,7 +229,7 @@ void init() {
 int main(int argc, char *argv[]) {
 
     struct gapbuf gb;
-    gapbufInit(&gb, 0); // 예를 들어, 초기 사이즈를 1024로 설정
+    gapbufInit(&gb, 1024); // 예를 들어, 초기 사이즈를 1024로 설정
 
     init();
     editorDrawRows(&gb);
@@ -241,7 +240,7 @@ int main(int argc, char *argv[]) {
     */
 
     while (1) {
-        presskey(&gb);
+        presskey();
         editorDrawRows(&gb);
     }
 

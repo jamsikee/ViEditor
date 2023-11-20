@@ -16,14 +16,14 @@ struct termios orig_termios;
 enum P_key {
     B_space = 127,
     left = 1000,
-    right = 2000,
-    up = 3000,
-    down = 4000,
-    Del = 5000,
-    End = 6000,
-    Home = 7000,
-    PgUp = 8000,
-    PgDn = 9000
+    right,
+    up,
+    down,
+    Del,
+    End,
+    Home,
+    PgUp,
+    PgDn
 };
 
 struct Cursor {
@@ -40,14 +40,6 @@ struct editorRow {
     int size;
     struct editorRow *next;
 };
-
-struct gapbuf {
-    char *buf;
-    int size;
-    int gap_start;
-    int gap_end;
-};
-
 
 void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
@@ -69,63 +61,71 @@ void Raw() {
     atexit(disRaw);
 }
 
-void gapbufInit(struct gapbuf *gb, int size) {
-    gb->buf = malloc(size);
-    gb->size = size;
-    gb->gap_start = 0;
-    gb->gap_end = size - 1;
-}
+void abAppend(struct abuf *ab, const char *s, int len) {
+    char *new = malloc(ab->len + len + 1); // +1 for the null terminator
 
-void gapbufFree(struct gapbuf *gb) {
-    free(gb->buf);
-}
-
-void gapbufAppend(struct gapbuf *gb, const char *s, int len) {
-    // 필요한 만큼의 공간이 있는지 확인
-    if (len > (gb->size - (gb->gap_end - gb->gap_start + 1))) {
-        // 새로운 크기 계산
-        int new_size = gb->size + len - (gb->gap_end - gb->gap_start + 1);
-        char *new_buf = realloc(gb->buf, new_size);
-        if (new_buf == NULL) {
-            return; // 실패 시 처리
-        }
-
-        // Gap을 옮기지 않고 크기만 조정
-        gb->buf = new_buf;
-        gb->size = new_size;
-        gb->gap_end += len - (gb->gap_end - gb->gap_start + 1);
+    if (new == NULL) return;
+    
+    // 버퍼에 있는 데이터 복사
+    if (ab->b != NULL) {
+        memcpy(new, ab->b, ab->len);
+        free(ab->b); // 이전 버퍼 해제
     }
 
-    // Gap에 텍스트 복사
-    memmove(&gb->buf[gb->gap_start], s, len);
-    gb->gap_start += len;
+    // 새 데이터 추가
+    memcpy(&new[ab->len], s, len);
+    new[ab->len + len] = '\0';
+    ab->b = new;
+    ab->len += len;
 }
 
 
-void editorDrawRows(struct gapbuf *gb) {
+struct editorRow *Insert(struct editorRow *row, const char *s, int len) {
+    struct editorRow *newRow = malloc(sizeof(struct editorRow));
+    newRow->chars = malloc(len + 1);
+    memcpy(newRow->chars, s, len);
+    newRow->chars[len] = '\0';
+    newRow->size = len;
+    newRow->next = row;
+    return newRow;
+}
+
+void freeRow(struct editorRow *row) {
+    while (row) {
+        struct editorRow *temp = row->next;
+        free(row->chars);
+        free(row);
+        row = temp;
+    }
+}
+
+void editorDrawRows(struct editorRow *row) {
     int y;
+    clear();
     for (y = 0; y < C.rows; y++) {
-        if (y == C.rows / 3) {
-            char welcome[80];
-            int welcomelen = snprintf(welcome, sizeof(welcome), "Visual Text editor -- version 0.0.1");
-            if (welcomelen > C.cols) welcomelen = C.cols;
-            int padding = (C.cols - welcomelen) / 2;
-            if (padding) {
-                gapbufAppend(gb, "~", 1);
-                padding--;
-            }
-            while (padding--) gapbufAppend(gb, " ", 1);
-            gapbufAppend(gb, welcome, welcomelen);
-        } else {
-            gapbufAppend(gb, "~", 1);
-        }
-        gapbufAppend(gb, "\x1b[K", 3);
-        if (y < C.rows - 1) {
-            gapbufAppend(gb, "\r\n", 2);
-        }
+        mvprintw(y, 0, "~");
     }
-    gapbufAppend(gb, "", 1);
+
+    if (C.rows / 3 >= 0 && C.rows / 3 < C.rows && C.currentrows == 0) {
+        char welcome[80];
+        int welcomelen = snprintf(welcome, sizeof(welcome), "Visual Text editor -- version 0.0.1");
+        if (welcomelen > C.cols) welcomelen = C.cols;
+        int padding = (C.cols - welcomelen) / 2;
+        mvprintw(C.rows / 3, padding > 0 ? padding : 0, "%s", welcome);
+    }
+
+    struct editorRow *current = row;
+    int row_count = 0;
+    while (current != NULL && row_count < C.rows) {
+        mvprintw(row_count, 0, current->chars);
+        current = current->next;
+        row_count++;
+    }
+
+    move(C.y, C.x);
+    refresh();
 }
+
 
 void Move(int key) {
     switch (key) {
@@ -152,28 +152,29 @@ void Move(int key) {
     }
 }
 
-void presskey() {
+void presskey(struct editorRow **row) {
     int c = getch();
 
     switch (c) {
         case CONTROL('q'):
+            freeRow(*row);
             endwin();
             exit(0);
             break;
-        case KEY_LEFT: // Left Arrow
-        case KEY_RIGHT: // Right Arrow
-        case KEY_UP: // Up arrow
-        case KEY_DOWN: // Down arrow
+        case KEY_LEFT: // 왼쪽 화살표 키
+        case KEY_RIGHT: // 오른쪽 화살표 키
+        case KEY_UP: // 위쪽 화살표 키
+        case KEY_DOWN: // 아래쪽 화살표 키
             Move(c);
             break;
-        case KEY_END: // End 
+        case KEY_END: // End 키
             C.x = C.cols - 1;
             break;
-        case KEY_HOME: // Home 
+        case KEY_HOME: // Home 키
             C.x = 0;
             break;
-        case KEY_NPAGE: // Page Down 
-        case KEY_PPAGE: // Page Up 
+        case KEY_NPAGE: // Page Down 키
+        case KEY_PPAGE: // Page Up 키
         {
             int temprows = C.rows;
             while (temprows--) {
@@ -186,8 +187,8 @@ void presskey() {
             break;
     }
 }
-/*
-void editorOpen(char *filename, struct gapbuf *gb) {
+
+void editorOpen(char *filename, struct editorRow **row) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
         perror("fopen");
@@ -203,7 +204,27 @@ void editorOpen(char *filename, struct gapbuf *gb) {
             linelen--;
         }
 
-        gapbufAppend(gb, line, linelen);
+        struct editorRow *newRow = malloc(sizeof(struct editorRow));
+        if (!newRow) {
+            fclose(fp);
+            free(line);
+            exit(1);
+        }
+
+        newRow->chars = malloc(linelen + 1);
+        if (!newRow->chars) {
+            fclose(fp);
+            free(line);
+            free(newRow);
+            exit(1);
+        }
+
+        memcpy(newRow->chars, line, linelen);
+        newRow->chars[linelen] = '\0';
+        newRow->size = linelen;
+        newRow->next = NULL;
+
+        Append(row, newRow->chars, newRow->size);
 
         C.currentrows++;
     }
@@ -211,7 +232,6 @@ void editorOpen(char *filename, struct gapbuf *gb) {
     free(line);
     fclose(fp);
 }
-*/
 
 void init() {
     Raw();
@@ -225,24 +245,16 @@ void init() {
 
 int main(int argc, char *argv[]) {
 
-    struct gapbuf gb;
-    gapbufInit(&gb, 1024); // 예를 들어, 초기 사이즈를 1024로 설정
-
+    struct editorRow *row = NULL;
     init();
-    editorDrawRows(&gb);
-    /*
+    editorDrawRows(row);
     if (argc >= 2) {
-        editorOpen(argv[1], &gb);
+    editorOpen(argv[1], &row);
     }
-    */
 
     while (1) {
-        move(C.x, C.y); 
-        printw("%c", &gb.buf); 
-        presskey();
-        editorDrawRows(&gb);
-        refresh();
+        presskey(&row);
+        editorDrawRows(row);
     }
-
     return 0;
 }

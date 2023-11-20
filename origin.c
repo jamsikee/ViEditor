@@ -155,12 +155,12 @@ void Move(int key) {
     }
 }
 
-void presskey(struct editorRow **row) {
+void presskey(struct gapbuf *gb) {
     int c = getch();
 
     switch (c) {
         case CONTROL('q'):
-            freeRow(*row);
+            gapbufFree(gb);
             endwin();
             exit(0);
             break;

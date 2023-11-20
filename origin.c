@@ -123,9 +123,9 @@ void editorDrawRows(struct gapbuf *gb) {
             gapbufAppend(gb, "\r\n", 2);
         }
     }
-    gapbufAppend(gb, "", 0);
+    gapbufAppend(gb, "", 1);
     move(C.x, C.y); 
-    printw(gb->buf);
+    printw("%s", gb->buf);
     refresh(); 
 }
 

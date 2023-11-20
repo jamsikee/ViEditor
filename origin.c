@@ -81,25 +81,26 @@ void gapbufFree(struct gapbuf *gb) {
 }
 
 void gapbufAppend(struct gapbuf *gb, const char *s, int len) {
-    // Gap이 충분하지 않으면 확장해야 함
+    // 필요한 만큼의 공간이 있는지 확인
     if (len > (gb->size - (gb->gap_end - gb->gap_start + 1))) {
-        int new_size = gb->size + len;
+        // 새로운 크기 계산
+        int new_size = gb->size + len - (gb->gap_end - gb->gap_start + 1);
         char *new_buf = realloc(gb->buf, new_size);
         if (new_buf == NULL) {
             return; // 실패 시 처리
         }
 
-        // Gap을 옮기고 크기 조정
-        memmove(&new_buf[gb->gap_end + len + 1], &new_buf[gb->gap_end + 1], gb->size - gb->gap_end - 1);
+        // Gap을 옮기지 않고 크기만 조정
         gb->buf = new_buf;
         gb->size = new_size;
-        gb->gap_end += len;
+        gb->gap_end += len - (gb->gap_end - gb->gap_start + 1);
     }
 
     // Gap에 텍스트 복사
-    memcpy(&gb->buf[gb->gap_start], s, len);
+    memmove(&gb->buf[gb->gap_start], s, len);
     gb->gap_start += len;
 }
+
 
 void editorDrawRows(struct gapbuf *gb) {
     int y;
@@ -128,7 +129,6 @@ void editorDrawRows(struct gapbuf *gb) {
     printw("%s", gb->buf);
     refresh(); 
 }
-
 
 void Move(int key) {
     switch (key) {

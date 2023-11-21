@@ -134,6 +134,11 @@ void editorDrawRows(struct editorRow *row) {
     refresh();
 }
 
+void Refresh(struct editorRow *row){
+    editorDrawRows(row);
+    move(C.y, C.x);
+    refresh();
+}
 
 void Move(int key) {
     switch (key) {
@@ -192,12 +197,6 @@ void presskey(struct editorRow **row) {
                     Move(down);
             }
         }
-            break;
-        default:
-            attron(A_REVERSE); // 흰색 바탕으로 설정
-            move(C.y, C.x);
-            addch(' '); // 현재 커서 위치에 공백 문자 출력
-            attroff(A_REVERSE); // 흰색 바탕 해제
             break;
     }
 }
@@ -268,7 +267,7 @@ int main(int argc, char *argv[]) {
 
     while (1) {
         presskey(&row);
-        editorDrawRows(row);
+        Refresh(row);
     }
     return 0;
 }

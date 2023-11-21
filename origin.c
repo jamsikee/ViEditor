@@ -255,10 +255,14 @@ void init() {
     C.y = 0;
     C.currentrows = 0;
 
-    start_color(); // 컬러 모드 시작
-    init_pair(1, COLOR_WHITE, COLOR_BLACK); // 색상 초기화 (흰색 문자, 검은색 배경)
-    attron(COLOR_PAIR(1)); // 컬러 쌍 1을 활성화하여 문자 색상 설정
-    curs_set(2); // 커서를 가시적으로 보이도록 설정
+    if (has_colors()) {
+        start_color();
+        init_pair(1, COLOR_WHITE, COLOR_BLACK);
+        attron(COLOR_PAIR(1));
+        curs_set(2);
+    } else {
+        curs_set(1); // 컬러를 지원하지 않을 경우 기본적으로 커서를 보이게 설정
+    }
 }
 
 int main(int argc, char *argv[]) {

@@ -1,3 +1,4 @@
+#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,10 +7,10 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <ctype.h>
-#include <ncurses.h>
 #include <signal.h>
 
 #define CONTROL(k) ((k) & 0x1f)
+#define BUFF_INIT {NULL, 0}
 
 struct termios orig_termios;
 
@@ -35,14 +36,6 @@ struct Cursor {
 
 struct Cursor C;
 
-struct LineRow {
-    char *chars;
-    int size;
-    struct LineRow *next;
-    int row_position;
-};
-
-
 void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
@@ -63,55 +56,65 @@ void Raw() {
     atexit(disRaw);
 }
 
-struct LineRow *InsertRow(struct LineRow *row, const char *chars, int size, int position) {
-    struct LineRow *new_row = malloc(sizeof(struct LineRow));
-    new_row->chars = malloc(size + 1); // NULL 문자 고려
-    strncpy(new_row->chars, chars, size);
-    new_row->chars[size] = '\0';
-    new_row->size = size;
-    new_row->row_position = position;
-    new_row->next = NULL;
+struct buffer {
+    char *buf;
+    int len;
+};
 
-    if (!row) {
-        return new_row;
+void abAppend(struct buffer *buff, const char *string, int len) {
+    char *new = malloc(buff->len + len + 1);
+
+    if (new == NULL) return;
+
+    if (buff->buf != NULL) {
+        memcpy(new, buff->buf, buff->len);
+        free(buff->buf);
     }
 
-    struct LineRow *current = row;
-    while (current->next) {
-        current = current->next;
-    }
-
-    current->next = new_row;
-    return row;
+    memcpy(&new[buff->len], string, len); // ab -> buff로 수정
+    new[buff->len + len] = '\0';
+    buff->buf = new;
+    buff->len += len;
 }
 
-void UpdateRowPositions(struct LineRow *row) {
-    int position = 0;
-    struct LineRow *current = row;
-    while (current) {
-        current->row_position = position;
-        position++;
-        current = current->next;
-    }
+void abFree(struct buffer *buff) {
+    free(buff->buf);
+    buff->buf = NULL;
+    buff->len = 0;
 }
 
-void editorDrawRows(struct LineRow *row) {
-    int y = 0;
-    struct LineRow *current = row;
-    while (current) {
-        if (y >= C.rows) {
-            break;
+void editorDrawRows() {
+    int y;
+    for (y = 0; y < LINES; y++) {
+        if (y == LINES / 3) {
+            char welcome[80];
+            int welcomelen = snprintf(welcome, sizeof(welcome),
+                                      "Kilo editor -- version %s", KILO_VERSION);
+            if (welcomelen > COLS) welcomelen = COLS;
+            int padding = (COLS - welcomelen) / 2;
+            if (padding) {
+                mvprintw(y, 0, "%*s~", padding - 1, "");
+                padding--;
+            }
+            mvprintw(y, padding, "%s", welcome);
+        } else {
+            mvprintw(y, 0, "~");
         }
-        mvprintw(y, 0, "%s", current->chars);
-        current = current->next;
-        y++;
+        clrtoeol(); // Clear to the end of line
     }
 }
 
-void Refresh(struct LineRow *row){
-    editorDrawRows(row);
-    move(C.y, C.x);
-    refresh();
+void editorRefreshScreen() {
+    initscr(); // Initialize ncurses mode
+    clear(); // Clear the screen
+
+    editorDrawRows(); // Draw the rows
+
+    move(C.y, C.x); // Move the cursor
+    refresh(); // Refresh the screen
+    getch(); // Wait for a key press
+
+    endwin(); // End ncurses mode
 }
 
 void Move(int key) {
@@ -144,30 +147,27 @@ void presskey(struct LineRow **row) {
 
     switch (c) {
         case CONTROL('q'):
-            freeRow(*row);
             endwin();
-            exit(0);
+            disRaw();
+            exit(1);
             break;
-        case KEY_LEFT: // 왼쪽 화살표 키
-        case KEY_RIGHT: // 오른쪽 화살표 키
-        case KEY_UP: // 위쪽 화살표 키
-        case KEY_DOWN: // 아래쪽 화살표 키
+        case KEY_LEFT: // Left arrow key
+        case KEY_RIGHT: // Right arrow key
+        case KEY_UP: // Up arrow key
+        case KEY_DOWN: // Down arrow key
             Move(c);
             break;
-        case KEY_END: // End 키
+        case KEY_END: // End key
             C.x = C.cols - 1;
             break;
-        case KEY_HOME: // Home 키
+        case KEY_HOME: // Home key
             C.x = 0;
             break;
-        case '\n': // Enter 키
-            row = InsertRow(row, "", 0, C.y + 1);
-            Move(down);
-            C.x = 0;
-            UpdateRowPositions(row);
+        case '\n': // Enter key
+            // Add your logic for handling Enter key here
             break;
-        case KEY_NPAGE: // Page Down 키
-        case KEY_PPAGE: // Page Up 키
+        case KEY_NPAGE: // Page Down key
+        case KEY_PPAGE: // Page Up key
         {
             int temprows = C.rows;
             while (temprows--) {
@@ -181,8 +181,6 @@ void presskey(struct LineRow **row) {
     }
 }
 
-
-
 void init() {
     Raw();
     initscr();
@@ -191,21 +189,19 @@ void init() {
     C.x = 0;
     C.y = 0;
     C.currentrows = 0;
-
 }
 
 int main(int argc, char *argv[]) {
-
     struct LineRow *row = NULL;
     init();
     editorDrawRows(row);
     if (argc >= 2) {
-    editorOpen(argv[1], &row);
+        editorOpen(argv[1], &row);
     }
 
     while (1) {
         presskey(&row);
-        Refresh(row);
+        editorRefreshScreen();
     }
     return 0;
 }

@@ -35,10 +35,10 @@ struct Cursor {
 
 struct Cursor C;
 
-struct editorRow {
+struct LineRow {
     char *chars;
     int size;
-    struct editorRow *next;
+    struct LineRow *next;
 };
 
 void disRaw() {
@@ -61,8 +61,8 @@ void Raw() {
     atexit(disRaw);
 }
 
-void Append(struct editorRow **row, const char *s, int len) {
-    struct editorRow *newRow = malloc(sizeof(struct editorRow));
+void Append(struct LineRow **row, const char *s, int len) {
+    struct LineRow *newRow = malloc(sizeof(struct LineRow));
     if (newRow == NULL) return;
 
     newRow->chars = malloc(len + 1);
@@ -81,15 +81,15 @@ void Append(struct editorRow **row, const char *s, int len) {
         return;
     }
 
-    struct editorRow *current = *row;
+    struct LineRow *current = *row;
     while (current->next != NULL) {
         current = current->next;
     }
     current->next = newRow;
 }
 
-struct editorRow *Insert(struct editorRow *row, const char *s, int len) {
-    struct editorRow *newRow = malloc(sizeof(struct editorRow));
+struct LineRow *Insert(struct LineRow *row, const char *s, int len) {
+    struct LineRow *newRow = malloc(sizeof(struct LineRow));
     newRow->chars = malloc(len + 1);
     memcpy(newRow->chars, s, len);
     newRow->chars[len] = '\0';
@@ -98,16 +98,16 @@ struct editorRow *Insert(struct editorRow *row, const char *s, int len) {
     return newRow;
 }
 
-void freeRow(struct editorRow *row) {
+void freeRow(struct LineRow *row) {
     while (row) {
-        struct editorRow *temp = row->next;
+        struct LineRow *temp = row->next;
         free(row->chars);
         free(row);
         row = temp;
     }
 }
 
-void editorDrawRows(struct editorRow *row) {
+void editorDrawRows(struct LineRow *row) {
     int y;
     clear();
     for (y = 0; y < C.rows; y++) {
@@ -122,7 +122,7 @@ void editorDrawRows(struct editorRow *row) {
         mvprintw(C.rows / 3, padding > 0 ? padding : 0, "%s", welcome);
     }
 
-    struct editorRow *current = row;
+    struct LineRow *current = row;
     int row_count = 0;
     while (current != NULL && row_count < C.rows) {
         mvprintw(row_count, 0, current->chars);
@@ -134,7 +134,7 @@ void editorDrawRows(struct editorRow *row) {
     refresh();
 }
 
-void Refresh(struct editorRow *row){
+void Refresh(struct LineRow *row){
     editorDrawRows(row);
     move(C.y, C.x);
     refresh();
@@ -165,7 +165,7 @@ void Move(int key) {
     }
 }
 
-void presskey(struct editorRow **row) {
+void presskey(struct LineRow **row) {
     int c = getch();
 
     switch (c) {
@@ -201,7 +201,7 @@ void presskey(struct editorRow **row) {
     }
 }
 
-void editorOpen(char *filename, struct editorRow **row) {
+void editorOpen(char *filename, struct LineRow **row) {
     FILE *fp = fopen(filename, "r");
     if (!fp) {
         perror("fopen");
@@ -217,7 +217,7 @@ void editorOpen(char *filename, struct editorRow **row) {
             linelen--;
         }
 
-        struct editorRow *newRow = malloc(sizeof(struct editorRow));
+        struct LineRow *newRow = malloc(sizeof(struct LineRow));
         if (!newRow) {
             fclose(fp);
             free(line);
@@ -258,7 +258,7 @@ void init() {
 
 int main(int argc, char *argv[]) {
 
-    struct editorRow *row = NULL;
+    struct LineRow *row = NULL;
     init();
     editorDrawRows(row);
     if (argc >= 2) {

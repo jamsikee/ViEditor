@@ -186,6 +186,11 @@ void presskey(struct LineRow **row) {
         case KEY_HOME: // Home 키
             C.x = 0;
             break;
+        case '\n': // Enter 키
+            *row = Insert(*row, "", 0);
+            Move(down);
+            C.x = 0;
+            break;
         case KEY_NPAGE: // Page Down 키
         case KEY_PPAGE: // Page Up 키
         {
@@ -255,14 +260,6 @@ void init() {
     C.y = 0;
     C.currentrows = 0;
 
-    if (has_colors()) {
-        start_color();
-        init_pair(1, COLOR_WHITE, COLOR_BLACK);
-        attron(COLOR_PAIR(1));
-        curs_set(2);
-    } else {
-        curs_set(1); // 컬러를 지원하지 않을 경우 기본적으로 커서를 보이게 설정
-    }
 }
 
 int main(int argc, char *argv[]) {

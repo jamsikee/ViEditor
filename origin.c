@@ -129,13 +129,20 @@ void editorDrawRows(struct LineRow *row) {
         current = current->next;
         row_count++;
     }
+}
 
-    move(C.y, C.x);
-    refresh();
+void editorDrawRowContents(struct LineRow *row) {
+    int y = 0;
+    for (struct LineRow *current = row; current != NULL; current = current->next) {
+        mvprintw(y, 0, current->chars);
+        y++;
+        if (y >= C.rows) break;
+    }
 }
 
 void Refresh(struct LineRow *row){
-    editorDrawRows(row);
+    clear();
+    editorDrawRowContents(row);
     move(C.y, C.x);
     refresh();
 }

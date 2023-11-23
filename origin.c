@@ -45,6 +45,16 @@ void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
 
+void editorRowDelChar();
+void editorInsertNewline();
+void editorDelchar();
+void editorInsertchar();
+void editorRowAppendString();
+void editorRowInsertChar();
+void editorDelRow();
+void editorFreeRow();
+void editorInsertRow();
+
 void Raw() {
     struct termios raw;
     tcgetattr(STDIN_FILENO, &orig_termios);
@@ -61,51 +71,6 @@ void Raw() {
     atexit(disRaw);
 }
 
-void Append(struct editorRow **row, const char *s, int len) {
-    struct editorRow *newRow = malloc(sizeof(struct editorRow));
-    if (newRow == NULL) return;
-
-    newRow->chars = malloc(len + 1);
-    if (newRow->chars == NULL) {
-        free(newRow);
-        return;
-    }
-
-    memcpy(newRow->chars, s, len);
-    newRow->chars[len] = '\0';
-    newRow->size = len;
-    newRow->next = NULL;
-
-    if (*row == NULL) {
-        *row = newRow;
-        return;
-    }
-
-    struct editorRow *current = *row;
-    while (current->next != NULL) {
-        current = current->next;
-    }
-    current->next = newRow;
-}
-
-struct editorRow *Insert(struct editorRow *row, const char *s, int len) {
-    struct editorRow *newRow = malloc(sizeof(struct editorRow));
-    newRow->chars = malloc(len + 1);
-    memcpy(newRow->chars, s, len);
-    newRow->chars[len] = '\0';
-    newRow->size = len;
-    newRow->next = row;
-    return newRow;
-}
-
-void freeRow(struct editorRow *row) {
-    while (row) {
-        struct editorRow *temp = row->next;
-        free(row->chars);
-        free(row);
-        row = temp;
-    }
-}
 
 void editorDrawRows(struct editorRow *row) {
     int y;
@@ -169,6 +134,10 @@ void presskey(struct editorRow **row) {
             endwin();
             exit(0);
             break;
+        case CONTROL('s'):
+            break;
+        case CONTROL('f'):
+            break;
         case KEY_LEFT: // 왼쪽 화살표 키
         case KEY_RIGHT: // 오른쪽 화살표 키
         case KEY_UP: // 위쪽 화살표 키
@@ -193,59 +162,17 @@ void presskey(struct editorRow **row) {
             }
         }
             break;
+        case KEY_ENTER:
+        case '\n':
+            break;
+        case Key_DC:
+            break;
+        case KEY_BACKSPACE:
         default:
-            attron(A_REVERSE); // 흰색 바탕으로 설정
-            move(C.y, C.x);
-            addch(' '); // 현재 커서 위치에 공백 문자 출력
-            attroff(A_REVERSE); // 흰색 바탕 해제
             break;
     }
 }
 
-void editorOpen(char *filename, struct editorRow **row) {
-    FILE *fp = fopen(filename, "r");
-    if (!fp) {
-        perror("fopen");
-        exit(1);
-    }
-
-    char *line = NULL;
-    size_t linecap = 0;
-    ssize_t linelen;
-
-    while ((linelen = getline(&line, &linecap, fp)) != -1) {
-        while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r')) {
-            linelen--;
-        }
-
-        struct editorRow *newRow = malloc(sizeof(struct editorRow));
-        if (!newRow) {
-            fclose(fp);
-            free(line);
-            exit(1);
-        }
-
-        newRow->chars = malloc(linelen + 1);
-        if (!newRow->chars) {
-            fclose(fp);
-            free(line);
-            free(newRow);
-            exit(1);
-        }
-
-        memcpy(newRow->chars, line, linelen);
-        newRow->chars[linelen] = '\0';
-        newRow->size = linelen;
-        newRow->next = NULL;
-
-        Append(row, newRow->chars, newRow->size);
-
-        C.currentrows++;
-    }
-
-    free(line);
-    fclose(fp);
-}
 
 void init() {
     Raw();
@@ -262,9 +189,6 @@ int main(int argc, char *argv[]) {
     struct editorRow *row = NULL;
     init();
     editorDrawRows(row);
-    if (argc >= 2) {
-    editorOpen(argv[1], &row);
-    }
 
     while (1) {
         presskey(&row);

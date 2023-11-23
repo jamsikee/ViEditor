@@ -1,4 +1,3 @@
-#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,10 +6,10 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <ctype.h>
+#include <ncurses.h>
 #include <signal.h>
 
 #define CONTROL(k) ((k) & 0x1f)
-#define BUFF_INIT {NULL, 0}
 
 struct termios orig_termios;
 
@@ -36,6 +35,12 @@ struct Cursor {
 
 struct Cursor C;
 
+struct editorRow {
+    char *chars;
+    int size;
+    struct editorRow *next;
+};
+
 void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
@@ -56,66 +61,79 @@ void Raw() {
     atexit(disRaw);
 }
 
-struct buffer {
-    char *buf;
-    int len;
-};
+void Append(struct editorRow **row, const char *s, int len) {
+    struct editorRow *newRow = malloc(sizeof(struct editorRow));
+    if (newRow == NULL) return;
 
-void abAppend(struct buffer *buff, const char *string, int len) {
-    char *new = malloc(buff->len + len + 1);
-
-    if (new == NULL) return;
-
-    if (buff->buf != NULL) {
-        memcpy(new, buff->buf, buff->len);
-        free(buff->buf);
+    newRow->chars = malloc(len + 1);
+    if (newRow->chars == NULL) {
+        free(newRow);
+        return;
     }
 
-    memcpy(&new[buff->len], string, len); // ab -> buff로 수정
-    new[buff->len + len] = '\0';
-    buff->buf = new;
-    buff->len += len;
+    memcpy(newRow->chars, s, len);
+    newRow->chars[len] = '\0';
+    newRow->size = len;
+    newRow->next = NULL;
+
+    if (*row == NULL) {
+        *row = newRow;
+        return;
+    }
+
+    struct editorRow *current = *row;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    current->next = newRow;
 }
 
-void abFree(struct buffer *buff) {
-    free(buff->buf);
-    buff->buf = NULL;
-    buff->len = 0;
+struct editorRow *Insert(struct editorRow *row, const char *s, int len) {
+    struct editorRow *newRow = malloc(sizeof(struct editorRow));
+    newRow->chars = malloc(len + 1);
+    memcpy(newRow->chars, s, len);
+    newRow->chars[len] = '\0';
+    newRow->size = len;
+    newRow->next = row;
+    return newRow;
 }
 
-void editorDrawRows() {
+void freeRow(struct editorRow *row) {
+    while (row) {
+        struct editorRow *temp = row->next;
+        free(row->chars);
+        free(row);
+        row = temp;
+    }
+}
+
+void editorDrawRows(struct editorRow *row) {
     int y;
-    for (y = 0; y < LINES; y++) {
-        if (y == LINES / 3) {
-            char welcome[80];
-            int welcomelen = snprintf(welcome, sizeof(welcome),
-                                      "Kilo editor -- version %s", KILO_VERSION);
-            if (welcomelen > COLS) welcomelen = COLS;
-            int padding = (COLS - welcomelen) / 2;
-            if (padding) {
-                mvprintw(y, 0, "%*s~", padding - 1, "");
-                padding--;
-            }
-            mvprintw(y, padding, "%s", welcome);
-        } else {
-            mvprintw(y, 0, "~");
-        }
-        clrtoeol(); // Clear to the end of line
+    clear();
+    for (y = 0; y < C.rows; y++) {
+        mvprintw(y, 0, "~");
     }
+
+    if (C.rows / 3 >= 0 && C.rows / 3 < C.rows && C.currentrows == 0) {
+        char welcome[80];
+        int welcomelen = snprintf(welcome, sizeof(welcome), "Visual Text editor -- version 0.0.1");
+        if (welcomelen > C.cols) welcomelen = C.cols;
+        int padding = (C.cols - welcomelen) / 2;
+        mvprintw(C.rows / 3, padding > 0 ? padding : 0, "%s", welcome);
+    }
+
+    struct editorRow *current = row;
+    int row_count = 0;
+    while (current != NULL && row_count < C.rows) {
+        mvprintw(row_count, 0, current->chars);
+        current = current->next;
+        row_count++;
+    }
+
+    move(C.y, C.x);
+    refresh();
 }
 
-void editorRefreshScreen() {
-    initscr(); // Initialize ncurses mode
-    clear(); // Clear the screen
-
-    editorDrawRows(); // Draw the rows
-
-    move(C.y, C.x); // Move the cursor
-    refresh(); // Refresh the screen
-    getch(); // Wait for a key press
-
-    endwin(); // End ncurses mode
-}
 
 void Move(int key) {
     switch (key) {
@@ -142,32 +160,29 @@ void Move(int key) {
     }
 }
 
-void presskey(struct LineRow **row) {
+void presskey(struct editorRow **row) {
     int c = getch();
 
     switch (c) {
         case CONTROL('q'):
+            freeRow(*row);
             endwin();
-            disRaw();
-            exit(1);
+            exit(0);
             break;
-        case KEY_LEFT: // Left arrow key
-        case KEY_RIGHT: // Right arrow key
-        case KEY_UP: // Up arrow key
-        case KEY_DOWN: // Down arrow key
+        case KEY_LEFT: // 왼쪽 화살표 키
+        case KEY_RIGHT: // 오른쪽 화살표 키
+        case KEY_UP: // 위쪽 화살표 키
+        case KEY_DOWN: // 아래쪽 화살표 키
             Move(c);
             break;
-        case KEY_END: // End key
+        case KEY_END: // End 키
             C.x = C.cols - 1;
             break;
-        case KEY_HOME: // Home key
+        case KEY_HOME: // Home 키
             C.x = 0;
             break;
-        case '\n': // Enter key
-            // Add your logic for handling Enter key here
-            break;
-        case KEY_NPAGE: // Page Down key
-        case KEY_PPAGE: // Page Up key
+        case KEY_NPAGE: // Page Down 키
+        case KEY_PPAGE: // Page Up 키
         {
             int temprows = C.rows;
             while (temprows--) {
@@ -178,7 +193,58 @@ void presskey(struct LineRow **row) {
             }
         }
             break;
+        default:
+            attron(A_REVERSE); // 흰색 바탕으로 설정
+            move(C.y, C.x);
+            addch(' '); // 현재 커서 위치에 공백 문자 출력
+            attroff(A_REVERSE); // 흰색 바탕 해제
+            break;
     }
+}
+
+void editorOpen(char *filename, struct editorRow **row) {
+    FILE *fp = fopen(filename, "r");
+    if (!fp) {
+        perror("fopen");
+        exit(1);
+    }
+
+    char *line = NULL;
+    size_t linecap = 0;
+    ssize_t linelen;
+
+    while ((linelen = getline(&line, &linecap, fp)) != -1) {
+        while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r')) {
+            linelen--;
+        }
+
+        struct editorRow *newRow = malloc(sizeof(struct editorRow));
+        if (!newRow) {
+            fclose(fp);
+            free(line);
+            exit(1);
+        }
+
+        newRow->chars = malloc(linelen + 1);
+        if (!newRow->chars) {
+            fclose(fp);
+            free(line);
+            free(newRow);
+            exit(1);
+        }
+
+        memcpy(newRow->chars, line, linelen);
+        newRow->chars[linelen] = '\0';
+        newRow->size = linelen;
+        newRow->next = NULL;
+
+        Append(row, newRow->chars, newRow->size);
+
+        C.currentrows++;
+    }
+
+    free(line);
+    fclose(fp);
 }
 
 void init() {
@@ -192,16 +258,17 @@ void init() {
 }
 
 int main(int argc, char *argv[]) {
-    struct LineRow *row = NULL;
+
+    struct editorRow *row = NULL;
     init();
     editorDrawRows(row);
     if (argc >= 2) {
-        editorOpen(argv[1], &row);
+    editorOpen(argv[1], &row);
     }
 
     while (1) {
         presskey(&row);
-        editorRefreshScreen();
+        editorDrawRows(row);
     }
     return 0;
 }

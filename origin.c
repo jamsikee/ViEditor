@@ -25,17 +25,19 @@ struct Cursor {
     int rows;
     int cols;
     int totalrows;
+    Row *row;
 };
 
 struct Cursor C;
 
-struct editorRow {
+struct Row {
+    int index;
     char *chars;
     int size;
-    struct editorRow *next;
-};
+    struct Row *next;
+} Row;
 
-struct editorRow *editorRows = NULL;
+struct Row *editorRows = NULL;
 
 void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
@@ -58,7 +60,7 @@ void Raw() {
 }
 
 
-void editorDrawRows(struct editorRow *row) {
+void editorDrawRows(struct Row *row) {
     int y;
     clear();
     for (y = 0; y < C.rows; y++) {
@@ -73,7 +75,7 @@ void editorDrawRows(struct editorRow *row) {
         mvprintw(C.rows / 3, padding > 0 ? padding : 0, "%s", welcome);
     }
 
-    struct editorRow *current = row;
+    struct Row *current = row;
     int row_count = 0;
     while (current != NULL && row_count < C.rows) {
         mvprintw(row_count, 0, current->chars);
@@ -84,134 +86,117 @@ void editorDrawRows(struct editorRow *row) {
     move(C.y, C.x);
     refresh();
 }
+
 void editorInsertRow(int at, char *s, size_t len) {
-    if (at < 0 || at > C.totalrows) return;
+  if (at < 0 || at > C.totalrows) return;
 
-    struct editorRow *newRow = (struct editorRow *)malloc(sizeof(struct editorRow));
-    newRow->size = len;
-    newRow->chars = (char *)malloc(len + 1);
-    memcpy(newRow->chars, s, len);
-    newRow->chars[len] = '\0';
-    newRow->next = NULL;
+  Row *new_row = (Row*)malloc(sizeof(Row));
+  new_row->idx = at;
+  new_row->size = len;
+  new_row->chars = malloc(len + 1);
+  memcpy(new_row->chars, s, len);
+  new_row->chars[len] = '\0';
+  new_row->next = NULL;
 
-    if (at == 0) {
-        newRow->next = editorRows;
-        editorRows = newRow;
-    } else {
-        struct editorRow *prevRow = editorRows;
-        for (int i = 0; i < at - 1; ++i) {
-            prevRow = prevRow->next;
-        }
-        newRow->next = prevRow->next;
-        prevRow->next = newRow;
+  if (C.row == NULL) {
+    C.row = new_row;
+  } else {
+    Row *current = C.row;
+    for (int i = 0; i < at - 1; i++) {
+      current = current->next;
     }
+    new_row->next = current->next;
+    current->next = new_row;
+  }
 
-    C.totalrows++;
+  C.totalrows++;
 }
 
-void editorFreeRow(struct editorRow *row) {
-    free(row->chars);
-    free(row);
+void editorFreRow(Row *row) {
+  free(row->chars);
+  free(row);
 }
 
 void editorDelRow(int at) {
-    if (at < 0 || at >= C.totalrows) return;
-
-    struct editorRow *temp = editorRows;
-
-    if (at == 0) {
-        editorRows = editorRows->next;
-        editorFreeRow(temp);
-    } else {
-        struct editorRow *prevRow = editorRows;
-        for (int i = 0; i < at - 1; ++i) {
-            prevRow = prevRow->next;
-        }
-        temp = prevRow->next;
-        prevRow->next = temp->next;
-        editorFreeRow(temp);
-    }
-
-    C.totalrows--;
+  if (at < 0 || at >= C.totalrows) return;
+  Row *current = C.row;
+  Row *prev = NULL;
+  for (int i = 0; i < at; i++) {
+    prev = current;
+    current = current->next;
+  }
+  if (prev == NULL) {
+    C.row = current->next;
+  } else {
+    prev->next = current->next;
+  }
+  editorFreRow(current);
+  C.totalrows--;
 }
 
-void editorRowInsertChar(struct editorRow *row, int at, int c) {
-    if (at < 0 || at > row->size) at = row->size;
-
-    row->chars = realloc(row->chars, row->size + 2);
-    memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1);
-
-    row->size++;
-    row->chars[at] = c;
+void editorRowInsertChar(Row *row, int at, int c) {
+  if (at < 0 || at > row->size) at = row->size;
+  row->chars = realloc(row->chars, row->size + 2);
+  memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1);
+  row->size++;
+  row->chars[at] = c;
 }
 
-void editorRowAppendString(struct editorRow *row, char *s, size_t len) {
-    row->chars = realloc(row->chars, row->size + len + 1);
-    memcpy(&row->chars[row->size], s, len);
-    row->size += len;
-    row->chars[row->size] = '\0';
+void editorRowAppendString(Row *row, char *s, size_t len) {
+  row->chars = realloc(row->chars, row->size + len + 1);
+  memcpy(&row->chars[row->size], s, len);
+  row->size += len;
+  row->chars[row->size] = '\0';
 }
 
-void editorRowDelChar(struct editorRow *row, int at) {
-    if (at < 0 || at >= row->size) return;
-
-    memmove(&row->chars[at], &row->chars[at + 1], row->size - at);
-    row->size--;
+void editorRowDelChar(Row *row, int at) {
+  if (at < 0 || at >= row->size) return;
+  memmove(&row->chars[at], &row->chars[at + 1], row->size - at);
+  row->size--;
 }
 
 void editorInsertChar(int c) {
-    if (C.y == C.totalrows) {
-        editorInsertRow(C.totalrows, "", 0);
-    }
-    editorRowInsertChar(editorRows, C.x, c);
-    C.x++;
+  if (C.y == C.totalrows) {
+    editorInsertRow(C.totalrows, "", 0);
+  }
+  editorRowInsertChar(&C.row[C.y], C.x, c);
+  C.x++;
 }
 
 void editorInsertNewline() {
-    if (C.x == 0) {
-        editorInsertRow(C.y, "", 0);
-    } else {
-        struct editorRow *row = editorRows;
-        for (int i = 0; i < C.y; ++i) {
-            row = row->next;
-        }
-        editorInsertRow(C.y + 1, &row->chars[C.x], row->size - C.x);
-        row = editorRows;
-        for (int i = 0; i <= C.y; ++i) {
-            row = row->next;
-        }
-        row->size = C.x;
-        row->chars[row->size] = '\0';
-    }
-    C.y++;
-    C.x = 0;
+  if (C.x == 0) {
+    editorInsertRow(C.y, "", 0);
+  } else {
+    Row *row = &C.row[C.y];
+    editorInsertRow(C.y + 1, &row->chars[C.x], row->size - C.x);
+    row = &C.row[C.y];
+    row->size = C.x;
+    row->chars[row->size] = '\0';
+  }
+  C.y++;
+  C.x = 0;
 }
 
 void editorDelChar() {
-    if (C.y == C.totalrows) return;
-    if (C.x == 0 && C.x == 0) return;
+  if (C.y == C.totalrows) return;
+  if (C.x == 0 && C.y == 0) return;
 
-    struct editorRow *row = editorRows;
-    for (int i = 0; i < C.y; ++i) {
-        row = row->next;
-    }
-
-    if (C.x > 0) {
-        editorRowDelChar(row, C.x - 1);
-        C.x--;
-    } else {
-        C.x = row->size;
-        editorRowAppendString(row, &row->chars[0], row->size);
-        editorDelRow(C.y);
-        C.y--;
-    }
+  Row *row = &C.row[C.y];
+  if (C.x > 0) {
+    editorRowDelChar(row, C.x - 1);
+    C.x--;
+  } else {
+    C.x = C.row[C.y - 1].size;
+    editorRowAppendString(&C.row[C.y - 1], row->chars, row->size);
+    editorDelRow(C.y);
+    C.y--;
+  }
 }
-
 
 
 void Move(int key) {
     
-    struct editorRow *row = editorRows;
+    struct Row *row = editorRows;
     for (int i = 0; i < C.y; ++i) {
         row = row->next;
     }
@@ -247,7 +232,7 @@ void Move(int key) {
 }
 
 
-void presskey(struct editorRow **row) {
+void presskey(struct Row **row) {
     int c = getch();
 
     switch (c) {
@@ -323,7 +308,7 @@ void init() {
 
 int main(int argc, char *argv[]) {
 
-    struct editorRow *row = NULL;
+    struct Row *row = NULL;
     init();
     editorDrawRows(row);
 

@@ -14,23 +14,17 @@
 struct termios orig_termios;
 
 enum P_key {
-    B_space = 127,
     left = 1000,
     right,
     up,
-    down,
-    Del,
-    End,
-    Home,
-    PgUp,
-    PgDn
+    down
 };
 
 struct Cursor {
     int x, y;
     int rows;
     int cols;
-    int currentrows;
+    int totalrows;
 };
 
 struct Cursor C;
@@ -40,6 +34,8 @@ struct editorRow {
     int size;
     struct editorRow *next;
 };
+
+struct editorRow *editorRows = NULL;
 
 void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
@@ -54,6 +50,8 @@ void editorRowInsertChar();
 void editorDelRow();
 void editorFreeRow();
 void editorInsertRow();
+
+
 
 
 void Raw() {
@@ -99,18 +97,149 @@ void editorDrawRows(struct editorRow *row) {
     move(C.y, C.x);
     refresh();
 }
+void editorInsertRow(int at, char *s, size_t len) {
+    if (at < 0 || at > C.totalrows) return;
+
+    struct editorRow *newRow = (struct editorRow *)malloc(sizeof(struct editorRow));
+    newRow->size = len;
+    newRow->chars = (char *)malloc(len + 1);
+    memcpy(newRow->chars, s, len);
+    newRow->chars[len] = '\0';
+    newRow->next = NULL;
+
+    if (at == 0) {
+        newRow->next = editorRows;
+        editorRows = newRow;
+    } else {
+        struct editorRow *prevRow = editorRows;
+        for (int i = 0; i < at - 1; ++i) {
+            prevRow = prevRow->next;
+        }
+        newRow->next = prevRow->next;
+        prevRow->next = newRow;
+    }
+
+    C.totalrows++;
+}
+
+void editorFreeRow(struct editorRow *row) {
+    free(row->chars);
+    free(row);
+}
+
+void editorDelRow(int at) {
+    if (at < 0 || at >= C.totalrows) return;
+
+    struct editorRow *temp = editorRows;
+
+    if (at == 0) {
+        editorRows = editorRows->next;
+        editorFreeRow(temp);
+    } else {
+        struct editorRow *prevRow = editorRows;
+        for (int i = 0; i < at - 1; ++i) {
+            prevRow = prevRow->next;
+        }
+        temp = prevRow->next;
+        prevRow->next = temp->next;
+        editorFreeRow(temp);
+    }
+
+    C.totalrows--;
+}
+
+void editorRowInsertChar(struct editorRow *row, int at, int c) {
+    if (at < 0 || at > row->size) at = row->size;
+
+    row->chars = realloc(row->chars, row->size + 2);
+    memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1);
+
+    row->size++;
+    row->chars[at] = c;
+}
+
+void editorRowAppendString(struct editorRow *row, char *s, size_t len) {
+    row->chars = realloc(row->chars, row->size + len + 1);
+    memcpy(&row->chars[row->size], s, len);
+    row->size += len;
+    row->chars[row->size] = '\0';
+}
+
+void editorRowDelChar(struct editorRow *row, int at) {
+    if (at < 0 || at >= row->size) return;
+
+    memmove(&row->chars[at], &row->chars[at + 1], row->size - at);
+    row->size--;
+}
+
+void editorInsertChar(int c) {
+    if (C.y == C.totalrows) {
+        editorInsertRow(C.totalrows, "", 0);
+    }
+    editorRowInsertChar(editorRows, C.x, c);
+    C.x++;
+}
+
+void editorInsertNewline() {
+    if (C.x == 0) {
+        editorInsertRow(C.y, "", 0);
+    } else {
+        struct editorRow *row = editorRows;
+        for (int i = 0; i < C.y; ++i) {
+            row = row->next;
+        }
+        editorInsertRow(C.y + 1, &row->chars[C.x], row->size - C.x);
+        row = editorRows;
+        for (int i = 0; i <= C.y; ++i) {
+            row = row->next;
+        }
+        row->size = C.x;
+        row->chars[row->size] = '\0';
+    }
+    C.y++;
+    C.x = 0;
+}
+
+void editorDelChar() {
+    if (C.y == C.totalrows) return;
+    if (C.x == 0 && C.x == 0) return;
+
+    struct editorRow *row = editorRows;
+    for (int i = 0; i < C.y; ++i) {
+        row = row->next;
+    }
+
+    if (C.x > 0) {
+        editorRowDelChar(row, C.x - 1);
+        C.x--;
+    } else {
+        C.x = row->size;
+        editorRowAppendString(row, &row->chars[0], row->size);
+        editorDelRow(C.y);
+        C.y--;
+    }
+}
+
 
 
 void Move(int key) {
+    erow *row = (C.y >= C.totalrows) ? NULL : &editorRows[C.y];
+
     switch (key) {
         case left:
             if (C.x != 0) {
                 C.x--;
+            } else if (C.y > 0) {
+                C.y--;
+                C.x = editorRows[C.y].size;
             }
             break;
         case right:
-            if (C.x != C.cols - 1) {
+            if (row && C.x < row->size) {
                 C.x++;
+            } else if (row && C.x == row->size) {
+                C.y++;
+                C.x = 0;
             }
             break;
         case up:
@@ -119,12 +248,13 @@ void Move(int key) {
             }
             break;
         case down:
-            if (C.y != C.rows - 1) {
+            if (C.y < C.totalrows) {
                 C.y++;
             }
             break;
     }
 }
+
 
 void presskey(struct editorRow **row) {
     int c = getch();
@@ -134,22 +264,28 @@ void presskey(struct editorRow **row) {
             endwin();
             exit(0);
             break;
+
         case CONTROL('s'):
             break;
+
         case CONTROL('f'):
             break;
+
         case KEY_LEFT: // 왼쪽 화살표 키
         case KEY_RIGHT: // 오른쪽 화살표 키
         case KEY_UP: // 위쪽 화살표 키
         case KEY_DOWN: // 아래쪽 화살표 키
             Move(c);
             break;
+            
         case KEY_END: // End 키
             C.x = C.cols - 1;
             break;
+
         case KEY_HOME: // Home 키
             C.x = 0;
             break;
+
         case KEY_NPAGE: // Page Down 키
         case KEY_PPAGE: // Page Up 키
         {
@@ -162,13 +298,23 @@ void presskey(struct editorRow **row) {
             }
         }
             break;
+
         case KEY_ENTER:
         case '\n':
+            editorInsertNewline();
             break;
+
         case KEY_DC:
+            Move(right);
+            editorDelChar();
             break;
+
         case KEY_BACKSPACE:
+            editorDelChar();
+            break;
+
         default:
+            editorInsertChar(c);
             break;
     }
 }
@@ -181,7 +327,7 @@ void init() {
     keypad(stdscr, TRUE);
     C.x = 0;
     C.y = 0;
-    C.currentrows = 0;
+    C.totalrows = 0;
 }
 
 int main(int argc, char *argv[]) {

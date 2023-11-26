@@ -103,12 +103,17 @@ void editorInsertRow(int at, char *s, size_t len) {
     for (int i = 0; i < at - 1; i++) {
       current = current->next;
     }
-    new_row->next = current->next;
-    current->next = new_row;
+    if (current->next != NULL) {
+      new_row->next = current->next;
+      current->next = new_row;
+    } else {
+      current->next = new_row;
+    }
   }
 
   C.totalrows++;
 }
+
 
 void editorFreRow(Row *row) {
   free(row->chars);

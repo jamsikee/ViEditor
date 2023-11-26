@@ -37,8 +37,6 @@ struct Row {
     struct Row *next;
 } Row;
 
-struct Row *editorRows = NULL;
-
 void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }

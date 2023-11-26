@@ -89,7 +89,7 @@ void editorInsertRow(int at, char *s, size_t len) {
   if (at < 0 || at > C.totalrows) return;
 
   Row *new_row = (Row*)malloc(sizeof(Row));
-  new_row->idx = at;
+  new_row->index = at;
   new_row->size = len;
   new_row->chars = malloc(len + 1);
   memcpy(new_row->chars, s, len);
@@ -194,7 +194,7 @@ void editorDelChar() {
 
 void Move(int key) {
     
-    struct Row *row = editorRows;
+    Row *row = C.row;
     for (int i = 0; i < C.y; ++i) {
         row = row->next;
     }
@@ -205,7 +205,11 @@ void Move(int key) {
                 C.x--;
             } else if (C.y > 0) {
                 C.y--;
-                C.x = editorRows[C.y].size;
+                Row *prev_row = C.row;
+                for (int i = 0; i < C.y - 1; ++i) {
+                    prev_row = prev_row->next;
+                }
+                C.x = prev_row->size;
             }
             break;
         case right:
@@ -228,6 +232,7 @@ void Move(int key) {
             break;
     }
 }
+
 
 
 void presskey(struct Row **row) {

@@ -223,7 +223,6 @@ void editorDelChar() {
 
 
 void Move(int key) {
-    erow *row = (C.y >= C.totalrows) ? NULL : &editorRows[C.y];
 
     switch (key) {
         case left:

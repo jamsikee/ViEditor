@@ -78,7 +78,7 @@ void editorDrawRows(struct editorRow *row) {
         mvprintw(y, 0, "~");
     }
 
-    if (C.rows / 3 >= 0 && C.rows / 3 < C.rows && C.currentrows == 0) {
+    if (C.rows / 3 >= 0 && C.rows / 3 < C.rows && C.totalrows == 0) {
         char welcome[80];
         int welcomelen = snprintf(welcome, sizeof(welcome), "Visual Text editor -- version 0.0.1");
         if (welcomelen > C.cols) welcomelen = C.cols;
@@ -223,6 +223,11 @@ void editorDelChar() {
 
 
 void Move(int key) {
+    
+    struct editorRow *row = editorRows;
+    for (int i = 0; i < C.y; ++i) {
+        row = row->next;
+    }
 
     switch (key) {
         case left:

@@ -30,7 +30,7 @@ struct Cursor {
 
 struct Cursor C;
 
-struct Row {
+typedef struct Row {
     int index;
     char *chars;
     int size;

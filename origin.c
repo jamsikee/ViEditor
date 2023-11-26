@@ -20,6 +20,13 @@ enum P_key {
     down
 };
 
+typedef struct Row {
+    int index;
+    char *chars;
+    int size;
+    struct Row *next;
+} Row;
+
 struct Cursor {
     int x, y;
     int rows;
@@ -29,13 +36,6 @@ struct Cursor {
 };
 
 struct Cursor C;
-
-typedef struct Row {
-    int index;
-    char *chars;
-    int size;
-    struct Row *next;
-} Row;
 
 void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);

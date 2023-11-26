@@ -55,6 +55,7 @@ void editorDelRow();
 void editorFreeRow();
 void editorInsertRow();
 
+
 void Raw() {
     struct termios raw;
     tcgetattr(STDIN_FILENO, &orig_termios);

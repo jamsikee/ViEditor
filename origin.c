@@ -131,7 +131,6 @@ void presskey(struct editorRow **row) {
 
     switch (c) {
         case CONTROL('q'):
-            freeRow(*row);
             endwin();
             exit(0);
             break;
@@ -166,7 +165,7 @@ void presskey(struct editorRow **row) {
         case KEY_ENTER:
         case '\n':
             break;
-        case Key_DC:
+        case KEY_DC:
             break;
         case KEY_BACKSPACE:
         default:

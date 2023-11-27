@@ -207,121 +207,113 @@ void update_render_row(editor_row *row) {
 }
 
 void insert_editor_row_at(int at_y, char *line, ssize_t line_length) {
-  if (at_y < 0 || at_y > EDITOR.number_of_rows)
+  if (at_y < 0 || at_y > EDITOR_number_of_rows)
     return;
 
-  EDITOR.row =
-      realloc(EDITOR.row, sizeof(editor_row) * (EDITOR.number_of_rows + 1));
-  memmove(&EDITOR.row[at_y + 1], &EDITOR.row[at_y],
-          sizeof(editor_row) * (EDITOR.number_of_rows - at_y));
+  EDITOR_row = realloc(EDITOR_row, sizeof(editor_row) * (EDITOR_number_of_rows + 1));
 
-  EDITOR.row[at_y].size = line_length;
-  EDITOR.row[at_y].chars = malloc(line_length + 1);
-  memcpy(EDITOR.row[at_y].chars, line, line_length);
-  EDITOR.row[at_y].chars[line_length] = '\0';
-  EDITOR.number_of_rows++;
+  for (int i = EDITOR_number_of_rows; i > at_y; i--) {
+    EDITOR_row[i] = EDITOR_row[i - 1];
+  }
 
-  EDITOR.row[at_y].render_size = 0;
-  EDITOR.row[at_y].render = NULL;
-  update_render_row(&EDITOR.row[at_y]);
-
-  EDITOR.file_modified = true;
+  EDITOR_row[at_y].size = line_length;
+  EDITOR_row[at_y].chars = malloc(line_length + 1);
+  strncpy(EDITOR_row[at_y].chars, line, line_length);
+  EDITOR_row[at_y].chars[line_length] = '\0';
+  EDITOR_number_of_rows++;
 }
 
 void insert_char_in_row(editor_row *row, int at, int c) {
   if (at < 0 || at > row->size)
     at = row->size;
   row->chars = realloc(row->chars, row->size + 2);
-  memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1);
+
+  for (int i = row->size; i > at; i--) {
+    row->chars[i] = row->chars[i - 1];
+  }
+
   row->size++;
   row->chars[at] = c;
-  update_render_row(row);
-
-  EDITOR.file_modified = true;
 }
 
 void append_string_to_row(editor_row *row, char *string, size_t length) {
   row->chars = realloc(row->chars, row->size + length + 1);
-  memcpy(&row->chars[row->size], string, length);
+  strncpy(&row->chars[row->size], string, length);
   row->size += length;
   row->chars[row->size] = '\0';
-
-  update_render_row(row);
-  EDITOR.file_modified = true;
 }
 
 void delete_char_in_row(editor_row *row, int at) {
   if (at < 0 || at >= row->size)
     return;
-  memmove(&row->chars[at], &row->chars[at + 1], row->size - at);
+
+  for (int i = at; i < row->size; i++) {
+    row->chars[i] = row->chars[i + 1];
+  }
+
   row->size--;
-  update_render_row(row);
-  EDITOR.file_modified = true;
 }
 
 void free_row(editor_row *row) {
   free(row->chars);
-  free(row->render);
 }
 
 void delete_row(int at) {
-  if (at < 0 || at >= EDITOR.number_of_rows)
+  if (at < 0 || at >= EDITOR_number_of_rows)
     return;
 
-  free_row(&EDITOR.row[at]);
-  memmove(&EDITOR.row[at], &EDITOR.row[at + 1],
-          sizeof(editor_row) * (EDITOR.number_of_rows - at - 1));
-  EDITOR.number_of_rows--;
-  EDITOR.file_modified = true;
+  free_row(&EDITOR_row[at]);
+
+  for (int i = at; i < EDITOR_number_of_rows - 1; i++) {
+    EDITOR_row[i] = EDITOR_row[i + 1];
+  }
 }
 
 /* editor operations */
 void insert_char(int c) {
-  if (EDITOR.cursor_y == EDITOR.number_of_rows) {
-    insert_editor_row_at(EDITOR.number_of_rows, "", 0);
+  if (EDITOR_cursor_y == EDITOR_number_of_rows) {
+    insert_editor_row_at(EDITOR_number_of_rows, "", 0);
   }
-  insert_char_in_row(&EDITOR.row[EDITOR.cursor_y], EDITOR.cursor_x, c);
-  EDITOR.cursor_x++;
+  insert_char_in_row(&EDITOR_row[EDITOR_cursor_y], EDITOR_cursor_x, c);
+  EDITOR_cursor_x++;
 }
 
 void insert_new_line() {
-  if (EDITOR.cursor_x == 0) {
-    insert_editor_row_at(EDITOR.cursor_y, "", 0);
+  if (EDITOR_cursor_x == 0) {
+    insert_editor_row_at(EDITOR_cursor_y, "", 0);
   } else {
-    editor_row *row = &EDITOR.row[EDITOR.cursor_y];
-    insert_editor_row_at(EDITOR.cursor_y + 1, &row->chars[EDITOR.cursor_x],
-                         row->size - EDITOR.cursor_x);
+    editor_row *row = &EDITOR_row[EDITOR_cursor_y];
+    insert_editor_row_at(EDITOR_cursor_y + 1, &row->chars[EDITOR_cursor_x],
+                         row->size - EDITOR_cursor_x);
 
-    row = &EDITOR.row[EDITOR.cursor_y];
-    row->size = EDITOR.cursor_x;
+    row = &EDITOR_row[EDITOR_cursor_y];
+    row->size = EDITOR_cursor_x;
     row->chars[row->size] = '\0';
-    update_render_row(row);
   }
 
-  EDITOR.cursor_y++;
-  EDITOR.cursor_x = 0;
+  EDITOR_cursor_y++;
+  EDITOR_cursor_x = 0;
 }
 
 void delete_char() {
-  if (EDITOR.cursor_y == EDITOR.number_of_rows)
+  if (EDITOR_cursor_y == EDITOR_number_of_rows)
     return;
 
-  if (EDITOR.cursor_x == 0 && EDITOR.cursor_y == 0)
+  if (EDITOR_cursor_x == 0 && EDITOR_cursor_y == 0)
     return;
 
-  editor_row *row = &EDITOR.row[EDITOR.cursor_y];
-  if (EDITOR.cursor_x > 0) {
-    delete_char_in_row(row, EDITOR.cursor_x - 1);
-    EDITOR.cursor_x--;
+  editor_row *row = &EDITOR_row[EDITOR_cursor_y];
+  if (EDITOR_cursor_x > 0) {
+    delete_char_in_row(row, EDITOR_cursor_x - 1);
+    EDITOR_cursor_x--;
   } else {
-    EDITOR.cursor_x = EDITOR.row[EDITOR.cursor_y - 1].size;
-    append_string_to_row(&EDITOR.row[EDITOR.cursor_y - 1], row->chars,
+    EDITOR_cursor_x = EDITOR_row[EDITOR_cursor_y - 1].size;
+    append_string_to_row(&EDITOR_row[EDITOR_cursor_y - 1], row->chars,
                          row->size);
-    delete_row(EDITOR.cursor_y);
-    EDITOR.cursor_y--;
+    delete_row(EDITOR_cursor_y);
+    EDITOR_cursor_y--;
   }
 }
-
 /* file i/o */
 
 char *editor_row_to_string(int *buffer_length) {

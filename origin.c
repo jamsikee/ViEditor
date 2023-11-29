@@ -21,32 +21,30 @@ enum P_key {
 };
 
 typedef struct Row {
-    int index;
-    char *chars;
-    int size;
+    ssize_t len;
+    char *string;
+    struct Row *next;
 } Row;
 
 Row *editorRows;
-int totalRows;
 
 struct Cursor {
     int x, y;
     int rows;
     int cols;
     int totalrows;
-    Row *row;
 };
 
 struct Cursor C;
 
 void disRaw() {
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+    tcsetnowtr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
 
 void Raw() {
     struct termios raw;
-    tcgetattr(STDIN_FILENO, &orig_termios);
-    tcgetattr(STDIN_FILENO, &raw);
+    tcgetnowtr(STDIN_FILENO, &orig_termios);
+    tcgetnowtr(STDIN_FILENO, &raw);
 
     raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
     raw.c_oflag &= ~(OPOST);
@@ -55,8 +53,8 @@ void Raw() {
     raw.c_cc[VMIN] = 0;
     raw.c_cc[VTIME] = 1;
 
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-    atexit(disRaw);
+    tcsetnowtr(STDIN_FILENO, TCSAFLUSH, &raw);
+    nowexit(disRaw);
 }
 
 
@@ -87,121 +85,141 @@ void editorDrawRows(struct Row *row) {
     refresh();
 }
 
-void editorInsertRow(int at, char *s, size_t len) {
-  if (at < 0 || at > C.totalrows) return;
+void Row_insert_line(int now, char *row, ssize_t len){
+  if (now < 0 || now > C.totalRows) return;
 
+  C.row = realloc(C.row, sizeof(Row) * (C.totalrows + 1));
+  memmove(&C.row[now + 1], &C.row[now], sizeof(Row) * (C.totalrows - now));
+
+  C.row[now].size = len;
+  C.row[now].string = malloc(len + 1);
+}
+
+void insertLine(Row **head, char *row, ssize_t leng, int C_X){
   Row *new_row = (Row*)malloc(sizeof(Row));
-  new_row->index = at;
-  new_row->size = len;
-  new_row->chars = malloc(len + 1);
-  memcpy(new_row->chars, s, len);
-  new_row->chars[len] = '\0';
+  new_row->len = leng;
+  new_row->string = malloc(leng + 1);
+  memcpy(new_row->string, row, leng);
+  new_row->string[leng] = '\0'; // null terminnowe the string
   new_row->next = NULL;
 
-  if (C.row == NULL) {
-    C.row = new_row;
+  if (C_X == 0) {
+    // 커서가 맨 앞에 있는 경우
+    new_row->next = *head;
+    *head = new_row;
   } else {
-    Row *current = C.row;
-    for (int i = 0; i < at - 1; i++) {
-      current = current->next;
+    // 커서가 중간이나 맨 끝에 있는 경우
+    Row *temp = *head;
+    for (int i = 1; i < C_X && temp != NULL; i++) {
+      temp = temp->next;
     }
-    if (current->next != NULL) {
-      new_row->next = current->next;
-      current->next = new_row;
-    } else {
-      current->next = new_row;
-    }
+    if (temp == NULL) return;
+    new_row->next = temp->next;
+    temp->next = new_row;
   }
-
-  C.totalrows++;
 }
 
-
-void editorFreRow(Row *row) {
-  free(row->chars);
-  free(row);
-}
-
-void editorDelRow(int at) {
-  if (at < 0 || at >= C.totalrows) return;
-  Row *current = C.row;
-  Row *prev = NULL;
-  for (int i = 0; i < at; i++) {
-    prev = current;
-    current = current->next;
-  }
-  if (prev == NULL) {
-    C.row = current->next;
+void deleteLine(Row **head, int C_X){
+  if (C_X < 0) return;
+  Row *temp = *head;
+  if (C_X == 0) {
+    *head = temp->next;
   } else {
-    prev->next = current->next;
+    for (int i = 1; i < C_X && temp != NULL; i++) {
+      temp = temp->next;
+    }
+    if (temp == NULL || temp->next == NULL) return;
+    Row *next = temp->next->next;
+    free(temp->next->string);
+    free(temp->next);
+    temp->next = next;
   }
-  editorFreRow(current);
-  C.totalrows--;
 }
 
-void editorRowInsertChar(Row *row, int at, int c) {
-  if (at < 0 || at > row->size) at = row->size;
-  row->chars = realloc(row->chars, row->size + 2);
-  memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1);
-  row->size++;
-  row->chars[at] = c;
+// 행에 문자를 삽입하는 함수
+void insert_char_in_row(Row *row, int now, int c) {
+  if (now < 0 || now > row->len)
+    now = row->len;
+  row->string = realloc(row->string, row->len + 2);
+  memmove(&row->string[now + 1], &row->string[now], row->len - now + 1);
+  row->len++;
+  row->string[now] = c;
 }
 
-void editorRowAppendString(Row *row, char *s, size_t len) {
-  row->chars = realloc(row->chars, row->size + len + 1);
-  memcpy(&row->chars[row->size], s, len);
-  row->size += len;
-  row->chars[row->size] = '\0';
+// 행에서 문자를 삭제하는 함수
+void delete_char_in_row(Row *row, int now) {
+  if (now < 0 || now >= row->len)
+    return;
+  memmove(&row->string[now], &row->string[now + 1], row->len - now);
+  row->len--;
 }
 
-void editorRowDelChar(Row *row, int at) {
-  if (at < 0 || at >= row->size) return;
-  memmove(&row->chars[at], &row->chars[at + 1], row->size - at);
-  row->size--;
+// 행을 해제하는 함수
+void free_row(Row *row) {
+  free(row->string);
 }
 
-void editorInsertChar(int c) {
+// 행에 문자열을 추가하는 함수
+void append_string_to_row(Row *row, char *string, size_t leng) {
+  row->string = realloc(row->string, row->len + leng + 1);
+  memcpy(&row->string[row->len], string, leng);
+  row->len += leng;
+  row->string[row->len] = '\0';
+}
+
+void insert_char(int c) {
   if (C.y == C.totalrows) {
-    editorInsertRow(C.totalrows, "", 0);
+    insertLine(&editorRows, "", 0, C.y);
   }
-  editorRowInsertChar(&C.row[C.y], C.x, c);
+  insert_char_in_row(&editorRows[C.y], C.x, c);
   C.x++;
 }
 
-void editorInsertNewline() {
+void insert_new_line() {
   if (C.x == 0) {
-    editorInsertRow(C.y, "", 0);
+    insertLine(&editorRows, "", 0, C.y);
   } else {
-    Row *row = &C.row[C.y];
-    editorInsertRow(C.y + 1, &row->chars[C.x], row->size - C.x);
-    row = &C.row[C.y];
-    row->size = C.x;
-    row->chars[row->size] = '\0';
+    Row *row = editorRows;
+    for (int i = 0; i < C.y; i++) {
+      row = row->next;
+    }
+    insertLine(&editorRows, &row->string[C.x], row->len - C.x, C.y + 1);
+
+    row->len = C.x;
+    row->string[row->len] = '\0';
   }
   C.y++;
   C.x = 0;
 }
 
-void editorDelChar() {
-  if (C.y == C.totalrows) return;
-  if (C.x == 0 && C.y == 0) return;
+void delete_char() {
+  if (C.y == C.totalrows)
+    return;
 
-  Row *row = &C.row[C.y];
+  if (C.x == 0 && C.y == 0)
+    return;
+
+  Row *row = editorRows;
+  for (int i = 0; i < C.y; i++) {
+    row = row->next;
+  }
   if (C.x > 0) {
-    editorRowDelChar(row, C.x - 1);
+    delete_char_in_row(row, C.x - 1);
     C.x--;
   } else {
-    C.x = C.row[C.y - 1].size;
-    editorRowAppendString(&C.row[C.y - 1], row->chars, row->size);
-    editorDelRow(C.y);
+    Row *prev_row = editorRows;
+    for (int i = 0; i < C.y - 1; i++) {
+      prev_row = prev_row->next;
+    }
+    append_string_to_row(prev_row, row->string, row->len);
+    deleteLine(&editorRows, C.y);
     C.y--;
+    C.x = prev_row->len;
   }
 }
 
-
-void Move(int key) {
-    
-    Row *row = C.row;
+ void Move(int key) {
+    Row *row = (C.y >= C.totalrows) ? NULL : C.row;
     for (int i = 0; i < C.y; ++i) {
         row = row->next;
     }
@@ -216,13 +234,13 @@ void Move(int key) {
                 for (int i = 0; i < C.y - 1; ++i) {
                     prev_row = prev_row->next;
                 }
-                C.x = prev_row->size;
+                C.x = prev_row->len;
             }
             break;
         case right:
-            if (row && C.x < row->size) {
+            if (row && C.x < row->len) {
                 C.x++;
-            } else if (row && C.x == row->size) {
+            } else if (row && C.x == row->len) {
                 C.y++;
                 C.x = 0;
             }
@@ -239,6 +257,7 @@ void Move(int key) {
             break;
     }
 }
+
 
 
 

@@ -38,13 +38,13 @@ struct Cursor {
 struct Cursor C;
 
 void disRaw() {
-    tcsetnowtr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
 
 void Raw() {
     struct termios raw;
-    tcgetnowtr(STDIN_FILENO, &orig_termios);
-    tcgetnowtr(STDIN_FILENO, &raw);
+    tcgetattr(STDIN_FILENO, &orig_termios);
+    tcgetattr(STDIN_FILENO, &raw);
 
     raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
     raw.c_oflag &= ~(OPOST);
@@ -53,8 +53,8 @@ void Raw() {
     raw.c_cc[VMIN] = 0;
     raw.c_cc[VTIME] = 1;
 
-    tcsetnowtr(STDIN_FILENO, TCSAFLUSH, &raw);
-    nowexit(disRaw);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    atexit(disRaw);
 }
 
 
@@ -76,7 +76,7 @@ void editorDrawRows(struct Row *row) {
     struct Row *current = row;
     int row_count = 0;
     while (current != NULL && row_count < C.rows) {
-        mvprintw(row_count, 0, current->chars);
+        mvprintw(row_count, 0, current->string);
         current = current->next;
         row_count++;
     }
@@ -85,22 +85,28 @@ void editorDrawRows(struct Row *row) {
     refresh();
 }
 
-void Row_insert_line(int now, char *row, ssize_t len){
-  if (now < 0 || now > C.totalRows) return;
+typedef struct Row {
+    ssize_t len;
+    char *string;
+    struct Row *next;
+} Row;
 
-  C.row = realloc(C.row, sizeof(Row) * (C.totalrows + 1));
-  memmove(&C.row[now + 1], &C.row[now], sizeof(Row) * (C.totalrows - now));
+Row *editorRows;
 
-  C.row[now].size = len;
-  C.row[now].string = malloc(len + 1);
-}
+struct Cursor {
+    int x, y;
+    int rows;
+    int cols;
+    int totalrows;
+};
+
 
 void insertLine(Row **head, char *row, ssize_t leng, int C_X){
   Row *new_row = (Row*)malloc(sizeof(Row));
   new_row->len = leng;
   new_row->string = malloc(leng + 1);
   memcpy(new_row->string, row, leng);
-  new_row->string[leng] = '\0'; // null terminnowe the string
+  new_row->string[leng] = '\0'; // null terminate the string
   new_row->next = NULL;
 
   if (C_X == 0) {
@@ -117,10 +123,11 @@ void insertLine(Row **head, char *row, ssize_t leng, int C_X){
     new_row->next = temp->next;
     temp->next = new_row;
   }
+  C.totalrows++;
 }
 
 void deleteLine(Row **head, int C_X){
-  if (C_X < 0) return;
+  if (C_X < 0 || C_X >= C.totalrows) return;
   Row *temp = *head;
   if (C_X == 0) {
     *head = temp->next;
@@ -134,6 +141,7 @@ void deleteLine(Row **head, int C_X){
     free(temp->next);
     temp->next = next;
   }
+  C.totalrows--;
 }
 
 // 행에 문자를 삽입하는 함수

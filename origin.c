@@ -159,7 +159,7 @@ void append_string_to_row(Row *row, char *string, size_t leng) {
   row->string[row->len] = '\0';
 }
 
-void insert_char(int c) {
+void editorInsertChar(int c) {
   if (C.y == C.totalrows) {
     insertLine(&editorRows, "", 0, C.y);
   }
@@ -167,7 +167,7 @@ void insert_char(int c) {
   C.x++;
 }
 
-void insert_new_line() {
+void editorInsertNewLine() {
   if (C.x == 0) {
     insertLine(&editorRows, "", 0, C.y);
   } else {
@@ -184,7 +184,7 @@ void insert_new_line() {
   C.x = 0;
 }
 
-void delete_char() {
+void editorDelChar() {
   if (C.y == C.totalrows)
     return;
 
@@ -211,7 +211,7 @@ void delete_char() {
 }
 
  void Move(int key) {
-    Row *row = (C.y >= C.totalrows) ? NULL : C.row;
+    Row *row = (C.y >= C.totalrows) ? NULL : editorRows;
     for (int i = 0; i < C.y; ++i) {
         row = row->next;
     }
@@ -253,7 +253,7 @@ void delete_char() {
 
 
 
-void presskey(struct Row **row) {
+void presskey() {
     int c = getch();
 
     switch (c) {
@@ -334,7 +334,7 @@ int main(int argc, char *argv[]) {
     editorDrawRows(row);
 
     while (1) {
-        presskey(&row);
+        presskey();
         editorDrawRows(row);
     }
     return 0;

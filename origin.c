@@ -222,7 +222,7 @@ void editorDelChar() {
                 C.x--;
             } else if (C.y > 0) {
                 C.y--;
-                Row *prev_row = C.row;
+                Row *prev_row = editorRows;
                 for (int i = 0; i < C.y - 1; ++i) {
                     prev_row = prev_row->next;
                 }
@@ -298,7 +298,7 @@ void presskey() {
 
         case KEY_ENTER:
         case '\n':
-            editorInsertNewline();
+            editorInsertNewLine();
             break;
 
         case KEY_DC:

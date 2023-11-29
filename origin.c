@@ -85,22 +85,6 @@ void editorDrawRows(struct Row *row) {
     refresh();
 }
 
-typedef struct Row {
-    ssize_t len;
-    char *string;
-    struct Row *next;
-} Row;
-
-Row *editorRows;
-
-struct Cursor {
-    int x, y;
-    int rows;
-    int cols;
-    int totalrows;
-};
-
-
 void insertLine(Row **head, char *row, ssize_t leng, int C_X){
   Row *new_row = (Row*)malloc(sizeof(Row));
   new_row->len = leng;

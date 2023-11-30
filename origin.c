@@ -225,8 +225,8 @@ void Delete_Char(Editor *editor, int pos_x, int pos_y){
 }
 
 void Move(int key) {
-    
-    Row *row = &Editor.rows[y];
+    Editor *editor;
+    Row *row = &(editor->rows[y]);
 
     switch (key) {
         case left:
@@ -234,7 +234,7 @@ void Move(int key) {
                 x--;
             } else if (y > 0) {
               y -= 1;
-              x = Editor.rows[y].size;
+              x = (editor->rows[y]).size;
             }
             break;
         case right:

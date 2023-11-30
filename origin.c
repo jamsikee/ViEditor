@@ -32,13 +32,11 @@ typedef struct{
   int len;
 } Editor;
 
-typedef struct Cursor {
-    int x, y;
-    int rows;
-    int cols;
-    int totalrows;
-} C;
-
+int x = 0;
+int y = 0;
+int rows = 0;
+int cols = 0;
+int totalrows = 0;
 
 void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
@@ -64,19 +62,19 @@ void Raw() {
 void editorDrawRows() {
     int y;
     clear();
-    for (y = 0; y < C.rows; y++) {
+    for (y = 0; y < rows; y++) {
         mvprintw(y, 0, "~");
     }
 
-    if (C.rows / 3 >= 0 && C.rows / 3 < C.rows && C.totalrows == 0) {
+    if (rows / 3 >= 0 && rows / 3 < rows && totalrows == 0) {
         char welcome[80];
         int welcomelen = snprintf(welcome, sizeof(welcome), "Visual Text editor -- version 0.0.1");
         if (welcomelen > C.cols) welcomelen = C.cols;
         int padding = (C.cols - welcomelen) / 2;
-        mvprintw(C.rows / 3, padding > 0 ? padding : 0, "%s", welcome);
+        mvprintw(rows / 3, padding > 0 ? padding : 0, "%s", welcome);
     }
 
-    move(C.y, C.x);
+    move(y, x);
     refresh();
 }
 
@@ -150,11 +148,11 @@ void Edit_Insert_Char_row(Editor *editor, int pos_x, int pos_y, char str) {
 
 void Insert_Char(Editor *editor, int str){
 
-    if (C.x == C.totalrows) 
-      Edit_Insert_row(editor, C.totalrows, "", 0);
+    if (x == totalrows) 
+      Edit_Insert_row(editor, totalrows, "", 0);
     else 
-      Edit_Insert_Char_row(editor, C.x, C.y, str);
-    C.x += 1;
+      Edit_Insert_Char_row(editor, x, y, str);
+    x += 1;
 
 }
 
@@ -189,8 +187,8 @@ void Insert_New_Line(Editor *editor, int pos_x, int pos_y){
     else
         New_Line_Mid(editor, pos_x, pos_y);
 
-    C.x = 0;
-    C.y += 1;
+    x = 0;
+    y += 1;
 
 }
 
@@ -217,48 +215,48 @@ void Delete_Char(Editor *editor, int pos_x, int pos_y){
 
     if (pos_x == 0) {
         Delete_Char_Beginning(editor, pos_y);
-        C.y -= 1;
+        y -= 1;
     }
     else {
         Delete_Char_Middle(editor, pos_x, pos_y);
-        C.x -= 1;
+        x -= 1;
     }
 
 }
 
 void Move(int key) {
     
-    Row *row = &Editor.rows[C.y];
+    Row *row = &Editor.rows[y];
 
     switch (key) {
         case left:
-            if (C.x != 0) {
-                C.x--;
-            } else if (C.y > 0) {
-                C.y--;
-                Row *prev_row = C.rows;
-                for (int i = 0; i < C.y - 1; ++i) {
+            if (x != 0) {
+                x--;
+            } else if (y > 0) {
+                y--;
+                Row *prev_row = rows;
+                for (int i = 0; i < y - 1; ++i) {
                     prev_row = prev_row->next;
                 }
-                C.x = prev_row->size;
+                x = prev_row->size;
             }
             break;
         case right:
-            if (row && C.x < row->size) {
-                C.x++;
-            } else if (row && C.x == row->size) {
-                C.y++;
-                C.x = 0;
+            if (row && x < row->size) {
+                x++;
+            } else if (row && x == row->size) {
+                y++;
+                x = 0;
             }
             break;
         case up:
-            if (C.y != 0) {
-                C.y--;
+            if (y != 0) {
+                y--;
             }
             break;
         case down:
-            if (C.y < C.totalrows) {
-                C.y++;
+            if (y < totalrows) {
+                y++;
             }
             break;
     }
@@ -289,17 +287,17 @@ void presskey() {
             break;
             
         case KEY_END: // End 키
-            C.x = C.cols - 1;
+            x = C.cols - 1;
             break;
 
         case KEY_HOME: // Home 키
-            C.x = 0;
+            x = 0;
             break;
 
         case KEY_NPAGE: // Page Down 키
         case KEY_PPAGE: // Page Up 키
         {
-            int temprows = C.rows;
+            int temprows = rows;
             while (temprows--) {
                 if (c == KEY_PPAGE)
                     Move(up);
@@ -311,16 +309,16 @@ void presskey() {
 
         case KEY_ENTER:
         case '\n':
-            Insert_New_Line(&Editor, C.x, C.y);
+            Insert_New_Line(&Editor, x, y);
             break;
 
         case KEY_DC:
             Move(right);
-            Delete_Char(&Editor, C.x, C.y);
+            Delete_Char(&Editor, x, y);
             break;
 
         case KEY_BACKSPACE:
-            Delete_Char(&Editor, C.x, C.y);
+            Delete_Char(&Editor, x, y);
             break;
 
         default:
@@ -333,11 +331,11 @@ void presskey() {
 void init() {
     Raw();
     initscr();
-    getmaxyx(stdscr, C.rows, C.cols);
+    getmaxyx(stdscr, rows, C.cols);
     keypad(stdscr, TRUE);
-    C.x = 0;
-    C.y = 0;
-    C.totalrows = 0;
+    x = 0;
+    y = 0;
+    totalrows = 0;
 }
 
 int main(int argc, char *argv[]) {

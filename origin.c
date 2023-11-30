@@ -296,6 +296,7 @@ void init() {
 }
 
 int main(int argc, char *argv[]) {
+  
     printf("sibal");
     init();
     while (1) {

@@ -56,7 +56,7 @@ void Raw() {
 }
 
 void Edit_Insert_row(Editor *editor, int pos, char *line, ssize_t len) {
-
+    printf("시발");
     if (pos < 0 || pos > editor->totalrows) return;
 
     editor->rows = realloc(editor->rows, sizeof(Row)*(editor -> totalrows + 1));
@@ -300,6 +300,7 @@ int main(int argc, char *argv[]) {
     
     init();
     printf("sibal");
+
     while (1) {
         presskey(); 
         refresh();

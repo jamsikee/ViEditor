@@ -32,14 +32,13 @@ typedef struct{
   int len;
 } Editor;
 
-typedef struct {
+typedef struct Cursor {
     int x, y;
     int rows;
     int cols;
     int totalrows;
-} Cursor;
+} C;
 
-struct Cursor C;
 
 void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);

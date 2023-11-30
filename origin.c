@@ -260,7 +260,7 @@ void Move(int key) {
 
 
 void presskey() {
-
+    Editor *editor;
     int c = getch();
 
     switch (c) {
@@ -305,20 +305,20 @@ void presskey() {
 
         case KEY_ENTER:
         case '\n':
-            Insert_New_Line(&Editor, x, y);
+            Insert_New_Line(editor, x, y);
             break;
 
         case KEY_DC:
             Move(right);
-            Delete_Char(&Editor, x, y);
+            Delete_Char(editor, x, y);
             break;
 
         case KEY_BACKSPACE:
-            Delete_Char(&Editor, x, y);
+            Delete_Char(editor, x, y);
             break;
 
         default:
-            Insert_Char(&Editor, c);
+            Insert_Char(editor, c);
             break;
     }
 }

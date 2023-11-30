@@ -62,7 +62,7 @@ void Raw() {
 }
 
 
-void editorDrawRows(struct Row *row) {
+void editorDrawRows() {
     int y;
     clear();
     for (y = 0; y < C.rows; y++) {
@@ -75,14 +75,6 @@ void editorDrawRows(struct Row *row) {
         if (welcomelen > C.cols) welcomelen = C.cols;
         int padding = (C.cols - welcomelen) / 2;
         mvprintw(C.rows / 3, padding > 0 ? padding : 0, "%s", welcome);
-    }
-
-    struct Row *current = row;
-    int row_count = 0;
-    while (current != NULL && row_count < C.rows) {
-        mvprintw(row_count, 0, current->string);
-        current = current->next;
-        row_count++;
     }
 
     move(C.y, C.x);
@@ -351,13 +343,12 @@ void init() {
 
 int main(int argc, char *argv[]) {
 
-    struct Row *row = NULL;
     init();
-    editorDrawRows(row);
+    editorDrawRows();
 
     while (1) {
         presskey();
-        editorDrawRows(row);
+        editorDrawRows();
     }
     return 0;
 

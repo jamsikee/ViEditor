@@ -69,8 +69,8 @@ void editorDrawRows() {
     if (rows / 3 >= 0 && rows / 3 < rows && totalrows == 0) {
         char welcome[80];
         int welcomelen = snprintf(welcome, sizeof(welcome), "Visual Text editor -- version 0.0.1");
-        if (welcomelen > C.cols) welcomelen = C.cols;
-        int padding = (C.cols - welcomelen) / 2;
+        if (welcomelen > cols) welcomelen = cols;
+        int padding = (cols - welcomelen) / 2;
         mvprintw(rows / 3, padding > 0 ? padding : 0, "%s", welcome);
     }
 
@@ -192,13 +192,25 @@ void Insert_New_Line(Editor *editor, int pos_x, int pos_y){
 
 }
 
+typedef struct{
+    size_t length;
+    char *string;
+} Row;
+
+typedef struct{
+  Row *rows;
+  int capacity;
+  int len;
+} Editor;
+
+
 void Delete_Char_Beginning(Editor *editor, int pos_y){
 
     if (pos_y > 0) {
-        editor_row *row = &editor->rows[pos_y];
-        editor_row *prev_row = &editor->rows[pos_y - 1];
-        prev_row->chars = realloc(prev_row->chars, prev_row->length + row->length + 1);
-        memcpy(&prev_row->chars[prev_row->length], row->chars, row->length + 1);
+        Row *row = &editor->rows[pos_y];
+        Row *prev_row = &editor->rows[pos_y - 1];
+        prev_row->string = realloc(prev_row->string, prev_row->length + row->length + 1);
+        memcpy(&prev_row->string[prev_row->length], row->string, row->length + 1);
         prev_row->length += row->length;
         Edit_Del_row(editor, pos_y);
     }
@@ -287,7 +299,7 @@ void presskey() {
             break;
             
         case KEY_END: // End 키
-            x = C.cols - 1;
+            x = cols - 1;
             break;
 
         case KEY_HOME: // Home 키
@@ -331,7 +343,7 @@ void presskey() {
 void init() {
     Raw();
     initscr();
-    getmaxyx(stdscr, rows, C.cols);
+    getmaxyx(stdscr, rows, cols);
     keypad(stdscr, TRUE);
     x = 0;
     y = 0;

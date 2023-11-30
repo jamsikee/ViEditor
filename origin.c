@@ -63,7 +63,7 @@ void Edit_Insert_row(Editor *editor, int pos, char *line, ssize_t len) {
     memmove(&editor->rows[pos + 1], &editor->rows[pos], sizeof(Row) * (editor -> totalrows - pos));
 
     editor->rows[pos].string = malloc(len + 1);
-    memcpy(editor->rows[pos]-> c, line, len);
+    memcpy(editor->rows[pos].string, line, len);
     editor->rows[pos].string[len] = '\0';
     editor->rows[pos].length = len;
 

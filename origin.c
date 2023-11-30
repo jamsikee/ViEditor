@@ -56,7 +56,7 @@ void Raw() {
 }
 
 void Edit_Insert_row(Editor *editor, int pos, char *line, ssize_t len) {
-    printf("시발");
+    printf("시발insert");
     if (pos < 0 || pos > editor->totalrows) return;
 
     editor->rows = realloc(editor->rows, sizeof(Row)*(editor -> totalrows + 1));
@@ -74,7 +74,7 @@ void Edit_Insert_row(Editor *editor, int pos, char *line, ssize_t len) {
 }
 
 void Edit_Del_row(Editor *editor, int pos){
-
+    printf("시발del");
     if (pos < 0 || pos >= editor->totalrows) return;
 
      free(&editor->rows[pos].string);
@@ -86,7 +86,7 @@ void Edit_Del_row(Editor *editor, int pos){
 }
 
 void Edit_Del_Char_row(Row *rows, int pos) {
-
+    printf("시발del");
     if (pos < 0 || pos >= rows->length){
       return;
     }
@@ -97,7 +97,7 @@ void Edit_Del_Char_row(Row *rows, int pos) {
 }
 
 void Edit_Insert_Char_row(Row *rows, int pos, char str) {
-
+    printf("시발insert");
     if(pos < 0 || pos > rows->length) {
       pos = rows->length;
     }
@@ -112,7 +112,7 @@ void Edit_Insert_Char_row(Row *rows, int pos, char str) {
 }
 
 void Insert_Char(Editor *editor, int str){
-
+    printf("시발insert");
     if (y == editor->totalrows) {
       Edit_Insert_row(editor, editor->totalrows, "", 0);
     }
@@ -140,7 +140,7 @@ void New_Line_Mid(Editor *editor, int pos){
 }
 
 void Insert_New_Line(Editor *editor, int pos){
-
+    printf("시발line");
     if (pos == 0) {
         New_Line_Beginning(editor, pos);
     }
@@ -154,7 +154,7 @@ void Insert_New_Line(Editor *editor, int pos){
 }
 
 void Prev_Del(Row *rows, char *str, size_t len) {
-
+  printf("시발del");
   rows->string = realloc(rows->string, rows->length + len + 1);
   memcpy(&rows->string[rows->length], str, len);
   rows->length += len;
@@ -163,7 +163,7 @@ void Prev_Del(Row *rows, char *str, size_t len) {
 }
 
 void Delete_Char(Editor *editor){
-
+      printf("시발del");
       if( y == editor->totalrows) {
         return;
       }

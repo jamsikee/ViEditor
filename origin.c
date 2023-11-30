@@ -85,7 +85,7 @@ void Init(Editor *editor){
 }
 
 void Free(Editor *editor){
-    for (int i = 0; i < editor->len, ++i){
+    for (int i = 0; i < editor->len; ++i){
       free(editor->rows[i].string);
     }
     free(editor->rows);
@@ -192,18 +192,6 @@ void Insert_New_Line(Editor *editor, int pos_x, int pos_y){
 
 }
 
-typedef struct{
-    size_t length;
-    char *string;
-} Row;
-
-typedef struct{
-  Row *rows;
-  int capacity;
-  int len;
-} Editor;
-
-
 void Delete_Char_Beginning(Editor *editor, int pos_y){
 
     if (pos_y > 0) {
@@ -242,15 +230,11 @@ void Move(int key) {
 
     switch (key) {
         case left:
-            if (x != 0) {
+            if (x > 0) {
                 x--;
             } else if (y > 0) {
-                y--;
-                Row *prev_row = rows;
-                for (int i = 0; i < y - 1; ++i) {
-                    prev_row = prev_row->next;
-                }
-                x = prev_row->size;
+              y -= 1;
+              x = Editor.rows[y].size;
             }
             break;
         case right:

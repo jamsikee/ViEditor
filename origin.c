@@ -285,7 +285,7 @@ void presskey() {
 }
 
 void init() {
-    Editor *editor;
+
     Raw();
     initscr();
     getmaxyx(stdscr, rows, cols);

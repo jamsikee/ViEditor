@@ -59,15 +59,15 @@ void Edit_Insert_row(Editor *editor, int pos, char *line, ssize_t len) {
 
     if (pos < 0 || pos > editor -> totalrows) return;
 
-    editor->rows = realloc(editor->rows, sizeof(Row)*(editor -> totalrows + 1))
+    editor->rows = realloc(editor->rows, sizeof(Row)*(editor -> totalrows + 1));
     memmove(&editor->rows[pos + 1], &editor->rows[pos], sizeof(Row) * (editor -> totalrows - pos));
 
-    editor->rows[pos]-> c = malloc(len + 1);
+    editor->rows[pos].string = malloc(len + 1);
     memcpy(editor->rows[pos]-> c, line, len);
-    editor->rows[pos]-> c[len] = '\0';
-    editor->rows[pos]-> length = len;
+    editor->rows[pos].string[len] = '\0';
+    editor->rows[pos].length = len;
 
-    editor->len++;
+    editor->totalrows++;
 
 }
 
@@ -75,11 +75,11 @@ void Edit_Del_row(Editor *editor, int pos){
 
     if (pos < 0 || pos >= editor->totalrows) return;
 
-     free(&editor->rows[pos]->c);
+     free(&editor->rows[pos].string);
 
      memmove(&editor->rows[pos], &editor->rows[pos + 1], sizeof(Row) * (editor->totalrows - pos - 1));
 
-     editor->len--;
+     editor->totalrows-=1;
 
 }
 
@@ -89,7 +89,7 @@ void Edit_Del_Char_row(Row *rows, int pos) {
       return;
     }
 
-    memmove(&rows-> c[pos], &rows-> c[pos + 1], rows->length - pos);
+    memmove(&rows-> string[pos], &rows-> string[pos + 1], rows->length - pos);
     rows ->length--;
 
 }
@@ -97,14 +97,14 @@ void Edit_Del_Char_row(Row *rows, int pos) {
 void Edit_Insert_Char_row(Row *rows, int pos, char str) {
 
     if(pos < 0 || pos > rows->length) {
-      pos = rows->length
+      pos = rows->length;
     }
 
-    char *temp = realloc(rows-> c, (rows->length + 2) * sizeof(char));
+    char *temp = realloc(rows-> string, (rows->length + 2) * sizeof(char));
     rows->string = temp;
-    memmove(&rows-> c[pos + 1], &rows-> c[pos], rows->length - pos + 1);
+    memmove(&rows-> string[pos + 1], &rows-> string[pos], rows->length - pos + 1);
 
-    rows-> c[pos] = str;
+    rows-> string[pos] = str;
     rows->length++;
 
 }
@@ -130,8 +130,8 @@ void New_Line_Beginning(Editor *editor, int pos){
 void New_Line_Mid(Editor *editor, int pos){
 
     Row *rows =  &(editor->rows[pos]);
-    Edit_Insert_row(editor, pos+1, &rows->c[x], rows->length - x);
-    rows = &edtior->rows[pos];
+    Edit_Insert_row(editor, pos+1, &rows->string[x], rows->length - x);
+    rows = &(editor->rows[pos]);
     rows->length = x;
     rows->string[rows->length] = '\0';
 
@@ -177,7 +177,7 @@ void Delete_Char(Editor *editor){
         x -= 1;
     }
     else {
-        x = (editor->rows[y]->length);
+        x = (editor->rows[y].length);
         Prev_Del(&editor->rows[y-1], rows->string, rows->length);
         Edit_Del_row(editor, y);
         x -= 1;
@@ -198,9 +198,9 @@ void Move(int key) {
             }
             break;
         case right:
-            if (row && x < rows->length) {
+            if (rows && x < rows->length) {
                 x++;
-            } else if (row && x == rows->length) {
+            } else if (rows && x == rows->length) {
                 y++;
                 x = 0;
             }

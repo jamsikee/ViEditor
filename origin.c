@@ -234,13 +234,13 @@ void Move(int key) {
                 x--;
             } else if (y > 0) {
               y -= 1;
-              x = (editor->rows[y]).size;
+              x = (editor->rows[y]).length;
             }
             break;
         case right:
-            if (row && x < row->size) {
+            if (row && x < row->length) {
                 x++;
-            } else if (row && x == row->size) {
+            } else if (row && x == row->length) {
                 y++;
                 x = 0;
             }

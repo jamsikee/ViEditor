@@ -338,6 +338,7 @@ int main(int argc, char *argv[]) {
     while (1) {
         presskey();
         editorDrawRows();
+        write(STDOUT_FILENO, "\x1b[%d;%dH", y, x);  
     }
     return 0;
 

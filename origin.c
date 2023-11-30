@@ -90,12 +90,21 @@ void Edit_Insert_row(Editor *editor, int pos, char *line, ssize_t line_len) {
 
     if (editor->len >= editor->capacity) {
         editor->capacity *= 2;
-        editor->rows = realloc(editor->rows, sizeof(Row) * editor->capacity);
+        Row *temp = realloc(editor->rows, sizeof(Row) * editor->capacity);
+        if (temp == NULL) {
+            fprintf(stderr, "realloc failed\n");
+            exit(EXIT_FAILURE);
+        }
+        editor->rows = temp;
     }
 
     memmove(&editor->rows[pos + 1], &editor->rows[pos], sizeof(Row) * (editor->len - pos));
 
     editor->rows[pos].string = malloc(line_len + 1);
+    if (editor->rows[pos].string == NULL) {
+        fprintf(stderr, "malloc failed\n");
+        exit(EXIT_FAILURE);
+    }
     strncpy(editor->rows[pos].string, line, line_len);
     editor->rows[pos].string[line_len] = '\0';
     editor->rows[pos].length = line_len;
@@ -130,7 +139,12 @@ void Edit_Insert_Char_row(Editor *editor, int pos_x, int pos_y, char str) {
 
     if (pos_y < 0 || pos_y >= editor->len || pos_x < 0 || pos_x > editor->rows[pos_y].length) return;
 
-    editor->rows[pos_y].string = realloc(editor->rows[pos_y].string, (editor->rows[pos_y].length + 2) * sizeof(char));
+    char *temp = realloc(editor->rows[pos_y].string, (editor->rows[pos_y].length + 2) * sizeof(char));
+    if (temp == NULL) {
+        fprintf(stderr, "realloc failed\n");
+        exit(EXIT_FAILURE);
+    }
+    editor->rows[pos_y].string = temp;
 
     memmove(&editor->rows[pos_y].string[pos_x + 1], &editor->rows[pos_y].string[pos_x], editor->rows[pos_y].length - pos_x + 1);
 
@@ -138,7 +152,6 @@ void Edit_Insert_Char_row(Editor *editor, int pos_x, int pos_y, char str) {
     editor->rows[pos_y].length++;
 
 }
-
 void Insert_Char(Editor *editor, int str){
 
     if (x == totalrows) 

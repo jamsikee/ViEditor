@@ -292,7 +292,6 @@ void init() {
     keypad(stdscr, TRUE);
     x = 0;
     y = 0;
-    editor->totalrows = 0;
     
 }
 

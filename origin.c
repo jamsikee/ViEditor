@@ -9,7 +9,6 @@
 #include <ncurses.h>
 #include <signal.h>
 
-#define CAPACITY 10
 #define CONTROL(k) ((k) & 0x1f)
 
 struct termios orig_termios;
@@ -21,22 +20,20 @@ enum P_key {
     down
 };
 
-typedef struct{
+typedef struct Row{
     int length;
     char *string;
 } Row;
 
-typedef struct{
+typedef struct Editor{
   Row *rows;
-  int capacity;
-  int len;
+  int totalrows;
 } Editor;
 
 int x = 0;
 int y = 0;
 int rows = 0;
 int cols = 0;
-int totalrows = 0;
 
 void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
@@ -58,37 +55,17 @@ void Raw() {
     atexit(disRaw);
 }
 
-void Free(Editor *editor){
-    for (int i = 0; i < editor->len; ++i){
-      free(editor->rows[i].string);
-    }
-    free(editor->rows);
-}
+void Edit_Insert_row(Editor *editor, int pos, char *line, ssize_t len) {
 
-void Edit_Insert_row(Editor *editor, int pos, char *line, ssize_t line_len) {
+    if (pos < 0 || pos > editor -> totalrows) return;
 
-    if (pos < 0 || pos > editor->len) return;
+    editor->rows = realloc(editor->rows, sizeof(Row)*(editor -> totalrows + 1))
+    memmove(&editor->rows[pos + 1], &editor->rows[pos], sizeof(Row) * (editor -> totalrows - pos));
 
-    if (editor->len >= editor->capacity) {
-        editor->capacity *= 2;
-        Row *temp = realloc(editor->rows, sizeof(Row) * editor->capacity);
-        if (temp == NULL) {
-            fprintf(stderr, "realloc failed\n");
-            exit(EXIT_FAILURE);
-        }
-        editor->rows = temp;
-    }
-
-    memmove(&editor->rows[pos + 1], &editor->rows[pos], sizeof(Row) * (editor->len - pos));
-
-    editor->rows[pos].string = malloc(line_len + 1);
-    if (editor->rows[pos].string == NULL) {
-        fprintf(stderr, "malloc failed\n");
-        exit(EXIT_FAILURE);
-    }
-    strncpy(editor->rows[pos].string, line, line_len);
-    editor->rows[pos].string[line_len] = '\0';
-    editor->rows[pos].length = line_len;
+    editor->rows[pos]-> c = malloc(len + 1);
+    memcpy(editor->rows[pos]-> c, line, len);
+    editor->rows[pos]-> c[len] = '\0';
+    editor->rows[pos]-> length = len;
 
     editor->len++;
 
@@ -96,124 +73,120 @@ void Edit_Insert_row(Editor *editor, int pos, char *line, ssize_t line_len) {
 
 void Edit_Del_row(Editor *editor, int pos){
 
-    if (pos < 0 || pos >= editor->len) return;
+    if (pos < 0 || pos >= editor->totalrows) return;
 
-     free(editor->rows[pos].string);
+     free(&editor->rows[pos]->c);
 
-     memmove(&editor->rows[pos], &editor->rows[pos + 1], sizeof(Row) * (editor->len - pos - 1));
+     memmove(&editor->rows[pos], &editor->rows[pos + 1], sizeof(Row) * (editor->totalrows - pos - 1));
 
      editor->len--;
 
 }
 
-void Edit_Del_Char_row(Editor *editor, int pos_x, int pos_y) {
+void Edit_Del_Char_row(Row *rows, int pos) {
 
-    if (pos_y < 0 || pos_y >= editor->len || pos_x < 0 || pos_x >= editor->rows[pos_y].length) return;
-
-    memmove(&editor->rows[pos_y].string[pos_x], &editor->rows[pos_y].string[pos_x + 1], editor->rows[pos_y].length - pos_x);
-
-    editor->rows[pos_y].length--;
-
-}
-
-void Edit_Insert_Char_row(Editor *editor, int pos_x, int pos_y, char str) {
-
-    if (pos_y < 0 || pos_y >= editor->len || pos_x < 0 || pos_x > editor->rows[pos_y].length) return;
-
-    char *temp = realloc(editor->rows[pos_y].string, (editor->rows[pos_y].length + 2) * sizeof(char));
-    if (temp == NULL) {
-        fprintf(stderr, "realloc failed\n");
-        exit(EXIT_FAILURE);
+    if (pos < 0 || pos >= rows->length){
+      return;
     }
-    editor->rows[pos_y].string = temp;
 
-    memmove(&editor->rows[pos_y].string[pos_x + 1], &editor->rows[pos_y].string[pos_x], editor->rows[pos_y].length - pos_x + 1);
-
-    editor->rows[pos_y].string[pos_x] = str;
-    editor->rows[pos_y].length++;
+    memmove(&rows-> c[pos], &rows-> c[pos + 1], rows->length - pos);
+    rows ->length--;
 
 }
+
+void Edit_Insert_Char_row(Row *rows, int pos, char str) {
+
+    if(pos < 0 || pos > rows->length) {
+      pos = rows->length
+    }
+
+    char *temp = realloc(rows-> c, (rows->length + 2) * sizeof(char));
+    rows->string = temp;
+    memmove(&rows-> c[pos + 1], &rows-> c[pos], rows->length - pos + 1);
+
+    rows-> c[pos] = str;
+    rows->length++;
+
+}
+
 void Insert_Char(Editor *editor, int str){
 
-    if (x == totalrows) 
-      Edit_Insert_row(editor, totalrows, "", 0);
-    else 
-      Edit_Insert_Char_row(editor, x, y, str);
+    if (y == editor->totalrows) {
+      Edit_Insert_row(editor, editor->totalrows, "", 0);
+    }
+    else {
+      Edit_Insert_Char_row(&editor->rows[y], x, str);
+    }
     x += 1;
 
 }
 
-void New_Line_Beginning(Editor *editor, int pos_y){
+void New_Line_Beginning(Editor *editor, int pos){
 
-    Edit_Insert_row(editor, pos_y, "", 0);
+    Edit_Insert_row(editor, pos, "", 0);
+    // pos = y
+}
+
+void New_Line_Mid(Editor *editor, int pos){
+
+    Row *rows =  &(editor->rows[pos]);
+    Edit_Insert_row(editor, pos+1, &rows->c[x], rows->length - x);
+    rows = &edtior->rows[pos];
+    rows->length = x;
+    rows->string[rows->length] = '\0';
 
 }
 
-void New_Line_Mid(Editor *editor, int pos_x, int pos_y){
+void Insert_New_Line(Editor *editor, int pos){
 
-    char* temp = strdup(&editor->rows[pos_y].string[pos_x]);
-    editor->rows[pos_y].string[pos_x] = '\0';
-    editor->rows[pos_y].length = pos_x;
-    Edit_Insert_row(editor, pos_y + 1, temp, strlen(temp));
-    free(temp);
-
-}
-
-void New_Line_End(Editor *editor, int pos_y){
-
-    Edit_Insert_row(editor, pos_y + 1, "", 0);
-
-}
-
-void Insert_New_Line(Editor *editor, int pos_x, int pos_y){
-
-    if (pos_x == 0)
-        New_Line_Beginning(editor, pos_y);
-    else if (pos_x == editor->rows[pos_y].length)
-        New_Line_End(editor, pos_y);
-    else
-        New_Line_Mid(editor, pos_x, pos_y);
-
+    if (pos == 0) {
+        New_Line_Beginning(editor, pos);
+    }
+    else {
+        New_Line_Mid(editor, pos);
+    }
+        
     x = 0;
     y += 1;
 
 }
 
-void Delete_Char_Beginning(Editor *editor, int pos_y){
+void Prev_Del(Row *rows, char *str, size_t len) {
 
-    if (pos_y > 0) {
-        Row *row = &editor->rows[pos_y];
-        Row *prev_row = &editor->rows[pos_y - 1];
-        prev_row->string = realloc(prev_row->string, prev_row->length + row->length + 1);
-        memcpy(&prev_row->string[prev_row->length], row->string, row->length + 1);
-        prev_row->length += row->length;
-        Edit_Del_row(editor, pos_y);
-    }
+  rows->string = realloc(rows->string, rows->length + len + 1);
+  memcpy(&rows->string[rows->length], str, len);
+  rows->length += len;
+  rows->string[rows->length] = '\0';
 
 }
 
-void Delete_Char_Middle(Editor *editor, int pos_x, int pos_y){
+void Delete_Char(Editor *editor){
 
-    Edit_Del_Char_row(editor, pos_x, pos_y);
+      if( y == editor->totalrows) {
+        return;
+      }
 
-}
+      if( x == 0 && y == 0) {
+        return;
+      }
 
-void Delete_Char(Editor *editor, int pos_x, int pos_y){
+    Row *rows = &(editor->rows[y]);
 
-    if (pos_x == 0) {
-        Delete_Char_Beginning(editor, pos_y);
-        y -= 1;
-    }
-    else {
-        Delete_Char_Middle(editor, pos_x, pos_y);
+    if (x > 0) {
+        Edit_Del_Char_row(rows, x-1);
         x -= 1;
     }
-
+    else {
+        x = (editor->rows[y]->length);
+        Prev_Del(&editor->rows[y-1], rows->string, rows->length);
+        Edit_Del_row(editor, y);
+        x -= 1;
+    }
 }
 
 void Move(int key) {
     Editor *editor;
-    Row *row = &(editor->rows[y]);
+    Row *rows = &(editor->rows[y]);
 
     switch (key) {
         case left:
@@ -221,13 +194,13 @@ void Move(int key) {
                 x--;
             } else if (y > 0) {
               y -= 1;
-              x = (editor->rows[y]).length;
+              x = editor->rows[y].length;
             }
             break;
         case right:
-            if (row && x < row->length) {
+            if (row && x < rows->length) {
                 x++;
-            } else if (row && x == row->length) {
+            } else if (row && x == rows->length) {
                 y++;
                 x = 0;
             }
@@ -238,7 +211,7 @@ void Move(int key) {
             }
             break;
         case down:
-            if (y < totalrows) {
+            if (y < editor->totalrows) {
                 y++;
             }
             break;
@@ -292,16 +265,16 @@ void presskey() {
 
         case KEY_ENTER:
         case '\n':
-            Insert_New_Line(editor, x, y);
+            Insert_New_Line(editor, y);
             break;
 
         case KEY_DC:
             Move(right);
-            Delete_Char(editor, x, y);
+            Delete_Char(editor);
             break;
 
         case KEY_BACKSPACE:
-            Delete_Char(editor, x, y);
+            Delete_Char(editor);
             break;
 
         default:
@@ -310,15 +283,16 @@ void presskey() {
     }
 }
 
-
 void init() {
+    Editor *editor;
     Raw();
     initscr();
     getmaxyx(stdscr, rows, cols);
     keypad(stdscr, TRUE);
     x = 0;
     y = 0;
-    totalrows = 0;
+    editor->totalrows = 0;
+    
 }
 
 int main(int argc, char *argv[]) {
@@ -329,8 +303,7 @@ int main(int argc, char *argv[]) {
     y = 0;
 
     while (1) {
-        presskey();
-        write(STDOUT_FILENO, "\x1b[H", 3);  
+        presskey(); 
         refresh();
     }
     return 0;

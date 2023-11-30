@@ -303,6 +303,7 @@ int main(int argc, char *argv[]) {
     printf("sibal");
 
     while (1) {
+        pritnf("??????");
         presskey(); 
         refresh();
     }

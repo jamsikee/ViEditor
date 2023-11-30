@@ -74,7 +74,6 @@ void editorDrawRows() {
         mvprintw(rows / 3, padding > 0 ? padding : 0, "%s", welcome);
     }
 
-    move(y, x);
     refresh();
 }
 
@@ -337,8 +336,8 @@ int main(int argc, char *argv[]) {
 
     while (1) {
         presskey();
-        editorDrawRows();
         write(STDOUT_FILENO, "\x1b[%d;%dH", y, x);  
+        editorDrawRows();
     }
     return 0;
 

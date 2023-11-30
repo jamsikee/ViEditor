@@ -58,25 +58,6 @@ void Raw() {
     atexit(disRaw);
 }
 
-
-void editorDrawRows() {
-    int y;
-    clear();
-    for (y = 0; y < rows; y++) {
-        mvprintw(y, 0, "~");
-    }
-
-    if (rows / 3 >= 0 && rows / 3 < rows && totalrows == 0) {
-        char welcome[80];
-        int welcomelen = snprintf(welcome, sizeof(welcome), "Visual Text editor -- version 0.0.1");
-        if (welcomelen > cols) welcomelen = cols;
-        int padding = (cols - welcomelen) / 2;
-        mvprintw(rows / 3, padding > 0 ? padding : 0, "%s", welcome);
-    }
-
-    refresh();
-}
-
 void Free(Editor *editor){
     for (int i = 0; i < editor->len; ++i){
       free(editor->rows[i].string);
@@ -343,14 +324,14 @@ void init() {
 int main(int argc, char *argv[]) {
 
     init();
-    editorDrawRows();
+    
     x = 0;
     y = 0;
 
     while (1) {
         presskey();
         write(STDOUT_FILENO, "\x1b[H", 3);  
-        editorDrawRows();
+        refresh();
     }
     return 0;
 

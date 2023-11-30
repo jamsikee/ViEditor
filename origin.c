@@ -60,11 +60,11 @@ void Edit_Insert_row(Editor *editor, int pos, char *line, ssize_t len) {
     if (pos < 0 || pos > editor->totalrows) return;
 
     editor->rows = realloc(editor->rows, sizeof(Row)*(editor -> totalrows + 1));
-    if (!editor->rows) return; // 메모리 할당 확인
+    
     memmove(&editor->rows[pos + 1], &editor->rows[pos], sizeof(Row) * (editor -> totalrows - pos));
 
     editor->rows[pos].string = malloc(len + 1);
-    if (!editor->rows[pos].string) return; // 메모리 할당 확인
+   
     memcpy(editor->rows[pos].string, line, len);
     editor->rows[pos].string[len] = '\0';
     editor->rows[pos].length = len;
@@ -299,6 +299,7 @@ void init() {
 int main(int argc, char *argv[]) {
 
     init();
+    printf("sibal");
 
     while (1) {
         presskey(); 

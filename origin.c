@@ -296,9 +296,10 @@ void init() {
 }
 
 int main(int argc, char *argv[]) {
-  
-    printf("sibal");
+
+    
     init();
+    printf("sibal");
     while (1) {
         presskey(); 
         refresh();

@@ -22,7 +22,7 @@ enum P_key {
 };
 
 typedef struct{
-    size_t length;
+    int length;
     char *string;
 } Row;
 
@@ -76,12 +76,6 @@ void editorDrawRows() {
 
     move(y, x);
     refresh();
-}
-
-void Init(Editor *editor){
-    editor->rows = malloc(sizeof(Row) * CAPACITY);
-    editor->capacity = CAPACITY;
-    editor->len = 0;
 }
 
 void Free(Editor *editor){
@@ -338,6 +332,8 @@ int main(int argc, char *argv[]) {
 
     init();
     editorDrawRows();
+    x = 0;
+    y = 0;
 
     while (1) {
         presskey();

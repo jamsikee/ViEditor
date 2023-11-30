@@ -279,6 +279,7 @@ void presskey() {
             break;
 
         default:
+            printf("?");
             Insert_Char(editor, c);
             break;
     }

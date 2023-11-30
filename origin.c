@@ -336,7 +336,7 @@ int main(int argc, char *argv[]) {
 
     while (1) {
         presskey();
-        write(STDOUT_FILENO, "\x1b[%d;%dH", y, x);  
+        write(STDOUT_FILENO, "\x1b[H", 3);  
         editorDrawRows();
     }
     return 0;

@@ -57,12 +57,14 @@ void Raw() {
 
 void Edit_Insert_row(Editor *editor, int pos, char *line, ssize_t len) {
 
-    if (pos < 0 || pos > editor -> totalrows) return;
+    if (pos < 0 || pos > editor->totalrows) return;
 
     editor->rows = realloc(editor->rows, sizeof(Row)*(editor -> totalrows + 1));
+    if (!editor->rows) return; // 메모리 할당 확인
     memmove(&editor->rows[pos + 1], &editor->rows[pos], sizeof(Row) * (editor -> totalrows - pos));
 
     editor->rows[pos].string = malloc(len + 1);
+    if (!editor->rows[pos].string) return; // 메모리 할당 확인
     memcpy(editor->rows[pos].string, line, len);
     editor->rows[pos].string[len] = '\0';
     editor->rows[pos].length = len;
@@ -100,11 +102,11 @@ void Edit_Insert_Char_row(Row *rows, int pos, char str) {
       pos = rows->length;
     }
 
-    char *temp = realloc(rows-> string, (rows->length + 2) * sizeof(char));
+    char *temp = realloc(rows->string, (rows->length + 2) * sizeof(char));
     rows->string = temp;
-    memmove(&rows-> string[pos + 1], &rows-> string[pos], rows->length - pos + 1);
+    memmove(&rows->string[pos + 1], &rows-> string[pos], rows->length - pos + 1);
 
-    rows-> string[pos] = str;
+    rows->string[pos] = str;
     rows->length++;
 
 }
@@ -174,14 +176,13 @@ void Delete_Char(Editor *editor){
 
     if (x > 0) {
         Edit_Del_Char_row(rows, x-1);
-        x -= 1;
     }
     else {
         x = (editor->rows[y].length);
         Prev_Del(&editor->rows[y-1], rows->string, rows->length);
         Edit_Del_row(editor, y);
-        x -= 1;
     }
+    x -=1;
 }
 
 void Move(int key) {
@@ -298,9 +299,6 @@ void init() {
 int main(int argc, char *argv[]) {
 
     init();
-    
-    x = 0;
-    y = 0;
 
     while (1) {
         presskey(); 

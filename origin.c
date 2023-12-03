@@ -7,39 +7,61 @@
 #include <sys/ioctl.h>
 #include <ctype.h>
 #include <ncurses.h>
-#include <signal.h>
+#include <stdbool.h>
 
 #define CONTROL(k) ((k) & 0x1f)
 
 struct termios orig_termios;
 
 enum P_key {
+
     left = 1000,
     right,
     up,
-    down
+    down,
+    del,
+    home,
+    end,
+    pg_up,
+    pg_dn,
+    b_s = 127
+    
 };
 
-typedef struct Row{
-    int length;
-    char *string;
+bool error = false;
+
+int x;
+int y;
+int rows;
+int cols;
+int move_rows;
+int move_cols;
+
+typedef struct Row {
+
+  int len;
+  char *c;
+
 } Row;
 
-typedef struct Editor{
-  Row *rows;
-  int totalrows;
-} Editor;
+struct Visual_Text_Editor{
 
-int x = 0;
-int y = 0;
-int rows = 0;
-int cols = 0;
+  int total;
+  Row *line;
+  char *filename;
+
+};
+
+struct Visual_Text_Editor Edit;
 
 void disRaw() {
+
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+
 }
 
 void Raw() {
+
     struct termios raw;
     tcgetattr(STDIN_FILENO, &orig_termios);
     tcgetattr(STDIN_FILENO, &raw);
@@ -53,158 +75,102 @@ void Raw() {
 
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
     atexit(disRaw);
-}
-
-void Edit_Insert_row(Editor *editor, int pos, char *line, ssize_t len) {
-    printf("시발insert");
-    if (pos < 0 || pos > editor->totalrows) return;
-
-    editor->rows = realloc(editor->rows, sizeof(Row)*(editor -> totalrows + 1));
-    
-    memmove(&editor->rows[pos + 1], &editor->rows[pos], sizeof(Row) * (editor -> totalrows - pos));
-
-    editor->rows[pos].string = malloc(len + 1);
-   
-    memcpy(editor->rows[pos].string, line, len);
-    editor->rows[pos].string[len] = '\0';
-    editor->rows[pos].length = len;
-
-    editor->totalrows++;
 
 }
 
-void Edit_Del_row(Editor *editor, int pos){
-    printf("시발del");
-    if (pos < 0 || pos >= editor->totalrows) return;
+void for_quit(){
 
-     free(&editor->rows[pos].string);
-
-     memmove(&editor->rows[pos], &editor->rows[pos + 1], sizeof(Row) * (editor->totalrows - pos - 1));
-
-     editor->totalrows-=1;
+    write(STDOUT_FILENO, "\x1b[2J", 4); // clear UI
+    write(STDOUT_FILENO, "\x1b[0;0H", 3);  // cursor (0, 0)
 
 }
 
-void Edit_Del_Char_row(Row *rows, int pos) {
-    printf("시발del");
-    if (pos < 0 || pos >= rows->length){
-      return;
-    }
+int Read_Key() {
 
-    memmove(&rows-> string[pos], &rows-> string[pos + 1], rows->length - pos);
-    rows ->length--;
+  int Return_value;
+  char c;
+  while ((Return_value = read(STDIN_FILENO, &c, 1)) != 1) {
+    error = true;
+  }
 
-}
+  char ESCAPE = '\x1b';                  // For defualt value ANSI ESCAPE SEQUENCE 
 
-void Edit_Insert_Char_row(Row *rows, int pos, char str) {
-    printf("시발insert");
-    if(pos < 0 || pos > rows->length) {
-      pos = rows->length;
-    }
+  if (c == ESCAPE) {
+    char List[3];
+    if ((Return_value = read(STDIN_FILENO, &List[0], 1)) != 1)
+      return ESCAPE;
+    if ((Return_value = read(STDIN_FILENO, &List[1], 1)) != 1)
+      return ESCAPE;
 
-    char *temp = realloc(rows->string, (rows->length + 2) * sizeof(char));
-    rows->string = temp;
-    memmove(&rows->string[pos + 1], &rows-> string[pos], rows->length - pos + 1);
-
-    rows->string[pos] = str;
-    rows->length++;
-
-}
-
-void Insert_Char(Editor *editor, int str){
-    printf("시발insert");
-    if (y == editor->totalrows) {
-      Edit_Insert_row(editor, editor->totalrows, "", 0);
-    }
-    else {
-      Edit_Insert_Char_row(&editor->rows[y], x, str);
-    }
-    x += 1;
-
-}
-
-void New_Line_Beginning(Editor *editor, int pos){
-
-    Edit_Insert_row(editor, pos, "", 0);
-    // pos = y
-}
-
-void New_Line_Mid(Editor *editor, int pos){
-
-    Row *rows =  &(editor->rows[pos]);
-    Edit_Insert_row(editor, pos+1, &rows->string[x], rows->length - x);
-    rows = &(editor->rows[pos]);
-    rows->length = x;
-    rows->string[rows->length] = '\0';
-
-}
-
-void Insert_New_Line(Editor *editor, int pos){
-    printf("시발line");
-    if (pos == 0) {
-        New_Line_Beginning(editor, pos);
-    }
-    else {
-        New_Line_Mid(editor, pos);
-    }
-        
-    x = 0;
-    y += 1;
-
-}
-
-void Prev_Del(Row *rows, char *str, size_t len) {
-  printf("시발del");
-  rows->string = realloc(rows->string, rows->length + len + 1);
-  memcpy(&rows->string[rows->length], str, len);
-  rows->length += len;
-  rows->string[rows->length] = '\0';
-
-}
-
-void Delete_Char(Editor *editor){
-      printf("시발del");
-      if( y == editor->totalrows) {
-        return;
+    if (List[0] == '[') {             // For processing ANSI ESCAPE SEQUENCE
+      if (List[1] >= '0' && List[1] <= '9') {
+        if ((Return_value = read(STDIN_FILENO, &List[2], 1)) != 1) {
+          return ESCAPE;
+        }
+        if (List[2] == '~') {
+          if (List[1] == '1') {
+            return home;              // \x1b[1~
+          } else if (List[1] == '3') {
+            return del;               // \x1b[3~
+          } else if (List[1] == '4') {
+            return end;               // \x1b[4~
+          } else if (List[1] == '5') {
+            return pg_up;             // \x1b[5~
+          } else if (List[1] == '6') {
+            return pg_dn;             // \x1b[6~
+          }
+        }
+      } else {
+        if (List[1] == 'A') {
+          return up;                  // \x1b[A
+        } else if (List[1] == 'B') {
+          return down;                // \x1b[B
+        } else if (List[1] == 'C') {
+          return right;               // \x1b[C
+        } else if (List[1] == 'D') {
+          return left;                // \x1b[D
+        } else if (List[1] == 'H') {
+          return home;                // \x1b[H
+        } else if (List[1] == 'F') {
+          return end;                 // \x1b[F
+        } else {
+          return ESCAPE;
+        }
       }
-
-      if( x == 0 && y == 0) {
-        return;
+    } else if (List[0] == '0') {
+      if (List[1] == 'H') {
+       return home;                 // \x1bOH
+      } else if (List[1] == 'F') {
+        return end;                 // \x1bOF
       }
-
-    Row *rows = &(editor->rows[y]);
-
-    if (x > 0) {
-        Edit_Del_Char_row(rows, x-1);
     }
-    else {
-        x = (editor->rows[y].length);
-        Prev_Del(&editor->rows[y-1], rows->string, rows->length);
-        Edit_Del_row(editor, y);
-    }
-    x -=1;
+      return ESCAPE;
+  } else {
+    return c;
+  }
 }
 
 void Move(int key) {
-    Editor *editor;
-    Row *rows = &(editor->rows[y]);
 
     switch (key) {
         case left:
-            if (x > 0) {
+            if (x != 0) {
                 x--;
-            } else if (y > 0) {
-              y -= 1;
-              x = editor->rows[y].length;
+            } /*
+            else if (y > 0) {
+                y--;
             }
+            */
             break;
         case right:
-            if (rows && x < rows->length) {
+        /*
+            if (row && x < row->size) {
                 x++;
-            } else if (rows && x == rows->length) {
+            } else if (row && x == row->size) {
                 y++;
                 x = 0;
             }
+            */
             break;
         case up:
             if (y != 0) {
@@ -212,7 +178,7 @@ void Move(int key) {
             }
             break;
         case down:
-            if (y < editor->totalrows) {
+            if (y < Edit.total) {
                 y++;
             }
             break;
@@ -221,92 +187,121 @@ void Move(int key) {
 
 
 void presskey() {
-    Editor *editor;
-    int c = getch();
 
-    switch (c) {
-        case CONTROL('q'):
+    int key_val = Read_Key();
+
+    switch (key_val) {
+        case CONTROL('q'):  // Ctrl + Q
             endwin();
+            for_quit();
+            disRaw();
             exit(0);
             break;
 
-        case CONTROL('s'):
+        case CONTROL('s'):  // Ctrl + S
             break;
 
-        case CONTROL('f'):
+        case CONTROL('f'):  // Ctrl + F
             break;
 
-        case KEY_LEFT: // 왼쪽 화살표 키
-        case KEY_RIGHT: // 오른쪽 화살표 키
-        case KEY_UP: // 위쪽 화살표 키
-        case KEY_DOWN: // 아래쪽 화살표 키
-            Move(c);
+        case left: // Arrow Left KEY
+        case right: // Arrow Right KEY
+        case up: // Arrow Up KEY
+        case down: // Arrow Down KEY
+            Move(key_val);
             break;
             
-        case KEY_END: // End 키
+        case end: // End KEY
             x = cols - 1;
             break;
 
-        case KEY_HOME: // Home 키
+        case home: // Home KEY
             x = 0;
             break;
 
-        case KEY_NPAGE: // Page Down 키
-        case KEY_PPAGE: // Page Up 키
+        case pg_up: // Page Down KEY
+        case pg_dn: // Page Up KEY
         {
             int temprows = rows;
             while (temprows--) {
-                if (c == KEY_PPAGE)
+                if (key_val == pg_up)
                     Move(up);
-                else if (c == KEY_NPAGE)
+                else if (key_val == pg_dn)
                     Move(down);
             }
         }
             break;
 
-        case KEY_ENTER:
-        case '\n':
-            Insert_New_Line(editor, y);
+        case '\r':  // ENTER KEY
+            //editorInsertNewline();
             break;
 
-        case KEY_DC:
-            Move(right);
-            Delete_Char(editor);
+        case del:
+            //editorDelChar();
+            //Move(right);
             break;
 
-        case KEY_BACKSPACE:
-            Delete_Char(editor);
+        case b_s:
+            //editorDelChar();
             break;
 
         default:
-            printf("?");
-            Insert_Char(editor, c);
+            editorInsertChar(key_val);
             break;
     }
 }
 
+
 void init() {
 
-    Raw();
     initscr();
-    getmaxyx(stdscr, rows, cols);
-    keypad(stdscr, TRUE);
+    Raw();
     x = 0;
     y = 0;
-    
+    getmaxyx(stdscr, rows, cols);
+    Edit.total = 0;
+    move_cols = 0;
+    move_rows = 0;
+
+}
+
+void open_file(char *filename) {
+  
+  free(EDITOR.filename);
+  Edit.filename = strdup(filename);
+
+  FILE *file = fopen(filename, "r");
+
+  char *row = NULL;
+  size_t size = 0;
+  ssize_t line_len;
+
+  while ((line_len = getline(&row, &size, file)) != -1) {
+    while (line_len > 0 && (row[line_len - 1] == '\r' ||
+                               row[line_len - 1] == '\n'))
+      line_len--;
+    insert_editor_row_at(Edit.total, row, line_len);
+  }
+
+  free(row);
+  fclose(file);
+
 }
 
 int main(int argc, char *argv[]) {
 
-    
-    init();
-    printf("sibal");
+  init();
+
+  if (argc >= 2) {
+    open_file(argv[1]);
+  }
 
     while (1) {
-        printf("??????");
-        presskey(); 
-        refresh();
+      presskey();
     }
-    return 0;
+
+  endwin();
+  disRaw();
+  return 0;
 
 }

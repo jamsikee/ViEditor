@@ -54,6 +54,12 @@ struct Visual_Text_Editor{
 
 struct Visual_Text_Editor Edit;
 
+void disRaw() {
+
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+
+}
+
 void Raw() {
 
     struct termios raw;
@@ -68,6 +74,7 @@ void Raw() {
     raw.c_cc[VTIME] = 1;
 
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    atexit(disRaw);
 
 }
 
@@ -244,7 +251,7 @@ void presskey() {
 
 
 void init() {
-
+  
     Raw();
     initscr();
     getmaxyx(stdscr, rows, cols);

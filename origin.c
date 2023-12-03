@@ -299,7 +299,6 @@ int main(int argc, char *argv[]) {
   }
 
   endwin();
-  disRaw();
   return 0;
 
 }

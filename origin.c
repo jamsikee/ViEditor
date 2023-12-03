@@ -251,12 +251,13 @@ void presskey() {
 
 
 void init() {
-
-    initscr();
+  
     Raw();
+    initscr();
+    getmaxyx(stdscr, rows, cols);
+    keypad(stdscr, TRUE);
     x = 0;
     y = 0;
-    getmaxyx(stdscr, rows, cols);
     Edit.total = 0;
     move_cols = 0;
     move_rows = 0;

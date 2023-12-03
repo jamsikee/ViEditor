@@ -192,7 +192,6 @@ void presskey() {
 
     switch (key_val) {
         case CONTROL('q'):  // Ctrl + Q
-            endwin();
             for_quit();
             exit(0);
             break;

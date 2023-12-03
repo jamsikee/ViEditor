@@ -246,7 +246,7 @@ void presskey() {
             break;
 
         default:
-            editorInsertChar(key_val);
+            //editorInsertChar(key_val);
             break;
     }
 }
@@ -267,7 +267,7 @@ void init() {
 
 void open_file(char *filename) {
   
-  free(EDITOR.filename);
+  free(Edit.filename);
   Edit.filename = strdup(filename);
 
   FILE *file = fopen(filename, "r");
@@ -280,7 +280,7 @@ void open_file(char *filename) {
     while (line_len > 0 && (row[line_len - 1] == '\r' ||
                                row[line_len - 1] == '\n'))
       line_len--;
-    insert_editor_row_at(Edit.total, row, line_len);
+    //insert_editor_row_at(Edit.total, row, line_len);
   }
 
   free(row);

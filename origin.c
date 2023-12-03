@@ -194,7 +194,6 @@ void presskey() {
         case CONTROL('q'):  // Ctrl + Q
             endwin();
             for_quit();
-            disRaw();
             exit(0);
             break;
 
@@ -296,9 +295,9 @@ int main(int argc, char *argv[]) {
     open_file(argv[1]);
   }
 
-    while (1) {
-      presskey();
-    }
+  while (1) {
+    presskey();
+  }
 
   endwin();
   disRaw();

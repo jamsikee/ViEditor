@@ -123,7 +123,7 @@ void InsertRow(int edit_y, char *line, ssize_t line_len) {
   memmove(&Edit.line[edit_y + 1], &Edit.line[edit_y], sizeof(Row) * (Edit.total - edit_y));
   // Memory move line[y] -> line[y + 1]
   Edit.line[edit_y].len = line_len;   
-  Edit.line[edit_y].c = malloc(INIT_LINE_SIZE + 1);
+  Edit.line[edit_y].c = malloc(line_len + 1);
   Edit.line[edit_y].line_capacity = INIT_LINE_SIZE + 1; 
   // Line_capacity is (Edit.line[y].c)'s size
   memcpy(Edit.line[edit_y].c, line, line_len);
@@ -190,13 +190,16 @@ void RowDeletechar(Row *line, int pos){
 
 void RowInsertchar(Row *line, int word, int pos){
 
-  if (pos < 0){
+  if (pos < 0 || pos > line->len){
     pos = line->len;
   }
+  line->c = realloc(line->c, line->len + 2);
+  /*
   if (line->len > line->line_capacity){
     line->line_capacity*=4;
     line->c = realloc(line->c, line->line_capacity);
   }
+  */
   // it seems like RowInsertString capacity*2
   memmove(&line->c[pos+1], &line->c[pos], line->len - pos + 1);
   // memory move line->len - pos + 1 size

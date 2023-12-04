@@ -479,7 +479,7 @@ void open_file(char *filename) {
 
 void tilde(){
   for (int i = 0; i < rows; i++){
-    write(STDOUT_FILENO, "~\n", 3); 
+    write(STDOUT_FILENO, "~\n", 2); 
   }
 }
 

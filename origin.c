@@ -93,25 +93,6 @@ void for_quit(){
 
 }
 
-
-typedef struct Row {
-
-  int len;
-  char *c;
-  int line_capacity;
-  
-} Row;
-
-struct Visual_Text_EdiEdit{
-
-  int total;
-  Row *line;
-  char *filename;
-
-};
-
-struct Visual_Text_EdiEdit Edit;
-
 Row *get_line(Row *line, int pos) {
 
     return &line[pos];

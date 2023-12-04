@@ -504,8 +504,7 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-  
-  if (Edit.total > 1) write(STDOUT_FILENO, "111", 3);
+  printw("Hello, World!");
   while (1) {
     presskey();
   }

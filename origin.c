@@ -260,7 +260,7 @@ void Del_current_line_char() {
 
 void Del_current_line() {
 
-  Row *line = get_line(Edit.line[y]);
+  Row *line = get_line(Edit.line, y);
   // get line Edit.line[y]
   x = Edit.line[y - 1].len;
   RowInsertString(&Edit.line[y - 1], line->c, line->len);

@@ -478,7 +478,7 @@ void open_file(char *filename) {
 }
 
 void tilde(){
-  for (int i = 0; i < rows-2; i++){
+  for (int i = 0; i < rows-10; i++){
     write(STDOUT_FILENO, "~", 1);
     write(STDOUT_FILENO, "\r\n", 2);
   }

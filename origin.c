@@ -183,9 +183,39 @@ void RowDeletechar(Row *line, int pos){
   If x < 0 or x >= line's len then return
   It means The cursor moved out of its intended position
   */
-
+  memmove(&line->c[pos], &line->c[pos+1], line->len - pos);
+  line->len-=1;
+  // memory move c[pos+1] -> c[pos]
 }
-void RowInsertchar();
+
+void empty_new_line(){
+  InsertRow(Edit.total, "", 0);
+  // If the line is empty or outside the screen add a empty line.
+}
+
+void RowInsertchar(Row *line, int word, int pos){
+  if (pos < 0){
+    pos = line->len;
+  }
+  while(line->len > line->line_capacity){
+    line->line_capacity*=2;
+    line->c = realloc(line->c, line->line_capacity);
+  }
+  // it seems like RowInsertString capacity*2
+  memmove(&line->c[pos+1], &line->c[pos], line->len - pos + 1);
+  // memory move line->len - pos + 1 size
+  line->len+=1;
+  line->c[pos] = word
+}
+
+void Insertchar(int char){
+  if(y == Edit.total) {
+    empty_new_line();
+  }
+  else if{
+    
+  }
+}
 void Newline();
 void DeleteChar();
 

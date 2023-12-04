@@ -499,7 +499,7 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-  mvprintw(y, x, "안녕");
+  mvprintw(10, 5, "안녕");
   while (1) {
     presskey();
   }

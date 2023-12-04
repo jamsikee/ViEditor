@@ -477,26 +477,7 @@ void open_file(char *filename) {
 
 }
 
-void first_message() {
-  char message_string[80];
-  int message_length =
-      snprintf(message_string, sizeof(message_string),
-               "Visual text editor -- Version: 0.0.1");
 
-  if (message_length > cols)
-    message_length = cols;
-  int padding = (cols - message_length) / 2;
-  if (padding) {
-    printf("~");
-    padding--;
-  }
-  while (padding) {
-    printf(" ");
-    padding--;
-  }
-
-  printf("%s", message_string);
-}
 
 void init() {
   
@@ -518,7 +499,7 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-  first_message();
+  mvprintw(y, x, "안녕");
   while (1) {
     presskey();
   }

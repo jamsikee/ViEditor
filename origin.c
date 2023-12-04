@@ -477,7 +477,11 @@ void open_file(char *filename) {
 
 }
 
-
+void tilde(){
+  for (int i = 0; i < rows; i++){
+    write(STDOUT_FILENO, "~", 1); 
+  }
+}
 
 void init() {
   
@@ -499,7 +503,7 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-  write(STDOUT_FILENO, "hello", 6);
+  tilde();
   while (1) {
     presskey();
   }

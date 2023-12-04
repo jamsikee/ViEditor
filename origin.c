@@ -503,7 +503,6 @@ void init() {
     Raw();
     initscr();
     getmaxyx(stdscr, rows, cols);
-    keypad(stdscr, TRUE);
     x = 0;
     y = 0;
     Edit.total = 0;

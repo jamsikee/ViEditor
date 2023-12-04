@@ -188,11 +188,6 @@ void RowDeletechar(Row *line, int pos){
   // memory move c[pos+1] -> c[pos]
 }
 
-void empty_new_line(){
-  InsertRow(Edit.total, "", 0);
-  // If the line is empty or outside the screen add a empty line.
-}
-
 void RowInsertchar(Row *line, int word, int pos){
   if (pos < 0){
     pos = line->len;
@@ -204,19 +199,39 @@ void RowInsertchar(Row *line, int word, int pos){
   // it seems like RowInsertString capacity*2
   memmove(&line->c[pos+1], &line->c[pos], line->len - pos + 1);
   // memory move line->len - pos + 1 size
-  line->len+=1;
-  line->c[pos] = word
+  line->len += 1;
+  line->c[pos] = word;
 }
 
-void Insertchar(int char){
+void empty_new_line(int pos){
+  InsertRow(pos, "", 0);
+  // If the line is empty or outside the screen add a empty line.
+}
+
+void Insertchar(int word){
   if(y == Edit.total) {
-    empty_new_line();
+    empty_new_line(Edit.total);
   }
-  else if{
-    
+  RowInsertchar(&Edit.line[y], word, x);
+  x += 1;
+}
+
+void miinsert(Row *line, int pos_y, int pos_x) {
+    RowInsertchar(pos_y + 1, &row->chars[pos_x], row->size - pos_x);
+
+    line = &Edit.line[pos_y];
+    line->len = pos_x;
+    line->c[line->len] = '\0';
+}
+
+void Newline(){
+  if(x == 0){
+    empty_new_line(y);
+  }
+  else{
+    Row *line = 
   }
 }
-void Newline();
 void DeleteChar();
 
 int Read_Key() {

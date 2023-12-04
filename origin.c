@@ -454,21 +454,6 @@ void presskey() {
     }
 }
 
-
-void init() {
-  
-    Raw();
-    initscr();
-    getmaxyx(stdscr, rows, cols);
-    keypad(stdscr, TRUE);
-    x = 0;
-    y = 0;
-    Edit.total = 0;
-    move_cols = 0;
-    move_rows = 0;
-
-}
-
 void open_file(char *filename) {
   
   free(Edit.filename);
@@ -513,6 +498,19 @@ void first_message() {
   printf("%s", message_string);
 }
 
+void init() {
+  
+    Raw();
+    initscr();
+    getmaxyx(stdscr, rows, cols);
+    keypad(stdscr, TRUE);
+    x = 0;
+    y = 0;
+    Edit.total = 0;
+    move_cols = 0;
+    move_rows = 0;
+
+}
 
 int main(int argc, char *argv[]) {
 

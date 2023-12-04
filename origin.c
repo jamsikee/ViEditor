@@ -89,7 +89,7 @@ void Raw() {
 void for_quit(){
 
     write(STDOUT_FILENO, "\x1b[2J", 4); // clear UI
-    write(STDOUT_FILENO, "\x1b[0;0H", 3);  // cursor (0, 0)
+    write(STDOUT_FILENO, "\x1b[H", 3);  // cursor (0, 0)
 
 }
 

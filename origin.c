@@ -23,7 +23,6 @@
 #include <termios.h>
 #include <errno.h>
 
-#include "eru.h"
 
 //struct Editor editor;
 //struct Editor *eru = &editor;

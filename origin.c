@@ -194,8 +194,8 @@ void RowInsertchar(Row *line, int word, int pos){
     pos = line->len;
   }
   
-  if (line->len > line->line_capacity){
-    line->line_capacity*=4;
+  if (line->len + 1> line->line_capacity){
+    line->line_capacity*=2;
     line->c = realloc(line->c, line->line_capacity);
   }
   

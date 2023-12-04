@@ -450,6 +450,7 @@ void presskey() {
 
         default:  // Input( )
             Insertchar(key_val);
+            write(STDOUT_FILENO, &key_val, 1);
             break;
     }
 }
@@ -501,8 +502,6 @@ int main(int argc, char *argv[]) {
 
   init();
 
-  printf("Program started\n");
-  
   if (argc >= 2) {
     open_file(argv[1]);
   }

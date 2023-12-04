@@ -67,15 +67,22 @@ void Raw() {
     tcgetattr(STDIN_FILENO, &orig_termios);
     tcgetattr(STDIN_FILENO, &raw);
 
-    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); // Non Sigint sign, change ctrl-M, Non INPCK, erase 8bit, ctrl-s, ctrl-q
-    raw.c_oflag &= ~(OPOST); // Non Output processing
-    raw.c_cflag |= (CS8); // 8 bit
-    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG); // Non canonical, Echo, ctrl-v, ctrl-c, ctrl-z
-    raw.c_cc[VMIN] = 0;  // If input then return read( )
-    raw.c_cc[VTIME] = 1; // Maximum time before read( )
+    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); 
+    // Non Sigint sign, change ctrl-M, Non INPCK, erase 8bit, ctrl-s, ctrl-q
+    raw.c_oflag &= ~(OPOST); 
+    // Non Output processing
+    raw.c_cflag |= (CS8); 
+    // Set 8 bit
+    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG); 
+    // Non canonical, Echo, ctrl-v, ctrl-c, ctrl-z
+    raw.c_cc[VMIN] = 0;  
+    // If input then return read( )
+    raw.c_cc[VTIME] = 1; 
+    // Maximum time before read( )
 
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-    atexit(disRaw); // If exit a program then automatically invoked
+    atexit(disRaw); 
+    // If exit a program then automatically invoked
 
 }
 
@@ -105,6 +112,13 @@ struct Visual_Text_EdiEdit{
 
 struct Visual_Text_EdiEdit Edit;
 
+Row *get_line(Row *line, int pos) {
+
+    return &line[pos];
+    // get line index
+
+}
+
 
 void InsertRow(int edit_y, char *line, ssize_t line_len) {
 
@@ -129,9 +143,11 @@ void InsertRow(int edit_y, char *line, ssize_t line_len) {
   // Memory move line[y] -> line[y + 1]
   Edit.line[edit_y].len = line_len;   
   Edit.line[edit_y].c = malloc(INIT_LINE_SIZE + 1);
-  Edit.line[edit_y].line_capacity = INIT_LINE_SIZE + 1; // Line_capacity is (Edit.line[y].c)'s size
+  Edit.line[edit_y].line_capacity = INIT_LINE_SIZE + 1; 
+  // Line_capacity is (Edit.line[y].c)'s size
   memcpy(Edit.line[edit_y].c, line, line_len);
-  Edit.line[edit_y].c[line_len] = '\0'; // The end of the string is null
+  Edit.line[edit_y].c[line_len] = '\0'; 
+  // The end of the string is null
   Edit.total+=1;
 
 }
@@ -160,6 +176,7 @@ void DeleteRow(int pos){
 }
 
 void RowInsertString(Row *line, char *str, size_t del_line_len){
+
   // This function will use delete char at x = 0 then delete row
   while (line->len + del_line_len > line->line_capacity){   
     line->line_capacity *= 2;
@@ -176,6 +193,7 @@ void RowInsertString(Row *line, char *str, size_t del_line_len){
 }
 
 void RowDeletechar(Row *line, int pos){
+
   if (pos < 0 || pos >= line->len){
     return;
   }
@@ -186,9 +204,11 @@ void RowDeletechar(Row *line, int pos){
   memmove(&line->c[pos], &line->c[pos+1], line->len - pos);
   line->len-=1;
   // memory move c[pos+1] -> c[pos]
+
 }
 
 void RowInsertchar(Row *line, int word, int pos){
+
   if (pos < 0){
     pos = line->len;
   }
@@ -201,38 +221,93 @@ void RowInsertchar(Row *line, int word, int pos){
   // memory move line->len - pos + 1 size
   line->len += 1;
   line->c[pos] = word;
+
 }
 
 void empty_new_line(int pos){
+
   InsertRow(pos, "", 0);
   // If the line is empty or outside the screen add a empty line.
+
 }
 
 void Insertchar(int word){
+
   if(y == Edit.total) {
-    empty_new_line(Edit.total);
+    empty_new_line(Edit.total); 
+    // if cursor y = total then add line;
   }
   RowInsertchar(&Edit.line[y], word, x);
   x += 1;
+  // Insert char at cursor x
+
 }
 
-void miinsert(Row *line, int pos_y, int pos_x) {
-    RowInsertchar(pos_y + 1, &row->chars[pos_x], row->size - pos_x);
+void contained_new_line(Row *line, int pos_y, int pos_x) {
 
+    RowInsertchar(pos_y + 1, &line->c[pos_x], line->len - pos_x);
+    // Insert current line's string(pos_x to line->len) to new line
     line = &Edit.line[pos_y];
     line->len = pos_x;
     line->c[line->len] = '\0';
+
 }
 
 void Newline(){
+
+  Row *line = get_line(Edit.line, y);
+  // get line Edit.line[y]
   if(x == 0){
     empty_new_line(y);
   }
   else{
-    Row *line = 
+    contained_new_line(line, y, x);
   }
+  y += 1;
+  x = 0;
+
 }
-void DeleteChar();
+
+void Del_current_line_char() {
+
+  Row *line = get_line(Edit.line, y);
+  // get line Edit.line[y]
+  RowDeletechar(line, x - 1);
+  x -= 1;
+
+}
+
+void Del_current_line() {
+
+  Row *line = get_line(Edit.line[y]);
+  // get line Edit.line[y]
+  x = Edit.line[y - 1].len;
+  RowInsertString(&Edit.line[y - 1], line->c, line->len);
+  DeleteRow(y);
+  y -= 1;
+  // x cursor is prev line's len and y cursor -1 and insert string at line's len
+
+}
+
+void DeleteChar(){
+
+  Row *line = get_line(Edit.line, y);
+
+  if( y == Edit.total){
+    return;
+  }
+  if( x == 0 && y == 0){
+    return;
+  }
+
+  if(x > 0){
+    Del_current_line_char();
+  }
+  else{
+    Del_current_line();
+  }
+
+}
 
 int Read_Key() {
 

@@ -195,7 +195,14 @@ void RowInsertchar(Row *line, int word, int pos){
   }
   while(line->len > line->line_capacity){
     line->line_capacity*=2;
-    line->c = realloc(line->c, line->line_capacity);
+    char* new_line = realloc(line->c, line->line_capacity);
+    if (new_line == NULL) {
+        // 메모리 할당에 실패했습니다.
+        // 여기서 적절한 오류 처리를 수행합니다.
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(1);
+    }
+    line->c = new_line;
   }
   // it seems like RowInsertString capacity*2
   memmove(&line->c[pos+1], &line->c[pos], line->len - pos + 1);

@@ -9,7 +9,9 @@
 #include <ncurses.h>
 #include <stdbool.h>
 
-#define CONTROL(k) ((k) & 0x1f)
+#define INIT_ROW_SIZE 1000
+#define INIT_LINE_SIZE 125
+#define CONTROL(k) ((k) & 0x1f) // control + k
 
 struct termios orig_termios;
 
@@ -44,7 +46,7 @@ typedef struct Row {
 
 } Row;
 
-struct Visual_Text_Editor{
+struct Visual_Text_EdiEdit{
 
   int total;
   Row *line;
@@ -52,12 +54,10 @@ struct Visual_Text_Editor{
 
 };
 
-struct Visual_Text_Editor Edit;
+struct Visual_Text_EdiEdit Edit;
 
 void disRaw() {
-
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
-
 }
 
 void Raw() {
@@ -66,15 +66,15 @@ void Raw() {
     tcgetattr(STDIN_FILENO, &orig_termios);
     tcgetattr(STDIN_FILENO, &raw);
 
-    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-    raw.c_oflag &= ~(OPOST);
-    raw.c_cflag |= (CS8);
-    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
-    raw.c_cc[VMIN] = 0;
-    raw.c_cc[VTIME] = 1;
+    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); // Non Sigint sign, change ctrl-M, Non INPCK, erase 8bit, ctrl-s, ctrl-q
+    raw.c_oflag &= ~(OPOST); // Non Output processing
+    raw.c_cflag |= (CS8); // 8 bit
+    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG); // Non canonical, Echo, ctrl-v, ctrl-c, ctrl-z
+    raw.c_cc[VMIN] = 0;  // If input then return read( )
+    raw.c_cc[VTIME] = 1; // Maximum time before read( )
 
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-    atexit(disRaw);
+    atexit(disRaw); // If exit a program then automatically invoked
 
 }
 
@@ -84,6 +84,49 @@ void for_quit(){
     write(STDOUT_FILENO, "\x1b[0;0H", 3);  // cursor (0, 0)
 
 }
+
+void InsertRow(int edit_y, char *line, ssize_t line_len) {
+
+  if (edit_y < 0 || edit_y > Edit.total) {
+    return;
+  }
+
+  if (Edit.total == 0) {
+    Edit.line = malloc(sizeof(Row) * INIT_ROW_SIZE);
+  } else if (Edit.total % INIT_ROW_SIZE == 0) {
+    Edit.line = realloc(Edit.line, sizeof(Row) * (Edit.total * 2));
+  }
+
+  memmove(&Edit.line[edit_y + 1], &Edit.line[edit_y], sizeof(Row) * (Edit.total - edit_y));
+
+  Edit.line[edit_y].len = line_len;
+  Edit.line[edit_y].c = malloc(INIT_LINE_SIZE + 1);
+  memcpy(Edit.line[edit_y].c, line, line_len);
+  Edit.line[edit_y].c[line_len] = '\0';
+  Edit.total+=1;
+
+}
+
+void FreeRow(Row *rows){
+
+  free(rows->c);
+
+}
+
+void DeleteRow(int pos){
+
+  if (pos < 0 || pos >= Edit.total){
+    return;
+  }
+
+  FreeRow(&Edit.line[pos]);
+  memmove(&Edit.line[pos], )
+}
+void RowInsertString();
+void RowDeletechar();
+void RowInsertchar();
+void Newline();
+void DeleteChar();
 
 int Read_Key() {
 
@@ -230,21 +273,21 @@ void presskey() {
         }
             break;
 
-        case '\r':  // ENTER KEY
-            //editorInsertNewline();
+        case '\r':  // Enter KEY
+            //ediEditInsertNewline();
             break;
 
-        case del:
-            //editorDelChar();
+        case del:  // Delete KEY
+            //ediEditDelChar();
             //Move(right);
             break;
 
-        case b_s:
-            //editorDelChar();
+        case b_s:  // Backspace KEY
+            //ediEditDelChar();
             break;
 
-        default:
-            //editorInsertChar(key_val);
+        default:  // Input( )
+            //ediEditInsertChar(key_val);
             break;
     }
 }
@@ -279,13 +322,14 @@ void open_file(char *filename) {
     while (line_len > 0 && (row[line_len - 1] == '\r' ||
                                row[line_len - 1] == '\n'))
       line_len--;
-    //insert_editor_row_at(Edit.total, row, line_len);
+    //InsertRow(Edit.total, row, line_len);
   }
 
   free(row);
   fclose(file);
 
 }
+
 
 int main(int argc, char *argv[]) {
 

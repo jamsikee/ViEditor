@@ -521,10 +521,9 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-
+  first_message();
   while (1) {
     presskey();
-    first_message();
   }
 
   endwin();

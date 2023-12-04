@@ -197,7 +197,6 @@ void RowInsertchar(Row *line, int word, int pos){
     line->line_capacity*=2;
     line->c = realloc(line->c, line->line_capacity);
   }
-  }
   // it seems like RowInsertString capacity*2
   memmove(&line->c[pos+1], &line->c[pos], line->len - pos + 1);
   // memory move line->len - pos + 1 size

@@ -108,7 +108,10 @@ struct Visual_Text_EdiEdit Edit;
 
 void InsertRow(int edit_y, char *line, ssize_t line_len) {
 
-  if (edit_y < 0 || edit_y > Edit.total) {
+  if (edit_y < 0) {
+    return;
+  }
+  else if(edit_y > Edit.total){
     return;
   }
   // If y < 0 or y > total then return
@@ -141,7 +144,10 @@ void FreeRow(Row *line){  // Efficient method for free memory
 
 void DeleteRow(int pos){
 
-  if (pos < 0 || pos >= Edit.total){  
+  if (pos < 0){  
+    return;
+  }
+  else if(pos >= Edit.total){
     return;
   }
   // If y < 0 or y > total then return
@@ -173,7 +179,11 @@ void RowDeletechar(Row *line, int pos){
   if (pos < 0 || pos >= line->len){
     return;
   }
-  // If x < 0 or 
+  /*
+  If x < 0 or x >= line's len then return
+  It means The cursor moved out of its intended position
+  */
+
 }
 void RowInsertchar();
 void Newline();

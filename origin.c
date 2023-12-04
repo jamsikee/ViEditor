@@ -226,7 +226,7 @@ void Insertchar(int word){
 
 void contained_new_line(Row *line, int pos_y, int pos_x) {
 
-    RowInsertchar(pos_y + 1, &line->c[pos_x], line->len - pos_x);
+    InsertRow(pos_y + 1, &line->c[pos_x], line->len - pos_x);
     // Insert current line's string(pos_x to line->len) to new line
     line = &Edit.line[pos_y];
     line->len = pos_x;

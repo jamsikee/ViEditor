@@ -455,20 +455,20 @@ void presskey() {
             break;
 
         case '\r':  // Enter KEY
-            //ediEditInsertNewline();
+            Newline();
             break;
 
         case del:  // Delete KEY
-            //ediEditDelChar();
-            //Move(right);
+            DeleteChar();
+            Move(right);
             break;
 
         case b_s:  // Backspace KEY
-            //ediEditDelChar();
+            DeleteChar();
             break;
 
         default:  // Input( )
-            //ediEditInsertChar(key_val);
+            Insertchar(key_val);
             break;
     }
 }
@@ -495,18 +495,18 @@ void open_file(char *filename) {
 
   FILE *file = fopen(filename, "r");
 
-  char *row = NULL;
+  char *line = NULL;
   size_t size = 0;
   ssize_t line_len;
 
-  while ((line_len = getline(&row, &size, file)) != -1) {
-    while (line_len > 0 && (row[line_len - 1] == '\r' ||
-                               row[line_len - 1] == '\n'))
+  while ((line_len = getline(&line, &size, file)) != -1) {
+    while (line_len > 0 && (line[line_len - 1] == '\r' ||
+                               line[line_len - 1] == '\n'))
       line_len--;
-    //InsertRow(Edit.total, row, line_len);
+    InsertRow(Edit.total, line, line_len);
   }
 
-  free(row);
+  free(line);
   fclose(file);
 
 }

@@ -43,6 +43,7 @@ typedef struct Row {
 
   int len;
   char *c;
+  int line_capacity;
 
 } Row;
 
@@ -85,45 +86,95 @@ void for_quit(){
 
 }
 
+
+typedef struct Row {
+
+  int len;
+  char *c;
+  int line_capacity;
+  
+} Row;
+
+struct Visual_Text_EdiEdit{
+
+  int total;
+  Row *line;
+  char *filename;
+
+};
+
+struct Visual_Text_EdiEdit Edit;
+
+
 void InsertRow(int edit_y, char *line, ssize_t line_len) {
 
   if (edit_y < 0 || edit_y > Edit.total) {
     return;
   }
+  // If y < 0 or y > total then return
 
   if (Edit.total == 0) {
     Edit.line = malloc(sizeof(Row) * INIT_ROW_SIZE);
   } else if (Edit.total % INIT_ROW_SIZE == 0) {
     Edit.line = realloc(Edit.line, sizeof(Row) * (Edit.total * 2));
   }
-
+  /*
+  Edit.line's memory = INIT_ROW_SIZE(1000)
+  If total % 1000 == 0 then realloc 1000 * 2
+  */
   memmove(&Edit.line[edit_y + 1], &Edit.line[edit_y], sizeof(Row) * (Edit.total - edit_y));
-
-  Edit.line[edit_y].len = line_len;
+  // Memory move line[y] -> line[y + 1]
+  Edit.line[edit_y].len = line_len;   
   Edit.line[edit_y].c = malloc(INIT_LINE_SIZE + 1);
+  Edit.line[edit_y].line_capacity = INIT_LINE_SIZE + 1; // Line_capacity is (Edit.line[y].c)'s size
   memcpy(Edit.line[edit_y].c, line, line_len);
-  Edit.line[edit_y].c[line_len] = '\0';
+  Edit.line[edit_y].c[line_len] = '\0'; // The end of the string is null
   Edit.total+=1;
 
 }
 
-void FreeRow(Row *rows){
+void FreeRow(Row *line){  // Efficient method for free memory
 
-  free(rows->c);
+  free(line->c);
 
 }
 
 void DeleteRow(int pos){
 
-  if (pos < 0 || pos >= Edit.total){
+  if (pos < 0 || pos >= Edit.total){  
     return;
   }
+  // If y < 0 or y > total then return
 
-  FreeRow(&Edit.line[pos]);
-  memmove(&Edit.line[pos], )
+  FreeRow(&Edit.line[pos]); // Line[pos]'s memory free
+  memmove(&Edit.line[pos], &Edit.line[pos+1], sizeof(Row) * (Edit.total - pos - 1));
+  // Line[pos+1]'s memory move to free memory(line[pos]) 
+  Edit.total-=1;
+
 }
-void RowInsertString();
-void RowDeletechar();
+
+void RowInsertString(Row *line, char *str, size_t del_line_len){
+  // This function will use delete char at x = 0 then delete row
+  while (line->len + del_line_len > line->line_capacity){   
+    line->line_capacity *= 2;
+    line->c = realloc(line->c, line->line_capacity);
+  }
+  /*
+    While line_capacity is full then size*=2 and realloc 
+    because 126 * 2 = 252 > line_capacity then run until satisfied condition
+  */
+  memcpy(&line->c[line->len], str, del_line_len);
+  line->len += del_line_len;
+  line->c[line->len] = '\0';
+
+}
+
+void RowDeletechar(Row *line, int pos){
+  if (pos < 0 || pos >= line->len){
+    return;
+  }
+  // If x < 0 or 
+}
 void RowInsertchar();
 void Newline();
 void DeleteChar();

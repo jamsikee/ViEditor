@@ -501,6 +501,8 @@ int main(int argc, char *argv[]) {
 
   init();
 
+  printf("Program started\n");
+  
   if (argc >= 2) {
     open_file(argv[1]);
   }

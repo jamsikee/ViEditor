@@ -14,7 +14,10 @@
 
 /* defines */
 
+#define EDI_VERSION "0.0.1"
+#define EDI_TAB_STOP 8
 #define CTRL_KEY(k) ((k)&0x1f)
+#define EDI_QUIT_TIMES 2
 #define ENTER_KEY '\r'
 
 enum editor_keys {
@@ -33,7 +36,9 @@ enum editor_keys {
 
 typedef struct editor_row {
   int size;
+  int render_size;
   char *chars;
+  char *render;
 } editor_row;
 
 struct editor_config {
@@ -126,13 +131,89 @@ void enable_raw_mode() {
     die("tcsetattr");
 }
 
+int get_cursor_position(int *rows, int *cols) {
+  if (write(STDOUT_FILENO, "\x1b[6n", 4) != 4)
+    return -1;
+
+  char buffer[32];
+  unsigned int i = 0;
+  while (i < sizeof(buffer) - 1) {
+    if (read(STDIN_FILENO, &buffer[i], 1) != 1)
+      break;
+    if (buffer[i] == 'R')
+      break;
+    i++;
+  }
+  buffer[i] = '\0';
+
+  if (buffer[0] != '\x1b' || buffer[1] != '[')
+    return -1;
+  if (sscanf(&buffer[2], "%d;%d", rows, cols) != 2)
+    return -1;
+
+  return 0;
+}
+
+int get_window_size(int *rows, int *cols) {
+  struct winsize ws;
+
+  if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
+    if (write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12)
+      return -1;
+    return get_cursor_position(rows, cols);
+  } else {
+    *rows = ws.ws_row;
+    *cols = ws.ws_col;
+    return 0;
+  }
+}
+
+/* row operations */
+int cursor_x_to_render_x(editor_row *row, int cursor_x) {
+  int render_cursor_x = 0;
+  for (int i = 0; i < cursor_x; i++) {
+    if (row->chars[i] == '\t') {
+      render_cursor_x += (EDI_TAB_STOP - 1) - (render_cursor_x % EDI_TAB_STOP);
+    }
+    render_cursor_x++;
+  }
+
+  return render_cursor_x;
+}
+
+void update_render_row(editor_row *row) {
+  int tabs = 0;
+  for (int j = 0; j < row->size; j++) {
+    if (row->chars[j] == '\t')
+      tabs++;
+  }
+
+  free(row->render);
+  row->render = malloc((row->size) + (tabs * (EDI_TAB_STOP - 1)) + 1);
+  int idx = 0;
+
+  for (int j = 0; j < row->size; j++) {
+    if (row->chars[j] == '\t') {
+      row->render[idx++] = ' ';
+      while (idx % EDI_TAB_STOP != 0)
+        row->render[idx++] = ' ';
+    } else {
+      row->render[idx++] = row->chars[j];
+    }
+  }
+
+  row->render[idx] = '\0';
+  row->render_size = idx;
+}
+
 void insert_editor_row_at(int at_y, char *line, ssize_t line_length) {
   if (at_y < 0 || at_y > EDITOR.number_of_rows)
     return;
 
   EDITOR.row =
       realloc(EDITOR.row, sizeof(editor_row) * (EDITOR.number_of_rows + 1));
-  memmove(&EDITOR.row[at_y + 1], &EDITOR.row[at_y], sizeof(editor_row) * (EDITOR.number_of_rows - at_y));
+  memmove(&EDITOR.row[at_y + 1], &EDITOR.row[at_y],
+          sizeof(editor_row) * (EDITOR.number_of_rows - at_y));
 
   EDITOR.row[at_y].size = line_length;
   EDITOR.row[at_y].chars = malloc(line_length + 1);
@@ -140,14 +221,23 @@ void insert_editor_row_at(int at_y, char *line, ssize_t line_length) {
   EDITOR.row[at_y].chars[line_length] = '\0';
   EDITOR.number_of_rows++;
 
+  EDITOR.row[at_y].render_size = 0;
+  EDITOR.row[at_y].render = NULL;
+  update_render_row(&EDITOR.row[at_y]);
+
+  EDITOR.file_modified = true;
 }
 
 void insert_char_in_row(editor_row *row, int at, int c) {
-  if (at < 0 || at > row->size) at = row->size;
+  if (at < 0 || at > row->size)
+    at = row->size;
   row->chars = realloc(row->chars, row->size + 2);
   memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1);
   row->size++;
   row->chars[at] = c;
+  update_render_row(row);
+
+  EDITOR.file_modified = true;
 }
 
 void append_string_to_row(editor_row *row, char *string, size_t length) {
@@ -155,6 +245,9 @@ void append_string_to_row(editor_row *row, char *string, size_t length) {
   memcpy(&row->chars[row->size], string, length);
   row->size += length;
   row->chars[row->size] = '\0';
+
+  update_render_row(row);
+  EDITOR.file_modified = true;
 }
 
 void delete_char_in_row(editor_row *row, int at) {
@@ -162,10 +255,13 @@ void delete_char_in_row(editor_row *row, int at) {
     return;
   memmove(&row->chars[at], &row->chars[at + 1], row->size - at);
   row->size--;
+  update_render_row(row);
+  EDITOR.file_modified = true;
 }
 
 void free_row(editor_row *row) {
   free(row->chars);
+  free(row->render);
 }
 
 void delete_row(int at) {
@@ -176,6 +272,7 @@ void delete_row(int at) {
   memmove(&EDITOR.row[at], &EDITOR.row[at + 1],
           sizeof(editor_row) * (EDITOR.number_of_rows - at - 1));
   EDITOR.number_of_rows--;
+  EDITOR.file_modified = true;
 }
 
 /* editor operations */
@@ -198,6 +295,7 @@ void insert_new_line() {
     row = &EDITOR.row[EDITOR.cursor_y];
     row->size = EDITOR.cursor_x;
     row->chars[row->size] = '\0';
+    update_render_row(row);
   }
 
   EDITOR.cursor_y++;

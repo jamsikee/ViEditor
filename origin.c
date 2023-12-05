@@ -470,17 +470,6 @@ void presskey() {
     }
 }
 
-char* storeFile(char *line, int length) {
-  char *new_line = malloc(length + 1);
-  if (new_line == NULL) {
-    fprintf(stderr, "Memory allocation failed\n");
-    exit(1);
-  }
-  memcpy(new_line, line, length);
-  new_line[length] = '\0';
-  return new_line;
-}
-
 void open_file(char *filename) {
   free(Edit.filename);
   Edit.filename = strdup(filename);
@@ -497,12 +486,9 @@ void open_file(char *filename) {
     while (line_len > 0 && (line[line_len - 1] == '\r' ||line[line_len - 1] == '\n')){
       line_len--;
     }
-
-    Edit.line[i].c = storeFile(line, read);
-    Edit.line[i].len = read;
     
-    InsertRow(Edit.total, Edit.line[i].c, read);
-    i++;
+    InsertRow(Edit.total, line, read);
+
   }
 
   free(line);

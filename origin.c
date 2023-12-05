@@ -470,46 +470,62 @@ void presskey() {
     }
 }
 
-char* storeFile(char *line, int length) {
-  char *new_line = malloc(length + 1);
-  if (new_line == NULL) {
-    fprintf(stderr, "Memory allocation failed\n");
-    exit(1);
-  }
-  memcpy(new_line, line, length);
-  new_line[length] = '\0';
-  return new_line;
+struct line {
+    char* data;
+    int len;
+};
+
+struct line get_line(FILE* file) {
+    struct line result = {NULL, 0};
+    char* line = NULL;
+    size_t size = 0;
+    ssize_t line_len;
+
+    if ((line_len = getline(&line, &size, file)) != -1) {
+        int read = line_len;
+        while (line_len > 0 && (line[line_len - 1] == '\r' || line[line_len - 1] == '\n')) {
+            line_len--;
+        }
+        
+        result.data = line;
+        result.len = line_len;
+    }
+
+    return result;
 }
 
 void open_file(char *filename) {
-  free(Edit.filename);
-  Edit.filename = strdup(filename);
-
-  FILE *file= fopen(filename, "rt");
-
-  char *line = NULL;
-  size_t size = 0;
-  ssize_t line_len;
-  int i = 0;
-
-  while ((line_len = getline(&line, &size, file)) != -1) {
-    
-    while (line_len > 0 && (line[line_len - 1] == '\r' ||line[line_len - 1] == '\n')){
-      line_len--;
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "Failed to open file %s\n", filename);
+        return;
     }
-    int read = line_len;
-    //여기서 해도 되고
-    //realloc
-    Edit.line[i].c = storeFile(line, read);
-    Edit.line[i].len = read;
     
-    InsertRow(Edit.total, Edit.line[i].c, read);
-    i++;
-  }
-
-  free(line);
-  fclose(file);
+    int i = 0;
+    while (1) {
+        struct line temp_line = get_line(file);
+        if (temp_line.data == NULL) {
+            break;
+        }
+        
+        char* temp = malloc(sizeof(char) * (temp_line.len + 1));
+        if (temp == NULL) {
+            fprintf(stderr, "Memory allocation error\n");
+            return;
+        }
+        
+        strncpy(temp, temp_line.data, temp_line.len);
+        temp[temp_line.len] = '\0';
+        
+        free(temp_line.data);
+        
+        InsertRow(Edit.total, temp, temp_line.len);
+        i++;
+    }
+    
+    fclose(file);
 }
+
 
 
 

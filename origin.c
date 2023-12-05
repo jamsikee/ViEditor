@@ -516,7 +516,11 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-  printf("%d", Edit.total);
+    printf("Total lines: %d\n", Edit.total);
+  for (int i = 0; i < Edit.total; i++) {
+    printf("Line %d: %s\n", i, Edit.line[i].c);
+  }
+
   while (1) {
     presskey();
     

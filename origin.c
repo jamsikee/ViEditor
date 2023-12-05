@@ -1,4 +1,4 @@
-#ifdef __WIN43
+#ifdef __WIN32
 
 #elif __linux__
 #include <stdio.h>
@@ -54,7 +54,7 @@ typedef struct Row {
 
 } Row;
 
-struct Visual_Text_EdiEdit{
+struct Visual_Text_Editor{
 
   int total;
   Row *line;

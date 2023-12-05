@@ -116,7 +116,7 @@ Row *get_line(Row *line, int pos) {
 }
 
 
-void InsertRow(int edit_y, char *line, ssize_t line_len) {
+void InsertRow(int edit_y, char *line, int line_len) {
   if (edit_y < 0) {
     return;
   }
@@ -489,15 +489,14 @@ void open_file(char *filename) {
 
   char *line = NULL;
   size_t size = 0;
-  ssize_t line_len;
+  int line_len;
   int i = 0;
 
   while ((line_len = getline(&line, &size, file)) != -1) {
-    
+    int read = line_len;
     while (line_len > 0 && (line[line_len - 1] == '\r' ||line[line_len - 1] == '\n')){
       line_len--;
     }
-    int read = line_len;
 
     Edit.line[i].c = storeFile(line, read);
     Edit.line[i].len = read;
@@ -533,7 +532,7 @@ int main(int argc, char *argv[]) {
     open_file(argv[1]);
 
   }else{
-    // open_file("default.txt");
+    open_file("default.txt");
   }
   
   while (1) {

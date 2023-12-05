@@ -471,10 +471,10 @@ void presskey() {
 }
 
 typedef struct {
-    char *content;
+    char *temp;
     size_t size;
     int length;
-} LineInfo;
+} File_Inf;
 
 void open_file(char *store_file) {
     free(Edit.store_file);
@@ -487,20 +487,20 @@ void open_file(char *store_file) {
         exit(EXIT_FAILURE);
     }
 
-    LineInfo line_info;
-    line_info.content = NULL;
-    line_info.size = 0;
-    line_info.length = 0;
+    File_Inf Inf;
+    Inf.temp = NULL;
+    Inf.size = 0;
+    Inf.length = 0;
 
-    while ((line_info.length = getline(&(line_info.content), &(line_info.size), file)) != -1) {
-        int read = line_info.length;
-        while (line_info.length > 0 && (line_info.content[line_info.length - 1] == '\r' || line_info.content[line_info.length - 1] == '\n')) {
-            line_info.length--;
+    while ((Inf.length = getline(&(Inf.temp), &(Inf.size), file)) != -1) {
+        int read = Inf.length;
+        while (Inf.length > 0 && (Inf.temp[Inf.length - 1] == '\r' || Inf.temp[Inf.length - 1] == '\n')) {
+            Inf.length--;
         }
-        InsertRow(Edit.total, line_info.content, read);
+        InsertRow(Edit.total, Inf.temp, read);
     }
 
-    free(line_info.content);
+    free(Inf.temp);
     fclose(file);
 }
 

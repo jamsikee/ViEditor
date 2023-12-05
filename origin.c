@@ -1,12 +1,12 @@
-// #ifdef __WIN32
-//   #include <stdio.h>
-//   #include <stdlib.h>
-//   #include <string.h>
-//   #include <fcntl.h>
-//   #include <ctype.h>
-//   #include <stdbool.h>
-//   #define CLEAR "cls"
-// #elif __linux__
+#ifdef __WIN32
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <string.h>
+  #include <fcntl.h>
+  #include <ctype.h>
+  #include <stdbool.h>
+  #define CLEAR "cls"
+#elif __linux__
   #include <stdio.h>
   #include <stdlib.h>
   #include <string.h>
@@ -19,9 +19,9 @@
   #include <stdbool.h>
   #define CLEAR "clear"
 
-// #elif __APPLE__
+#elif __APPLE__
 
-// #endif
+#endif
 
 #define INIT_ROW_SIZE 500
 #define INIT_LINE_SIZE 125

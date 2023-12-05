@@ -487,7 +487,7 @@ void open_file(char *filename) {
       line_len--;
     }
     
-    //InsertRow(Edit.total, line, read);
+    InsertRow(Edit.total, line, read);
 
   }
 

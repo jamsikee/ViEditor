@@ -474,36 +474,47 @@ void presskey() {
     }
 }
 
+char* storeFile(char *line, int length) {
+  char *new_line = malloc(length + 1);
+  if (new_line == NULL) {
+    fprintf(stderr, "Memory allocation failed\n");
+    exit(1);
+  }
+  memcpy(new_line, line, length);
+  new_line[length] = '\0';
+  return new_line;
+}
+
 void open_file(char *filename) {
   free(Edit.filename);
   Edit.filename = strdup(filename);
 
   FILE *file= fopen(filename, "rt");
- 
+
   char *line = NULL;
   size_t size = 0;
   ssize_t line_len;
+  int i = 0;
 
   while ((line_len = getline(&line, &size, file)) != -1) {
-    int read = line_len;
+    
     while (line_len > 0 && (line[line_len - 1] == '\r' ||line[line_len - 1] == '\n')){
       line_len--;
     }
-    printf("%s\r", line);
-    //InsertRow(Edit.total, line, read);
+    int read = line_len;
+    //여기서 해도 되고
+    //realloc
+    Edit.line[i].c = storeFile(line, read);
+    Edit.line[i].len = read;
+    
+    InsertRow(Edit.total, Edit.line[i].c, read);
+    i++;
   }
 
   free(line);
   fclose(file);
-
 }
 
-void tilde(){
-  for (int i = 0; i < rows; i++){
-    write(STDOUT_FILENO, "~", 1);
-    write(STDOUT_FILENO, "\r\n", 2);
-  }
-}
 
 void init() {
   
@@ -521,9 +532,13 @@ void init() {
 int main(int argc, char *argv[]) {
   system(CLEAR);
   init();
-
+  // filename = argv[1];
   if (argc >= 2) {
+    
     open_file(argv[1]);
+
+  }else{
+    //
   }
   
   while (1) {

@@ -1,3 +1,6 @@
+#ifdef __WIN43
+
+#elif __linux__
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +11,10 @@
 #include <ctype.h>
 #include <ncurses.h>
 #include <stdbool.h>
+
+#elif __APPLE__
+
+#endif
 
 #define INIT_ROW_SIZE 500
 #define INIT_LINE_SIZE 125
@@ -55,7 +62,7 @@ struct Visual_Text_EdiEdit{
 
 };
 
-struct Visual_Text_EdiEdit Edit;
+struct Visual_Text_Editor Edit;
 
 void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
@@ -452,7 +459,6 @@ void presskey() {
 
         default:  // Input( )
             Insertchar(key_val);
-            write(STDOUT_FILENO, &key_val, 1);
             break;
     }
 }

@@ -516,7 +516,7 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-  printf(Edit.total);
+  printf("%d", Edit.total);
   while (1) {
     presskey();
     

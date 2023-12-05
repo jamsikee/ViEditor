@@ -487,7 +487,7 @@ void open_file(char *filename) {
       line_len--;
     }
     
-    InsertRow(Edit.total, line, read);
+    //InsertRow(Edit.total, line, read);
 
   }
 
@@ -514,11 +514,7 @@ int main(int argc, char *argv[]) {
   init();
   // filename = argv[1];
   if (argc >= 2) {
-    
     open_file(argv[1]);
-
-  }else{
-    open_file("default.txt");
   }
   
   while (1) {

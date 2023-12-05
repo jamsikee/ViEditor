@@ -44,6 +44,7 @@ enum P_key {
     
 };
 
+// gloval value
 bool error = false;
 
 int x;
@@ -58,7 +59,7 @@ typedef struct Row {
   int len;
   char *c;
   int line_capacity;
-
+  // Store_Row_Information
 } Row;
 
 struct Visual_Text_Editor{
@@ -66,10 +67,19 @@ struct Visual_Text_Editor{
   int total;
   Row *line;
   char *store_file;
-
-};
+  // Editor Struct
+};  
 
 struct Visual_Text_Editor Edit;
+
+typedef struct {
+
+    char *temp;
+  size_t size;
+    int length;
+    // Store_File_Information
+} File_Inf;
+
 
 
 void disRaw() {
@@ -103,7 +113,6 @@ void Raw() {
 
 void for_quit(){
 
-    write(STDOUT_FILENO, "\x1b[2J", 4); // clear UI
     write(STDOUT_FILENO, "\x1b[H", 3);  // cursor (0, 0)
 
 }
@@ -470,12 +479,6 @@ void presskey() {
     }
 }
 
-typedef struct {
-    char *temp;
-    size_t size;
-    int length;
-} File_Inf;
-
 void open_file(char *store_file) {
     free(Edit.store_file);
     Edit.store_file = malloc(strlen(store_file) + 1);
@@ -524,7 +527,7 @@ void init() {
 int main(int argc, char *argv[]) {
   system(CLEAR);
   init();
-  // store_file = argv[1];
+  file_name = argv[1];
   if (argc >= 2) {
     open_file(argv[1]);
   }

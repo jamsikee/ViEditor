@@ -1,12 +1,12 @@
-#ifdef __WIN32
-  #include <stdio.h>
-  #include <stdlib.h>
-  #include <string.h>
-  #include <fcntl.h>
-  #include <ctype.h>
-  #include <stdbool.h>
-  #define CLEAR "cls"
-#elif __linux__
+// #ifdef __WIN32
+//   #include <stdio.h>
+//   #include <stdlib.h>
+//   #include <string.h>
+//   #include <fcntl.h>
+//   #include <ctype.h>
+//   #include <stdbool.h>
+//   #define CLEAR "cls"
+// #elif __linux__
   #include <stdio.h>
   #include <stdlib.h>
   #include <string.h>
@@ -19,9 +19,9 @@
   #include <stdbool.h>
   #define CLEAR "clear"
 
-#elif __APPLE__
+// #elif __APPLE__
 
-#endif
+// #endif
 
 #define INIT_ROW_SIZE 500
 #define INIT_LINE_SIZE 125
@@ -508,12 +508,6 @@ void open_file(char *store_file) {
     fclose(file);
 }
 
-void tilde(){
-  for (int i; i < rows - 2; ++i){
-    printf("~\r\n");
-  }
-}
-
 void status_bar(char* file_name) {
     char left_Inf[50];
     char right_Inf[40];
@@ -527,9 +521,16 @@ void status_bar(char* file_name) {
     int remained_len = cols - strlen(left_Inf) - strlen(right_Inf);
     snprintf(right_Inf, sizeof(right_Inf), "no ft / %d/%d", y + 1, Edit.total);
 
-    printf("\x1b[%d;0H", rows - 2); // 상태바 위치로 커서 이동
-    printf("\x1b[K"); // 해당 라인 지우기
+    printf("\033[%d;0H", rows - 2); // 상태바 위치로 커서 이동
+    printf("\033[K"); // 해당 라인 지우기
+    printf("%-s%*s", left_Inf, remained_len, right_Inf);
+}
 
+void tilde(){
+  for (int i; i < rows - 2; ++i){
+    printf("~\r");
+    printf("\n");
+  }
 }
 
 void init() {
@@ -542,18 +543,13 @@ void init() {
     Edit.total = 0;
     move_cols = 0;
     move_rows = 0;
-    Edit.store_file = '\0';
-}
 
-void refresh_UI(){
-  tilde();
-  status_bar(Edit.store_file);
 }
 
 int main(int argc, char *argv[]) {
   system(CLEAR);
   init();
-  Edit.store_file = argv[1];
+  char *file_name = argv[1];
   if (argc >= 2) {
     open_file(argv[1]);
   }
@@ -564,7 +560,8 @@ int main(int argc, char *argv[]) {
 
   while (1) {
     presskey();
-    refresh_UI();
+    tilde();
+    status_bar(file_name);
   }
 
   endwin();

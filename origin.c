@@ -527,7 +527,7 @@ int main(int argc, char *argv[]) {
   }
   
   for(int i=0; i<rows-2; ++i){
-    printf("%s\r\n", Edit.line[i].c;);  
+    printf("%s\r\n", Edit.line[i].c);  
   }
   
   while (1) {

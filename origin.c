@@ -113,7 +113,6 @@ void Raw() {
 
 void for_quit(){
 
-    system(CLEAR);
     write(STDOUT_FILENO, "\x1b[H", 3);  // cursor (0, 0)
 
 }
@@ -542,7 +541,7 @@ int main(int argc, char *argv[]) {
     presskey();
     
   }
-
+  system(CLEAR);
   endwin();
   return 0;
 

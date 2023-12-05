@@ -523,9 +523,9 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-  printf("success");
   
   while (1) {
+    printf("success");
     presskey();
     
   }

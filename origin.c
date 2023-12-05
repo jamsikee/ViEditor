@@ -489,7 +489,7 @@ void open_file(char *filename) {
     while (line_len > 0 && (line[line_len - 1] == '\r' ||line[line_len - 1] == '\n')){
       line_len--;
     }
-    printf("%s", line);
+    printf("%s\r", line);
     //InsertRow(Edit.total, line, read);
   }
 

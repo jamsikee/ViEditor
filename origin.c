@@ -521,8 +521,8 @@ void status_bar(char* file_name) {
     int remained_len = cols - strlen(left_Inf) - strlen(right_Inf);
     snprintf(right_Inf, sizeof(right_Inf), "no ft / %d/%d", y + 1, Edit.total);
 
-    printf("\033[%d;0H", rows - 2); // 상태바 위치로 커서 이동
-    printf("\033[K"); // 해당 라인 지우기
+    printf("\x1b[%d;0H", rows - 2); // 상태바 위치로 커서 이동
+    printf("\x1b[K"); // 해당 라인 지우기
     printf("%-s%*s", left_Inf, remained_len, right_Inf);
 }
 

@@ -558,9 +558,9 @@ int main(int argc, char *argv[]) {
     presskey();
     tilde();
     status_bar(file_name);
-    for (int i = 0; i < Edit.total; i++) {
-    printf("%s\r",  Edit.line[i].c);
-  }
+    // for (int i = 0; i < Edit.total; i++) {
+    // printf("%s\r",  Edit.line[i].c);
+  // }
   }
 
   endwin();

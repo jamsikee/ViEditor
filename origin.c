@@ -472,7 +472,12 @@ void presskey() {
 
 void open_file(char *filename) {
     free(Edit.filename);
-    Edit.filename = strdup(filename);
+    Edit.filename = malloc(strlen(filename) + 1);
+    if (Edit.filename == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+    strcpy(Edit.filename, filename);
 
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
@@ -480,17 +485,23 @@ void open_file(char *filename) {
         exit(EXIT_FAILURE);
     }
 
-    char line[INIT_LINE_SIZE];
-    while (fgets(line, sizeof(line), file) != NULL) {
-        int len = strlen(line);
-        while (len > 0 && (line[len - 1] == '\r' || line[len - 1] == '\n')) {
-            len--;
+    char *line = NULL;
+    size_t size = 0;
+    ssize_t line_len;
+
+    while ((line_len = getline(&line, &size, file)) != -1) {
+        int read = line_len;
+        while (line_len > 0 && (line[line_len - 1] == '\r' || line[line_len - 1] == '\n')) {
+            line_len--;
         }
-        InsertRow(Edit.total, line, len);
+        
+        InsertRow(Edit.total, line, read);
     }
 
+    free(line);
     fclose(file);
 }
+
 
 
 

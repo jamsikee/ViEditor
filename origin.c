@@ -470,18 +470,24 @@ void presskey() {
     }
 }
 
-char* tempstore(char* line, int len) {
-    char* temp = malloc(sizeof(char) * (len + 1));
+struct line {
+    char* data;
+    int len;
+};
+
+char* tempstore(struct line* line) {
+    char* temp = malloc(sizeof(char) * (line->len + 1));
     if (temp == NULL) {
         fprintf(stderr, "Memory allocation error\n");
         return NULL;
     }
     
-    strncpy(temp, line, len);
-    temp[len] = '\0';
+    strncpy(temp, line->data, line->len);
+    temp[line->len] = '\0';
     
     return temp;
 }
+
 
 void open_file(char *filename) {
     FILE* file = fopen(filename, "r");
@@ -509,6 +515,7 @@ void open_file(char *filename) {
     free(line);
     fclose(file);
 }
+
 
 
 

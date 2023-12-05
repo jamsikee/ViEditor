@@ -53,6 +53,7 @@ int rows;
 int cols;
 int move_rows;
 int move_cols;
+int scrren_rows;
 
 typedef struct Row {
 
@@ -543,7 +544,7 @@ void init() {
     Edit.total = 0;
     move_cols = 0;
     move_rows = 0;
-
+    scrren_rows = rows - 2;
 }
 
 int main(int argc, char *argv[]) {
@@ -553,7 +554,7 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-
+  printf("hello");
   while (1) {
     presskey();
     tilde();

@@ -471,38 +471,25 @@ void presskey() {
 }
 
 void open_file(char *filename) {
-  free(Edit.filename);
-  Edit.filename = strdup(filename);
+    free(Edit.filename);
+    Edit.filename = strdup(filename);
 
-  FILE *file = fopen(filename, "rt");
-  if (file == NULL) {
-    fprintf(stderr, "Cannot open file: %s\n", filename);
-    return;
-  }
-
-  char *line = NULL;
-  size_t size = 0;
-  int c;
-
-  while ((c = fgetc(file)) != EOF) {
-    if (c == '\n' || c == '\r') {
-      InsertRow(Edit.total, line, size);
-      free(line);
-      line = NULL;
-      size = 0;
-    } else {
-      line = realloc(line, size + 1);
-      line[size++] = c;
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "Cannot open file: %s\n", filename);
+        exit(EXIT_FAILURE);
     }
-  }
 
-  // 마지막 줄 처리
-  if (size > 0) {
-    InsertRow(Edit.total, line, size);
-  }
+    char line[INIT_LINE_SIZE];
+    while (fgets(line, sizeof(line), file) != NULL) {
+        int len = strlen(line);
+        while (len > 0 && (line[len - 1] == '\r' || line[len - 1] == '\n')) {
+            len--;
+        }
+        InsertRow(Edit.total, line, len);
+    }
 
-  free(line);
-  fclose(file);
+    fclose(file);
 }
 
 

@@ -480,27 +480,24 @@ void open_file(char *filename) {
     strcpy(Edit.filename, filename);
 
     FILE *file = fopen(filename, "r");
-    if (file == NULL) {
-        fprintf(stderr, "Cannot open file: %s\n", filename);
-        exit(EXIT_FAILURE);
-    }
 
     char *line = NULL;
     size_t size = 0;
-    ssize_t line_len;
 
-    while ((line_len = getline(&line, &size, file)) != -1) {
-        int read = line_len;
-        while (line_len > 0 && (line[line_len - 1] == '\r' || line[line_len - 1] == '\n')) {
-            line_len--;
-        }
+    while (getline(&line, &size, file) != -1) {
+        int line_len = strcspn(line, "\r\n"); // Find the position of '\r' or '\n'
+        line[line_len] = '\0'; // Replace the newline character with '\0'
         
-        InsertRow(Edit.total, line, read);
+        InsertRow(Edit.total, line, line_len);
+
+        free(line);
+        line = NULL;
+        size = 0;
     }
 
-    free(line);
     fclose(file);
 }
+
 
 
 

@@ -488,7 +488,6 @@ char* tempstore(struct line* line) {
     return temp;
 }
 
-
 void open_file(char *filename) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
@@ -506,7 +505,8 @@ void open_file(char *filename) {
             line_len--;
         }
         
-        char* temp = tempstore(line, line_len);
+        struct line temp_line = {line, line_len};
+        char* temp = tempstore(&temp_line);
         if (temp != NULL) {
             InsertRow(Edit.total, temp, read);
         }
@@ -515,6 +515,7 @@ void open_file(char *filename) {
     free(line);
     fclose(file);
 }
+
 
 
 

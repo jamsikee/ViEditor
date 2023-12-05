@@ -475,7 +475,7 @@ struct line {
     int len;
 };
 
-struct line get_line(FILE* file) {
+struct line store_line(FILE* file) {
     struct line result = {NULL, 0};
     char* line = NULL;
     size_t size = 0;
@@ -503,7 +503,7 @@ void open_file(char *filename) {
     
     int i = 0;
     while (1) {
-        struct line temp_line = get_line(file);
+        struct line temp_line = store_line(file);
         if (temp_line.data == NULL) {
             break;
         }

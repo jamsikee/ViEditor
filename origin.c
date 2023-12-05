@@ -533,7 +533,7 @@ int main(int argc, char *argv[]) {
     open_file(argv[1]);
 
   }else{
-    open_file("default.txt");
+    // open_file("default.txt");
   }
   
   while (1) {

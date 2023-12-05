@@ -1,16 +1,27 @@
 #ifdef __WIN32
-
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <string.h>
+  // #include <termios.h>
+  // #include <unistd.h>
+  #include <fcntl.h>
+  // #include <sys/ioctl.h>
+  #include <ctype.h>
+  // #include <ncurses.h>
+  #include <stdbool.h>
+  #define CLEAR "cls"
 #elif __linux__
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <termios.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <ctype.h>
-#include <ncurses.h>
-#include <stdbool.h>
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <string.h>
+  #include <termios.h>
+  #include <unistd.h>
+  #include <fcntl.h>
+  #include <sys/ioctl.h>
+  #include <ctype.h>
+  #include <ncurses.h>
+  #include <stdbool.h>
+  #define CLEAR "clear"
 
 #elif __APPLE__
 
@@ -507,7 +518,7 @@ void init() {
 }
 
 int main(int argc, char *argv[]) {
-
+  system(CLEAR);
   init();
 
   if (argc >= 2) {

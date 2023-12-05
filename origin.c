@@ -525,6 +525,10 @@ int main(int argc, char *argv[]) {
     open_file(argv[1]);
   }
   
+  for(int i=0; i<rows-2; ++i){
+    printf("~\r\n");  
+  }
+  
   while (1) {
     presskey();
     

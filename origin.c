@@ -75,6 +75,7 @@ struct Visual_Text_Editor{
 
 struct Visual_Text_Editor Edit;
 
+
 void disRaw() {
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
@@ -479,8 +480,8 @@ void open_file(char *filename) {
   free(Edit.filename);
   Edit.filename = strdup(filename);
 
-  FILE *file = fopen(filename, "r");
-
+  FILE *file= fopen(filename, "r");
+ 
   char *line = NULL;
   size_t size = 0;
   ssize_t line_len;
@@ -526,7 +527,7 @@ int main(int argc, char *argv[]) {
   }
   
   for(int i=0; i<rows-2; ++i){
-    printf("~\r\n");  
+    printf("%s\r\n", Edit.line[i].c;);  
   }
   
   while (1) {

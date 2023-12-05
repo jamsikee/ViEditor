@@ -550,6 +550,7 @@ void init() {
 int main(int argc, char *argv[]) {
   system(CLEAR);
   init();
+  endwin();
   char *file_name = argv[1];
   if (argc >= 2) {
     open_file(argv[1]);
@@ -564,7 +565,6 @@ int main(int argc, char *argv[]) {
   // }
   }
 
-  endwin();
   return 0;
 
 }

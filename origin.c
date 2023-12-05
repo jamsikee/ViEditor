@@ -65,7 +65,7 @@ struct Visual_Text_Editor{
 
   int total;
   Row *line;
-  char *filename;
+  char *store_file;
 
 };
 
@@ -470,59 +470,37 @@ void presskey() {
     }
 }
 
-struct line {
-    char* data;
-    int len;
-};
-
-struct line store_line(FILE* file) {
-    struct line result = {NULL, 0};
-    char* line = NULL;
-    size_t size = 0;
-    ssize_t line_len;
-
-    if ((line_len = getline(&line, &size, file)) != -1) {
-        int read = line_len;
-        while (line_len > 0 && (line[line_len - 1] == '\r' || line[line_len - 1] == '\n')) {
-            line_len--;
-        }
-        
-        result.data = line;
-        result.len = line_len;
-    }
-
-    return result;
-}
+typedef struct {
+    char *content;
+    size_t size;
+    int length;
+} LineInfo;
 
 void open_file(char *filename) {
-    FILE* file = fopen(filename, "r");
-    if (file == NULL) {
-        fprintf(stderr, "Failed to open file %s\n", filename);
-        return;
+    free(Edit.filename);
+    Edit.filename = malloc(strlen(filename) + 1);
+    strcpy(Edit.filename, filename);
+
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        fprintf(stderr, "Cannot open file: %s\n", filename);
+        exit(EXIT_FAILURE);
     }
-    
-    int i = 0;
-    while (1) {
-        struct line temp_line = store_line(file);
-        if (temp_line.data == NULL) {
-            break;
+
+    LineInfo line_info;
+    line_info.content = NULL;
+    line_info.size = 0;
+    line_info.length = 0;
+
+    while ((line_info.length = getline(&(line_info.content), &(line_info.size), file)) != -1) {
+        int read = line_info.length;
+        while (line_info.length > 0 && (line_info.content[line_info.length - 1] == '\r' || line_info.content[line_info.length - 1] == '\n')) {
+            line_info.length--;
         }
-        
-        char* temp = malloc(sizeof(char) * (temp_line.len + 1));
-        if (temp == NULL) {
-            fprintf(stderr, "Memory allocation error\n");
-            return;
-        }
-        
-        strncpy(temp, temp_line.data, temp_line.len);
-        temp[temp_line.len] = '\0';
-        
-        free(temp_line.data);
-        
-        InsertRow(Edit.total, temp, temp_line.len);
-        i++;
+        InsertRow(Edit.total, line_info.content, read);
     }
-    
+
+    free(line_info.content);
     fclose(file);
 }
 
@@ -546,7 +524,7 @@ void init() {
 int main(int argc, char *argv[]) {
   system(CLEAR);
   init();
-  // filename = argv[1];
+  // store_file = argv[1];
   if (argc >= 2) {
     open_file(argv[1]);
   }

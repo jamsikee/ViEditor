@@ -518,7 +518,7 @@ int main(int argc, char *argv[]) {
   }
 
   for (int i = 0; i < Edit.total; i++) {
-    printf("%s\n",  Edit.line[i].c);
+    printf("%s\r",  Edit.line[i].c);
   }
   printf("Total lines: %d\n", Edit.total);
   while (1) {

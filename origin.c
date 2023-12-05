@@ -121,7 +121,6 @@ Row *get_line(Row *line, int pos) {
 
 
 void InsertRow(int edit_y, char *line, ssize_t line_len) {
-
   if (edit_y < 0) {
     return;
   }
@@ -476,11 +475,10 @@ void presskey() {
 }
 
 void open_file(char *filename) {
-  
   free(Edit.filename);
   Edit.filename = strdup(filename);
 
-  FILE *file= fopen(filename, "r");
+  FILE *file= fopen(filename, "rt");
  
   char *line = NULL;
   size_t size = 0;
@@ -525,7 +523,7 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-  printf("%s", Edit.line[0].c);
+  printf("success");
   
   while (1) {
     presskey();

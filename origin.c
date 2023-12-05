@@ -485,10 +485,10 @@ void open_file(char *filename) {
   ssize_t line_len;
 
   while ((line_len = getline(&line, &size, file)) != -1) {
-    while (line_len > 0 && (line[line_len - 1] == '\r' ||
-                               line[line_len - 1] == '\n'))
+    int read = line_len;
+    while (line_len > 0 && (line[line_len - 1] == '\r' ||line[line_len - 1] == '\n'))
       line_len--;
-    InsertRow(Edit.total, line, line_len);
+    InsertRow(Edit.total, line, read);
   }
 
   free(line);
@@ -525,7 +525,6 @@ int main(int argc, char *argv[]) {
   }
   
   while (1) {
-    printf("success");
     presskey();
     
   }

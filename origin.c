@@ -470,38 +470,48 @@ void presskey() {
     }
 }
 
-void trim_newline(char *str) {
-    size_t len = strlen(str);
-    while (len > 0 && (str[len - 1] == '\r' || str[len - 1] == '\n')) {
-        len--;
+char* tempstore(char* line, int len) {
+    char* temp = malloc(sizeof(char) * (len + 1));
+    if (temp == NULL) {
+        fprintf(stderr, "Memory allocation error\n");
+        return NULL;
     }
-    str[len] = '\0';
+    
+    strncpy(temp, line, len);
+    temp[len] = '\0';
+    
+    return temp;
 }
 
-void read_file(char *filename) {
-    free(Edit.filename);
-    Edit.filename = malloc(strlen(filename) + 1);
+void open_file(char *filename) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "Failed to open file %s\n", filename);
+        return;
+    }
     
-    strcpy(Edit.filename, filename);
-
-    FILE *file = fopen(filename, "r");
-    if (!file) {
-        fprintf(stderr, "Cannot open file: %s\n", filename);
-        exit(EXIT_FAILURE);
-    }
-
-    char *line = NULL;
-    size_t size;
-    int line_len;
-
+    char* line = NULL;
+    size_t size = 0;
+    ssize_t line_len;
+    
     while ((line_len = getline(&line, &size, file)) != -1) {
-        trim_newline(line);
-        InsertRow(Edit.total, line, line_len);
+        int read = line_len;
+        while (line_len > 0 && (line[line_len - 1] == '\r' || line[line_len - 1] == '\n')) {
+            line_len--;
+        }
+        
+        char* temp = tempstore(line, line_len);
+        if (temp != NULL) {
+            InsertRow(Edit.total, temp, read);
+        }
     }
-
+    
     free(line);
     fclose(file);
 }
+
+
+
 
 
 void init() {
@@ -522,7 +532,7 @@ int main(int argc, char *argv[]) {
   init();
   // filename = argv[1];
   if (argc >= 2) {
-    read_file(argv[1]);
+    open_file(argv[1]);
   }
 
   for (int i = 0; i < Edit.total; i++) {

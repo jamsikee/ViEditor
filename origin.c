@@ -545,7 +545,7 @@ void init() {
     Edit.store_file = '\0';
 }
 
-void refresh(){
+void refresh_UI(){
   tilde();
   status_bar(Edit.store_file);
 }
@@ -564,7 +564,7 @@ int main(int argc, char *argv[]) {
 
   while (1) {
     presskey();
-    refresh();
+    refresh_UI();
   }
 
   endwin();

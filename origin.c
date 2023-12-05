@@ -502,8 +502,7 @@ void open_file(char *filename) {
       line_len--;
     }
     int read = line_len;
-    //여기서 해도 되고
-    //realloc
+
     Edit.line[i].c = storeFile(line, read);
     Edit.line[i].len = read;
     
@@ -538,7 +537,7 @@ int main(int argc, char *argv[]) {
     open_file(argv[1]);
 
   }else{
-    //
+    open_file("default.txt");
   }
   
   while (1) {

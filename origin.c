@@ -508,6 +508,12 @@ void open_file(char *store_file) {
     fclose(file);
 }
 
+void tilde(){
+  for (int i; i < rows - 2; ++i){
+    printf("~\r\n");
+  }
+}
+
 void status_bar(char* file_name) {
     char left_Inf[50];
     char right_Inf[40];
@@ -536,13 +542,18 @@ void init() {
     Edit.total = 0;
     move_cols = 0;
     move_rows = 0;
+    Edit.store_file = '\0';
+}
 
+void refresh(){
+  tilde();
+  status_bar(Edit.store_file);
 }
 
 int main(int argc, char *argv[]) {
   system(CLEAR);
   init();
-  char *file_name = argv[1];
+  Edit.store_file = argv[1];
   if (argc >= 2) {
     open_file(argv[1]);
   }
@@ -553,7 +564,7 @@ int main(int argc, char *argv[]) {
 
   while (1) {
     presskey();
-    status_bar(file_name);
+    refresh();
   }
 
   endwin();

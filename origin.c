@@ -476,14 +476,14 @@ typedef struct {
     int length;
 } LineInfo;
 
-void open_file(char *filename) {
-    free(Edit.filename);
-    Edit.filename = malloc(strlen(filename) + 1);
-    strcpy(Edit.filename, filename);
+void open_file(char *store_file) {
+    free(Edit.store_file);
+    Edit.store_file = malloc(strlen(store_file) + 1);
+    strcpy(Edit.store_file, store_file);
 
-    FILE *file = fopen(filename, "r");
+    FILE *file = fopen(store_file, "r");
     if (!file) {
-        fprintf(stderr, "Cannot open file: %s\n", filename);
+        fprintf(stderr, "Cannot open file: %s\n", store_file);
         exit(EXIT_FAILURE);
     }
 

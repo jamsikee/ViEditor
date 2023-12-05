@@ -528,7 +528,7 @@ void status_bar(char* file_name) {
 }
 
 void tilde(){
-  for (int i; i < rows - 2; ++i){
+  for (int i; i < scrren_rows; ++i){
     printf("~\r");
     printf("\n");
   }
@@ -554,7 +554,7 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-  printf("hello");
+
   while (1) {
     presskey();
     tilde();

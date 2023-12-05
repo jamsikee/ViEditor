@@ -113,6 +113,7 @@ void Raw() {
 
 void for_quit(){
 
+
     write(STDOUT_FILENO, "\x1b[H", 3);  // cursor (0, 0)
 
 }
@@ -527,7 +528,7 @@ void init() {
 int main(int argc, char *argv[]) {
   system(CLEAR);
   init();
-  file_name = argv[1];
+  char *file_name = argv[1];
   if (argc >= 2) {
     open_file(argv[1]);
   }

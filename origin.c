@@ -474,26 +474,37 @@ void open_file(char *filename) {
   free(Edit.filename);
   Edit.filename = strdup(filename);
 
-  FILE *file= fopen(filename, "rt");
+  FILE *file = fopen(filename, "rt");
+  if (file == NULL) {
+    fprintf(stderr, "Cannot open file: %s\n", filename);
+    return;
+  }
 
   char *line = NULL;
   size_t size = 0;
-  int line_len;
-  int i = 0;
+  int c;
 
-  while ((line_len = getline(&line, &size, file)) != -1) {
-    int read = line_len;
-    while (line_len > 0 && (line[line_len - 1] == '\r' ||line[line_len - 1] == '\n')){
-      line_len--;
+  while ((c = fgetc(file)) != EOF) {
+    if (c == '\n' || c == '\r') {
+      InsertRow(Edit.total, line, size);
+      free(line);
+      line = NULL;
+      size = 0;
+    } else {
+      line = realloc(line, size + 1);
+      line[size++] = c;
     }
-    
-    InsertRow(Edit.total, line, read);
+  }
 
+  // 마지막 줄 처리
+  if (size > 0) {
+    InsertRow(Edit.total, line, size);
   }
 
   free(line);
   fclose(file);
 }
+
 
 
 void init() {

@@ -470,36 +470,38 @@ void presskey() {
     }
 }
 
-void open_file(char *filename) {
+void trim_newline(char *str) {
+    size_t len = strlen(str);
+    while (len > 0 && (str[len - 1] == '\r' || str[len - 1] == '\n')) {
+        len--;
+    }
+    str[len] = '\0';
+}
+
+void read_file(char *filename) {
     free(Edit.filename);
     Edit.filename = malloc(strlen(filename) + 1);
-    if (Edit.filename == NULL) {
-        fprintf(stderr, "Memory allocation failed\n");
-        exit(EXIT_FAILURE);
-    }
+    
     strcpy(Edit.filename, filename);
 
     FILE *file = fopen(filename, "r");
-
-    char *line = NULL;
-    size_t size = 0;
-
-    while (getline(&line, &size, file) != -1) {
-        int line_len = strcspn(line, "\r\n"); // Find the position of '\r' or '\n'
-        line[line_len] = '\0'; // Replace the newline character with '\0'
-        
-        InsertRow(Edit.total, line, line_len);
-
-        free(line);
-        line = NULL;
-        size = 0;
+    if (!file) {
+        fprintf(stderr, "Cannot open file: %s\n", filename);
+        exit(EXIT_FAILURE);
     }
 
+    char *line = NULL;
+    size_t size;
+    int line_len;
+
+    while ((line_len = getline(&line, &size, file)) != -1) {
+        trim_newline(line);
+        InsertRow(Edit.total, line, line_len);
+    }
+
+    free(line);
     fclose(file);
 }
-
-
-
 
 
 void init() {
@@ -520,7 +522,7 @@ int main(int argc, char *argv[]) {
   init();
   // filename = argv[1];
   if (argc >= 2) {
-    open_file(argv[1]);
+    read_file(argv[1]);
   }
 
   for (int i = 0; i < Edit.total; i++) {

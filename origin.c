@@ -550,8 +550,7 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < Edit.total; i++) {
     printf("%s\r",  Edit.line[i].c);
   }
-  printf("%s", file_name);
-  printf("Total lines: %d\n", Edit.total);
+
   while (1) {
     presskey();
     status_bar(file_name);

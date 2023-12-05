@@ -550,7 +550,7 @@ void init() {
 int main(int argc, char *argv[]) {
   system(CLEAR);
   init();
-  endwin();
+  
   char *file_name = argv[1];
   if (argc >= 2) {
     open_file(argv[1]);
@@ -564,7 +564,7 @@ int main(int argc, char *argv[]) {
     // printf("%s\r",  Edit.line[i].c);
   // }
   }
-
+  endwin();
   return 0;
 
 }

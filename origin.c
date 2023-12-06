@@ -555,7 +555,7 @@ int main(int argc, char *argv[]) {
   }
 
   for (int i = 0; i < Edit.total; i++) {
-    write("%s\r",  Edit.line[i].c);
+    printf("%s\r",  Edit.line[i].c);
   }
 
   while (1) {

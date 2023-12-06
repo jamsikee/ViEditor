@@ -338,7 +338,9 @@ int main() {
   // if (argc >= 2) {
   //   open_file(argv[1]);
   // }
-  printf("~\r\n");
+  mvprintw(1, 0, "~");
+  mvprintw(2, 0, "~");
+  mvprintw(3, 0, "~");
   // while (1) {
   //   presskey();
     

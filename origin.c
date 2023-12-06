@@ -332,7 +332,7 @@ int main() {
   sprintf(location, "\033[%d;%dH", 1,1);
   write(STDOUT_FILENO, location, strlen(location));
   char buf[30];
-  sprintf(buf, "size : %d %d",rows, cols);
+  sprintf(buf, "size : %d %d\r\n",rows, cols);
   write(STDOUT_FILENO, buf, strlen(buf));
   Edit.filename = "No Name";
   move_cursor_init();

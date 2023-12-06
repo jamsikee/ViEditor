@@ -466,6 +466,7 @@ void presskey() {
 
         default:  // Input( )
             Insertchar(key_val);
+            printf("%d", key_val);
             break;
     }
 }

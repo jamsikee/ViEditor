@@ -559,6 +559,7 @@ int main(int argc, char *argv[]) {
   }
 
   while (1) {
+    refresh();
     tilde();
     status_bar(file_name);
     presskey();

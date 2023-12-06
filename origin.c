@@ -564,7 +564,7 @@ int main(int argc, char *argv[]) {
     printf("%c %c %c %c\n", buf[0],buf[1],buf[2],buf[3]);
 
     
-    //presskey();
+    presskey();
   }
   endwin();
   return 0;

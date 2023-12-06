@@ -560,7 +560,7 @@ int main(int argc, char *argv[]) {
     l = read(STDIN_FILENO, &buf, 1);
     
     // printf("%c ", buf);
-    write(STDOUT_FILENO, &buf, strlen(buf));
+    write(STDOUT_FILENO, &buf, 1);
     if(buf == CONTROL('q')) break;
     
     //presskey();

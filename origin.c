@@ -140,7 +140,7 @@ void InsertRow(int edit_y, char *line, int line_len) {
   }
   // If y < 0 or y > total then return
 
-  if (Edit.total == 0) {
+  if (Edit.total == 0) 
     Edit.line = malloc(sizeof(Row) * 5);
   // } else if (Edit.total % INIT_ROW_SIZE == 0) {
   //   Edit.line = realloc(Edit.line, sizeof(Row) * (Edit.total * 2));
@@ -499,12 +499,10 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
+
   for (int i; i < 5; ++i){
-  
     presskey();
-  
   }
 
   return 0;
-
 }

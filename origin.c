@@ -536,7 +536,7 @@ void status_bar(char* file_name) {
 
 void tilde(){
   for (int i; i < scrren_rows; ++i){
-    printf("~\r");
+    write(STDOUT_FILENO, "~\r\n", 3);
   }
 }
 

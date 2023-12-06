@@ -339,10 +339,10 @@ int main() {
   //   open_file(argv[1]);
   // }
   printf("else");
-  while (1) {
-    presskey();
+  // while (1) {
+  //   presskey();
     
-  }
+  // }
 
   endwin();
   return 0;

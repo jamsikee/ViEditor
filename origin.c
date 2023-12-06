@@ -518,11 +518,11 @@ int main(int argc, char *argv[]) {
   //   open_file(argv[1]);
   // }
 
-  
-  printf("Total lines: %d\n", Edit.total);
   for (int i; i < 23; ++i){
     printf("~\r\n");
   }
+  printf("Total lines: %d\n", Edit.total);
+  
   write(STDOUT_FILENO, "\x1b[H", 3);  // cursor (0, 0)
 
   while (1) {

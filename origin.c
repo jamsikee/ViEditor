@@ -310,7 +310,6 @@ void status_bar(int rows) {
 }
 
 void state() {
-    clear(); // 기존 내용을 지우고 새로 그림
     int columns = 80;
     int i = 0;
     for (i = 0; i < rows; i++) {
@@ -332,13 +331,13 @@ int main() {
   initscr();
   noecho();
   getmaxyx(stdscr, rows, cols);
+  state();
   x = 0;
   y = 0;
   Edit.total = 0;
   move_cols = 0;
   move_rows = 0;
   Edit.filename = "No Name";
-  state();
   status_bar(rows);
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find", rows);
   move_cursor_init();

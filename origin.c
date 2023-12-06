@@ -492,10 +492,10 @@ int main(int argc, char *argv[]) {
   write(STDOUT_FILENO, "\x1b[H", 3); 
   init();
   
-  char *file_name = argv[1];
-  if (argc >= 2) {
-    open_file(argv[1]);
-  }
+  // char *file_name = argv[1];
+  // if (argc >= 2) {
+  //   open_file(argv[1]);
+  // }
 
   for (int i; i < 100; ++i){
     presskey();

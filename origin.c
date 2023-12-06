@@ -25,7 +25,7 @@
 
 #define INIT_ROW_SIZE 500
 #define INIT_LINE_SIZE 125
-#define KEY_CTRL(ch) ((ch) & 0x1f)
+#define CONTROL(k) ((k) & 0x1f) // control + k
 
 struct termios orig_termios;
 
@@ -83,10 +83,38 @@ typedef struct {
 
 
 
+void disRaw() {
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+}
+
+void Raw() {
+    atexit(disRaw); 
+    struct termios raw = orig_termios;
+    tcgetattr(STDIN_FILENO, &orig_termios);
+
+    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); 
+    // Non Sigint sign, change ctrl-M, Non INPCK, erase 8bit, ctrl-s, ctrl-q
+    raw.c_oflag &= ~(OPOST); 
+    // Non Output processing
+    raw.c_cflag |= (CS8); 
+    // Set 8 bit
+    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG); 
+    // Non canonical, Echo, ctrl-v, ctrl-c, ctrl-z
+    raw.c_cc[VMIN] = 0;  
+    // If input then return read( )
+    raw.c_cc[VTIME] = 1; 
+    // Maximum time before read( )
+
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    
+    // If exit a program then automatically invoked
+
+}
+
 void for_quit(){
 
     system(CLEAR);
-    move(0, 0);
+    write(STDOUT_FILENO, "\x1b[H", 3);  // cursor (0, 0)
 
 }
 
@@ -288,6 +316,73 @@ void DeleteChar(){
 
 }
 
+int Read_Key() {
+
+  int Return_value;
+  char c;
+  char test[4];
+
+  while ((Return_value = read(STDIN_FILENO, &c, 1)) != 1) {
+    error = true;
+  }
+
+  
+  char ESCAPE = '\x1b';                  // For defualt value ANSI ESCAPE SEQUENCE 
+
+  if (c == ESCAPE) {
+    char List[3];
+    if ((Return_value = read(STDIN_FILENO, &List[0], 1)) != 1)
+      return ESCAPE;
+    if ((Return_value = read(STDIN_FILENO, &List[1], 1)) != 1)
+      return ESCAPE;
+
+    if (List[0] == '[') {             // For processing ANSI ESCAPE SEQUENCE
+      if (List[1] >= '0' && List[1] <= '9') {
+        if (read(STDIN_FILENO, &List[2], 1) != 1) {
+          return ESCAPE;
+        }
+        if (List[2] == '~') {
+          if (List[1] == '1') {
+            return home;              // \x1b[1~
+          } else if (List[1] == '3') {
+            return del;               // \x1b[3~
+          } else if (List[1] == '4') {
+            return end;               // \x1b[4~
+          } else if (List[1] == '5') {
+            return pg_up;             // \x1b[5~
+          } else if (List[1] == '6') {
+            return pg_dn;             // \x1b[6~
+          }
+        }
+      } else {
+        if (List[1] == 'A') {
+          return up;                  // \x1b[A
+        } else if (List[1] == 'B') {
+          return down;                // \x1b[B
+        } else if (List[1] == 'C') {
+          return right;               // \x1b[C
+        } else if (List[1] == 'D') {
+          return left;                // \x1b[D
+        } else if (List[1] == 'H') {
+          return home;                // \x1b[H
+        } else if (List[1] == 'F') {
+          return end;                 // \x1b[F
+        } else {
+          return ESCAPE;
+        }
+      }
+    } else if (List[0] == 'O') {
+      if (List[1] == 'H') {
+       return home;                 // \x1bOH
+      } else if (List[1] == 'F') {
+        return end;                 // \x1bOF
+      }
+    }
+      return ESCAPE;
+  } else {
+    return c;
+  }
+}
 
 void Move(int key) {
     Row *line = (y >= Edit.total)? NULL: &Edit.line[y];
@@ -327,67 +422,63 @@ void Move(int key) {
 
 
 void presskey() {
-    int key_val = getch();
+
+    int key_val = Read_Key();
 
     switch (key_val) {
-        case 'q':  // 'q' 키 누름
-        case 'Q':  // 'Q' 키 누름 (대문자)
-            if (key_val == KEY_CTRL('q')) {  // Ctrl + Q
-                for_quit();
-                endwin(); // ncurses 종료
-                exit(0);
-            }
+        case CONTROL('q'):  // Ctrl + Q
+            for_quit();
+            exit(0);
             break;
 
-        case KEY_CTRL('s'):  // Ctrl + S
-            // Ctrl + S 키에 대한 처리
+        case CONTROL('s'):  // Ctrl + S
             break;
 
-        case KEY_CTRL('f'):  // Ctrl + F
-            // Ctrl + F 키에 대한 처리
+        case CONTROL('f'):  // Ctrl + F
             break;
 
-        case KEY_LEFT: // 왼쪽 화살표 키
-        case KEY_RIGHT: // 오른쪽 화살표 키
-        case KEY_UP: // 위쪽 화살표 키
-        case KEY_DOWN: // 아래쪽 화살표 키
+        case left: // Arrow Left KEY
+        case right: // Arrow Right KEY
+        case up: // Arrow Up KEY
+        case down: // Arrow Down KEY
             Move(key_val);
             break;
-
-        case KEY_END: // End 키
+            
+        case end: // End KEY
             x = cols - 1;
             break;
 
-        case KEY_HOME: // Home 키
+        case home: // Home KEY
             x = 0;
             break;
 
-        case KEY_PPAGE: // Page Up 키
-            for (int i = 0; i < rows; ++i) {
-                Move(up);
+        case pg_up: // Page Down KEY
+        case pg_dn: // Page Up KEY
+        {
+            int temprows = rows;
+            while (temprows--) {
+                if (key_val == pg_up)
+                    Move(up);
+                else if (key_val == pg_dn)
+                    Move(down);
             }
+        }
             break;
 
-        case KEY_NPAGE: // Page Down 키
-            for (int i = 0; i < rows; ++i) {
-                Move(down);
-            }
-            break;
-
-        case '\r':  // Enter 키
+        case '\r':  // Enter KEY
             Newline();
             break;
 
-        case KEY_DC:  // Delete 키
+        case del:  // Delete KEY
             DeleteChar();
             Move(right);
             break;
 
-        case KEY_BACKSPACE:  // Backspace 키
+        case b_s:  // Backspace KEY
             DeleteChar();
             break;
 
-        default:  // 일반 입력 처리
+        default:  // Input( )
             Insertchar(key_val);
             break;
     }
@@ -440,17 +531,13 @@ void status_bar(char* file_name) {
 
 void tilde(){
   for (int i; i < scrren_rows; ++i){
-    printw("~\r");
+    printf("~\r");
   }
 }
 
-
 void init() {
   
-    initscr();
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
+    Raw();
     getmaxyx(stdscr, rows, cols);
     x = 0;
     y = 0;
@@ -469,10 +556,15 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-
+  char buf[4];
   while (1) {
-    presskey();
-    refresh();
+    int length;
+    length = read(STDIN_FILENO, buf, 4);
+
+    printf("%c %c %c %c\n", buf[0],buf[1],buf[2],buf[3]);
+
+    
+    //presskey();
   }
   endwin();
   return 0;

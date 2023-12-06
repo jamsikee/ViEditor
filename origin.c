@@ -523,6 +523,8 @@ int main(int argc, char *argv[]) {
   for (int i; i < 23; ++i){
     printf("~\r\n");
   }
+  write(STDOUT_FILENO, "\x1b[H", 3);  // cursor (0, 0)
+
   while (1) {
     presskey();
     

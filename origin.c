@@ -328,6 +328,9 @@ int main() {
   initscr();
   // noecho();
   getmaxyx(stdscr, rows, cols);
+  char location[30];
+  sprintf(location, "\033[%d;%dH", 1,1);
+  write(STDOUT_FILENO, location, strlen(location));
   char buf[30];
   sprintf(buf, "size : %d %d",rows, cols);
   write(STDOUT_FILENO, buf, strlen(buf));

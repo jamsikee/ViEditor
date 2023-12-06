@@ -324,7 +324,6 @@ void end_message(const char *message, int rows) {
 }
 
 int main() {
-  system(CLEAR);
   initscr();
   noecho();
   getmaxyx(stdscr, rows, cols);
@@ -338,11 +337,6 @@ int main() {
   // if (argc >= 2) {
   //   open_file(argv[1]);
   // }
-  printf("~\n");
-  printf("~\n");
-  printf("~\n");
-  printf("~\n");
-  printf("~\n");
   // while (1) {
   //   presskey();
     

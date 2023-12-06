@@ -321,7 +321,7 @@ int main() {
   Edit.filename = "No Name";
   state();
   status_bar(rows);
-  end_message(rows);
+  end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find", rows);
   move_cursor_init();
   // char* filename = argv[1];
   // if (argc >= 2) {

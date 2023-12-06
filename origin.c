@@ -481,7 +481,10 @@ void Move_cursor(int key) {
                 y++;
             }
             break;
+        default:
+            break;
     }
+    
 }
 
 
@@ -561,7 +564,7 @@ int main(int argc, char *argv[]) {
   tilde();
   while (1) {
     presskey();
-    
+  
   }
 
   return 0;

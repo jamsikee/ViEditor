@@ -317,16 +317,13 @@ void DeleteChar(){
 }
 
 int Read_Key() {
-
   int Return_value;
   char c;
-  char test[4];
+  
 
   while ((Return_value = read(STDIN_FILENO, &c, 1)) != 1) {
     error = true;
   }
-  printf("%c", c);
-
   
   char ESCAPE = '\x1b';                  // For defualt value ANSI ESCAPE SEQUENCE 
 
@@ -336,14 +333,12 @@ int Read_Key() {
       return ESCAPE;
     if ((Return_value = read(STDIN_FILENO, &List[1], 1)) != 1)
       return ESCAPE;
-    printf("%c", List[0]);
-    printf("%c", List[1]);
+    
     if (List[0] == '[') {             // For processing ANSI ESCAPE SEQUENCE
       if (List[1] >= '0' && List[1] <= '9') {
         if (read(STDIN_FILENO, &List[2], 1) != 1) {
           return ESCAPE;
         }
-        printf("%c", List[2]);
         if (List[2] == '~') {
           if (List[1] == '1') {
             return home;              // \x1b[1~
@@ -559,11 +554,15 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-  char buf[4];
+  char buf;
+  int l;
   while (1) {
+    l = read(STDIN_FILE, &buf, 1);
+    printf("%c ", buf);
+
+    if(buf == CONTROL('q')) break;
     
-    
-    presskey();
+    //presskey();
   }
   endwin();
   return 0;

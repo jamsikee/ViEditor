@@ -322,7 +322,7 @@ int main(int argc, char *argv[]) {
   system(CLEAR);
   Raw();
   init();
-   filename = argv[1];
+  char* filename = argv[1];
   if (argc >= 2) {
     open_file(argv[1]);
   }
@@ -331,10 +331,10 @@ int main(int argc, char *argv[]) {
     printf("~\r\n");
   }
 
-  while (1) {
-    presskey();
+  // while (1) {
+  //   presskey();
     
-  }
+  // }
 
   endwin();
   return 0;

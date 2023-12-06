@@ -309,9 +309,9 @@ void state() {
     clear();
     int columns = 80;
     int i = 0;
+
     for (i = 0; i < rows; i++) {
-            mvprintw(i, 0, "~");
-        
+      write(STDOUT_FILENO, "~\r\n", strlen("\r\n"));
     }
 }
 

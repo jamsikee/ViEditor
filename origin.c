@@ -304,7 +304,7 @@ void state() {
 void end_message(const char *message, int rows) {
     int msg_length = strlen(message);
     mvprintw(rows - 1, 0, "%s", message);
-    print_status(rows);
+    status_bar(rows);
     refresh();
 }
 

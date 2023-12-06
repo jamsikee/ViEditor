@@ -544,7 +544,7 @@ void init() {
     scrren_rows = rows - 2;
 }
 
-void(all_refresh){
+void all_refresh(){
   tilde();
 }
 

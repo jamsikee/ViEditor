@@ -524,12 +524,11 @@ void status_bar(char* file_name) {
 
     printf("\1xb[%d;0H", rows - 2); // 상태바 위치로 커서 이동
     printf("\1xb[K"); // 해당 라인 지우기
-    printf("%-s%*s", left_Inf, remained_len, right_Inf);
 }
 
 void tilde(){
   for (int i; i < scrren_rows; ++i){
-    write(STDOUT_FILENO, "~\r", 3);
+    printw("~\r");
   }
 }
 
@@ -556,7 +555,7 @@ int main(int argc, char *argv[]) {
   }
 
   for (int i = 0; i < Edit.total; i++) {
-    printf("%s\r",  Edit.line[i].c);
+    printw("%s\r",  Edit.line[i].c);
   }
 
   while (1) {

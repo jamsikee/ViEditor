@@ -23,11 +23,10 @@
 
 // #endif
 
-#define INIT_ROW_SIZE 1000
+#define INIT_ROW_SIZE 500
 #define INIT_LINE_SIZE 125
 #define CONTROL(k) ((k) & 0x1f) // control + k
 
-void Move_cursor(int key);
 struct termios orig_termios;
 
 enum P_key {
@@ -45,7 +44,6 @@ enum P_key {
     
 };
 
-// gloval value
 bool error = false;
 
 int x;
@@ -54,49 +52,36 @@ int rows;
 int cols;
 int move_rows;
 int move_cols;
-int scrren_rows;
 
 typedef struct Row {
 
   int len;
   char *c;
   int line_capacity;
-  // Store_Row_Information
+
 } Row;
 
 struct Visual_Text_Editor{
 
   int total;
   Row *line;
-  char *store_file;
-  // Editor Struct
-};  
+  char *filename;
+
+};
 
 struct Visual_Text_Editor Edit;
 
-typedef struct {
-
-    char *temp;
-  size_t size;
-    int length;
-    // Store_File_Information
-} File_Inf;
-
-
 
 void disRaw() {
-    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1) {
-      exit(EXIT_FAILURE);
-    }
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
 
 void Raw() {
-    
-   
-    if(tcgetattr(STDIN_FILENO, &orig_termios) == -1) exit(EXIT_FAILURE);
-    atexit(disRaw); 
 
-    struct termios raw = orig_termios;
+    struct termios raw;
+    tcgetattr(STDIN_FILENO, &orig_termios);
+    tcgetattr(STDIN_FILENO, &raw);
+
     raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); 
     // Non Sigint sign, change ctrl-M, Non INPCK, erase 8bit, ctrl-s, ctrl-q
     raw.c_oflag &= ~(OPOST); 
@@ -110,15 +95,15 @@ void Raw() {
     raw.c_cc[VTIME] = 1; 
     // Maximum time before read( )
 
-    if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) exit(EXIT_FAILURE);
-    
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    atexit(disRaw); 
     // If exit a program then automatically invoked
 
 }
 
 void for_quit(){
 
-    system(CLEAR);
+    write(STDOUT_FILENO, "\x1b[2J", 4); // clear UI
     write(STDOUT_FILENO, "\x1b[H", 3);  // cursor (0, 0)
 
 }
@@ -141,14 +126,10 @@ void InsertRow(int edit_y, char *line, int line_len) {
   // If y < 0 or y > total then return
 
   if (Edit.total == 0) {
-    Edit.line = malloc(sizeof(Row) * 1);
-  } 
-  else{
-    Edit.line = realloc(Edit.line, sizeof(Row) * (Edit.total + 1));
+    Edit.line = malloc(sizeof(Row) * INIT_ROW_SIZE);
+  } else if (Edit.total % INIT_ROW_SIZE == 0) {
+    Edit.line = realloc(Edit.line, sizeof(Row) * (Edit.total * 2));
   }
-  // } else if (Edit.total % INIT_ROW_SIZE == 0) {
-  //   Edit.line = realloc(Edit.line, sizeof(Row) * (Edit.total * 2));
-  // }
   /*
   Edit.line's memory = INIT_ROW_SIZE(1000)
   If total % 1000 == 0 then realloc 1000 * 2
@@ -156,7 +137,8 @@ void InsertRow(int edit_y, char *line, int line_len) {
   memmove(&Edit.line[edit_y + 1], &Edit.line[edit_y], sizeof(Row) * (Edit.total - edit_y));
   // Memory move line[y] -> line[y + 1]
   Edit.line[edit_y].len = line_len;   
-  Edit.line[edit_y].c = malloc(line_len + 1);
+  Edit.line[edit_y].c = malloc(INIT_LINE_SIZE + 1);
+  Edit.line[edit_y].line_capacity = INIT_LINE_SIZE + 1; 
   // Line_capacity is (Edit.line[y].c)'s size
   memcpy(Edit.line[edit_y].c, line, line_len);
   Edit.line[edit_y].c[line_len] = '\0'; 
@@ -191,7 +173,10 @@ void DeleteRow(int pos){
 void RowInsertString(Row *line, char *str, size_t del_line_len){
 
   // This function will use delete char at x = 0 then delete row
-  line->c = realloc(line->c, line->len + del_line_len + 1);
+  while (line->len + del_line_len > line->line_capacity){   
+    line->line_capacity *= 2;
+    line->c = realloc(line->c, line->line_capacity);
+  }
   /*
     While line_capacity is full then size*=2 and realloc 
     because 126 * 2 = 252 > line_capacity then run until satisfied condition
@@ -223,7 +208,10 @@ void RowInsertchar(Row *line, int word, int pos){
     pos = line->len;
   }
   
-  line->c = realloc(line->c, line->len + 2);
+  if (line->len + 1> line->line_capacity){
+    line->line_capacity*=2;
+    line->c = realloc(line->c, line->line_capacity);
+  }
   
   // it seems like RowInsertString capacity*2
   memmove(&line->c[pos+1], &line->c[pos], line->len - pos + 1);
@@ -313,19 +301,120 @@ void DeleteChar(){
     Del_current_line_char();
   }
   else{
-    Del_current_line(); 
+    Del_current_line();
   }
 
 }
 
+int Read_Key() {
+
+  int Return_value;
+  char c;
+  while ((Return_value = read(STDIN_FILENO, &c, 1)) != 1) {
+    error = true;
+  }
+
+  char ESCAPE = '\x1b';                  // For defualt value ANSI ESCAPE SEQUENCE 
+
+  if (c == ESCAPE) {
+    char List[3];
+    if ((Return_value = read(STDIN_FILENO, &List[0], 1)) != 1)
+      return ESCAPE;
+    if ((Return_value = read(STDIN_FILENO, &List[1], 1)) != 1)
+      return ESCAPE;
+
+    if (List[0] == '[') {             // For processing ANSI ESCAPE SEQUENCE
+      if (List[1] >= '0' && List[1] <= '9') {
+        if ((Return_value = read(STDIN_FILENO, &List[2], 1)) != 1) {
+          return ESCAPE;
+        }
+        if (List[2] == '~') {
+          if (List[1] == '1') {
+            return home;              // \x1b[1~
+          } else if (List[1] == '3') {
+            return del;               // \x1b[3~
+          } else if (List[1] == '4') {
+            return end;               // \x1b[4~
+          } else if (List[1] == '5') {
+            return pg_up;             // \x1b[5~
+          } else if (List[1] == '6') {
+            return pg_dn;             // \x1b[6~
+          }
+        }
+      } else {
+        if (List[1] == 'A') {
+          return up;                  // \x1b[A
+        } else if (List[1] == 'B') {
+          return down;                // \x1b[B
+        } else if (List[1] == 'C') {
+          return right;               // \x1b[C
+        } else if (List[1] == 'D') {
+          return left;                // \x1b[D
+        } else if (List[1] == 'H') {
+          return home;                // \x1b[H
+        } else if (List[1] == 'F') {
+          return end;                 // \x1b[F
+        } else {
+          return ESCAPE;
+        }
+      }
+    } else if (List[0] == '0') {
+      if (List[1] == 'H') {
+       return home;                 // \x1bOH
+      } else if (List[1] == 'F') {
+        return end;                 // \x1bOF
+      }
+    }
+      return ESCAPE;
+  } else {
+    return c;
+  }
+}
+
+void Move(int key) {
+
+    switch (key) {
+        case left:
+            if (x != 0) {
+                x--;
+            } /*
+            else if (y > 0) {
+                y--;
+            }
+            */
+            break;
+        case right:
+        /*
+            if (row && x < row->size) {
+                x++;
+            } else if (row && x == row->size) {
+                y++;
+                x = 0;
+            }
+            */
+            break;
+        case up:
+            if (y != 0) {
+                y--;
+            }
+            break;
+        case down:
+            if (y < Edit.total) {
+                y++;
+            }
+            break;
+    }
+}
+
+
 void presskey() {
 
-    int key_val = getchar();
+    int key_val = Read_Key();
 
     switch (key_val) {
         case CONTROL('q'):  // Ctrl + Q
             for_quit();
-            exit(EXIT_SUCCESS);
+            exit(0);
             break;
 
         case CONTROL('s'):  // Ctrl + S
@@ -338,7 +427,7 @@ void presskey() {
         case right: // Arrow Right KEY
         case up: // Arrow Up KEY
         case down: // Arrow Down KEY
-            Move_cursor(key_val);
+            Move(key_val);
             break;
             
         case end: // End KEY
@@ -352,13 +441,13 @@ void presskey() {
         case pg_up: // Page Down KEY
         case pg_dn: // Page Up KEY
         {
-            // int temprows = rows;
-            // while (temprows--) {
-            //     if (key_val == pg_up)
-            //         Move(up);
-            //     else if (key_val == pg_dn)
-            //         Move(down);
-            // }
+            int temprows = rows;
+            while (temprows--) {
+                if (key_val == pg_up)
+                    Move(up);
+                else if (key_val == pg_dn)
+                    Move(down);
+            }
         }
             break;
 
@@ -367,8 +456,8 @@ void presskey() {
             break;
 
         case del:  // Delete KEY
-            Move_cursor(right);
             DeleteChar();
+            Move(right);
             break;
 
         case b_s:  // Backspace KEY
@@ -377,129 +466,67 @@ void presskey() {
 
         default:  // Input( )
             Insertchar(key_val);
-            printf("%d", key_val);
             break;
     }
 }
 
-void Move_cursor(int key) {
-    Row *line = (y >= Edit.total)? NULL: &Edit.line[y];
+void open_file(char *filename) {
+  free(Edit.filename);
+  Edit.filename = strdup(filename);
 
-    switch (key) {
-        case left:
-            if (x != 0) {
-                x--;
-            } 
-            else if (y > 0) {
-                y--;
-                x = Edit.line[y].len;
-            }
-            break;
-        case right:
-        
-            if (line && x < line->len) {
-                x++;
-            } else if (line && x == line->len) {
-                y++;
-                x = 0;
-            }
-            
-            break;
-        case up:
-            if (y != 0) {
-                y--;
-            }
-            break;
-        case down:
-            if (y < Edit.total) {
-                y++;
-            }
-            break;
-        default:
-            break;
+  FILE *file= fopen(filename, "rt");
+
+  char *line = NULL;
+  size_t size = 0;
+  int line_len;
+  int i = 0;
+
+  while ((line_len = getline(&line, &size, file)) != -1) {
+    int read = line_len;
+    while (line_len > 0 && (line[line_len - 1] == '\r' ||line[line_len - 1] == '\n')){
+      line_len--;
     }
     
-}
+    InsertRow(Edit.total, line, read);
 
-
-void open_file(char *store_file) {
-    free(Edit.store_file);
-    Edit.store_file = malloc(strlen(store_file) + 1);
-    strcpy(Edit.store_file, store_file);
-
-    FILE *file = fopen(store_file, "r");
-    if (!file) {
-        fprintf(stderr, "Cannot open file: %s\n", store_file);
-        exit(EXIT_FAILURE);
-    }
-
-    File_Inf Inf;
-    Inf.temp = NULL;
-    Inf.size = 0;
-    Inf.length = 0;
-
-    while ((Inf.length = getline(&(Inf.temp), &(Inf.size), file)) != -1) {
-        int read = Inf.length;
-        while (Inf.length > 0 && (Inf.temp[Inf.length - 1] == '\r' || Inf.temp[Inf.length - 1] == '\n')) {
-            Inf.length--;
-        }
-        InsertRow(Edit.total, Inf.temp, read);
-    }
-
-    free(Inf.temp);
-    fclose(file);
-}
-
-void status_bar(char* file_name) {
-    char left_Inf[50];
-    char right_Inf[40];
-
-    if (file_name == NULL || file_name[0] == '\0') {
-        snprintf(left_Inf, sizeof(left_Inf), "[No Name] - %d lines", Edit.total);
-    } else {
-        snprintf(left_Inf, sizeof(left_Inf), "%.20s - %d lines", file_name, Edit.total);
-    }
-
-    int remained_len = cols - strlen(left_Inf) - strlen(right_Inf);
-    snprintf(right_Inf, sizeof(right_Inf), "no ft / %d/%d", y + 1, Edit.total);
-
-    printf("\1xb[%d;0H", rows - 2); // 상태바 위치로 커서 이동
-    printf("\1xb[K"); // 해당 라인 지우기
-}
-
-void tilde(){
-  for (int i; i < scrren_rows; ++i){
-    printf("~\r\n");
   }
+
+  free(line);
+  fclose(file);
 }
+
 
 void init() {
   
     Raw();
+    initscr();
+    getmaxyx(stdscr, rows, cols);
     x = 0;
     y = 0;
     Edit.total = 0;
     move_cols = 0;
     move_rows = 0;
-    rows = 23;
-    scrren_rows = rows - 2;
-    cols = 0;
-}
 
+}
 
 int main(int argc, char *argv[]) {
   system(CLEAR);
-  write(STDOUT_FILENO, "\x1b[H", 3); 
   init();
-  
-  // char *file_name = argv[1];
+  // filename = argv[1];
   // if (argc >= 2) {
   //   open_file(argv[1]);
   // }
 
-  for (int i; i < 100; ++i){
+  for (int i = 0; i < Edit.total; i++) {
+    printf("%s\r",  Edit.line[i].c);
+  }
+  printf("Total lines: %d\n", Edit.total);
+  while (1) {
     presskey();
+    
   }
 
+  endwin();
   return 0;
+
 }

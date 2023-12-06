@@ -312,7 +312,7 @@ int main() {
   move_cols = 0;
   move_rows = 0;
   Edit.filename = "No Name";
-  void state();
+  state();
   // char* filename = argv[1];
   // if (argc >= 2) {
   //   open_file(argv[1]);

@@ -310,19 +310,15 @@ void status_bar(int rows) {
 }
 
 void state() {
+    clear(); // 기존 내용을 지우고 새로 그림
     int columns = 80;
     int i = 0;
     for (i = 0; i < rows; i++) {
-        if (i == rows / 2 && i == 7) {
-            int padding = (columns - strlen("visual text editor — version 0.0.1")) / 2;
-            mvprintw(i, 0, "~%*cvisual text editor — version 0.0.1", padding, ' ');
-        } else {
             mvprintw(i, 0, "~");
-        }
-        refresh(); // 화면 갱신
+        
     }
-
 }
+
 
 void end_message(const char *message, int rows) {
     int msg_length = strlen(message);

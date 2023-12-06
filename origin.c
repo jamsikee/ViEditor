@@ -311,14 +311,12 @@ int main() {
   Edit.total = 0;
   move_cols = 0;
   move_rows = 0;
+  Edit.filename = "No Name";
+  void state();
   // char* filename = argv[1];
   // if (argc >= 2) {
   //   open_file(argv[1]);
   // }
-
-  for (int i; i < 23; ++i){
-    printf("~\r\n");
-  }
 
   // while (1) {
   //   presskey();

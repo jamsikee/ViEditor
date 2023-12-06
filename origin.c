@@ -152,7 +152,7 @@ void InsertRow(int edit_y, char *line, int line_len) {
   memmove(&Edit.line[edit_y + 1], &Edit.line[edit_y], sizeof(Row) * (Edit.total - edit_y));
   // Memory move line[y] -> line[y + 1]
   Edit.line[edit_y].len = line_len;   
-  Edit.line[edit_y].c = malloc(INIT_LINE_SIZE + 1);
+  Edit.line[edit_y].c = malloc(5);
   Edit.line[edit_y].line_capacity = INIT_LINE_SIZE + 1; 
   // Line_capacity is (Edit.line[y].c)'s size
   memcpy(Edit.line[edit_y].c, line, line_len);

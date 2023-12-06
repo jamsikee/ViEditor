@@ -281,8 +281,8 @@ void move_cursor_init(){
 void status_bar(int rows) {
     C_M(1, rows - 1);
     printf("\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
-            y, 
-            x);
+            10, 
+            10);
     printf("\x1b[0m");
 }
 
@@ -313,6 +313,9 @@ int main() {
   move_rows = 0;
   Edit.filename = "No Name";
   state();
+  status_bar();
+  
+  move_cursor_init();
   // char* filename = argv[1];
   // if (argc >= 2) {
   //   open_file(argv[1]);

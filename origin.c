@@ -83,38 +83,10 @@ typedef struct {
 
 
 
-void disRaw() {
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
-}
-
-void Raw() {
-    atexit(disRaw); 
-    struct termios raw = orig_termios;
-    tcgetattr(STDIN_FILENO, &orig_termios);
-
-    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); 
-    // Non Sigint sign, change ctrl-M, Non INPCK, erase 8bit, ctrl-s, ctrl-q
-    raw.c_oflag &= ~(OPOST); 
-    // Non Output processing
-    raw.c_cflag |= (CS8); 
-    // Set 8 bit
-    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG); 
-    // Non canonical, Echo, ctrl-v, ctrl-c, ctrl-z
-    raw.c_cc[VMIN] = 0;  
-    // If input then return read( )
-    raw.c_cc[VTIME] = 1; 
-    // Maximum time before read( )
-
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-    
-    // If exit a program then automatically invoked
-
-}
-
 void for_quit(){
 
     system(CLEAR);
-    write(STDOUT_FILENO, "\x1b[H", 3);  // cursor (0, 0)
+    vmove(stdscr, 0, 0);
 
 }
 
@@ -316,72 +288,6 @@ void DeleteChar(){
 
 }
 
-int Read_Key() {
-
-  int Return_value;
-  char c;
-
-  while ((Return_value = read(STDIN_FILENO, &c, 1)) != 1) {
-    error = true;
-  }
-
-  
-  char ESCAPE = '\x1b';                  // For defualt value ANSI ESCAPE SEQUENCE 
-
-  if (c == ESCAPE) {
-    char List[3];
-    if ((Return_value = read(STDIN_FILENO, &List[0], 1)) != 1)
-      return ESCAPE;
-    if ((Return_value = read(STDIN_FILENO, &List[1], 1)) != 1)
-      return ESCAPE;
-
-    if (List[0] == '[') {             // For processing ANSI ESCAPE SEQUENCE
-      if (List[1] >= '0' && List[1] <= '9') {
-        if (read(STDIN_FILENO, &List[2], 1) != 1) {
-          return ESCAPE;
-        }
-        if (List[2] == '~') {
-          if (List[1] == '1') {
-            return home;              // \x1b[1~
-          } else if (List[1] == '3') {
-            return del;               // \x1b[3~
-          } else if (List[1] == '4') {
-            return end;               // \x1b[4~
-          } else if (List[1] == '5') {
-            return pg_up;             // \x1b[5~
-          } else if (List[1] == '6') {
-            return pg_dn;             // \x1b[6~
-          }
-        }
-      } else {
-        if (List[1] == 'A') {
-          return up;                  // \x1b[A
-        } else if (List[1] == 'B') {
-          return down;                // \x1b[B
-        } else if (List[1] == 'C') {
-          return right;               // \x1b[C
-        } else if (List[1] == 'D') {
-          return left;                // \x1b[D
-        } else if (List[1] == 'H') {
-          return home;                // \x1b[H
-        } else if (List[1] == 'F') {
-          return end;                 // \x1b[F
-        } else {
-          return ESCAPE;
-        }
-      }
-    } else if (List[0] == 'O') {
-      if (List[1] == 'H') {
-       return home;                 // \x1bOH
-      } else if (List[1] == 'F') {
-        return end;                 // \x1bOF
-      }
-    }
-      return ESCAPE;
-  } else {
-    return c;
-  }
-}
 
 void Move(int key) {
     Row *line = (y >= Edit.total)? NULL: &Edit.line[y];
@@ -421,63 +327,67 @@ void Move(int key) {
 
 
 void presskey() {
-
-    int key_val = Read_Key();
+    int key_val = getch();
 
     switch (key_val) {
-        case CONTROL('q'):  // Ctrl + Q
-            for_quit();
-            exit(0);
+        case 'q':  // 'q' 키 누름
+        case 'Q':  // 'Q' 키 누름 (대문자)
+            if (key_val == KEY_CTRL('q')) {  // Ctrl + Q
+                for_quit();
+                endwin(); // ncurses 종료
+                exit(0);
+            }
             break;
 
-        case CONTROL('s'):  // Ctrl + S
+        case KEY_CTRL('s'):  // Ctrl + S
+            // Ctrl + S 키에 대한 처리
             break;
 
-        case CONTROL('f'):  // Ctrl + F
+        case KEY_CTRL('f'):  // Ctrl + F
+            // Ctrl + F 키에 대한 처리
             break;
 
-        case left: // Arrow Left KEY
-        case right: // Arrow Right KEY
-        case up: // Arrow Up KEY
-        case down: // Arrow Down KEY
+        case KEY_LEFT: // 왼쪽 화살표 키
+        case KEY_RIGHT: // 오른쪽 화살표 키
+        case KEY_UP: // 위쪽 화살표 키
+        case KEY_DOWN: // 아래쪽 화살표 키
             Move(key_val);
             break;
-            
-        case end: // End KEY
+
+        case KEY_END: // End 키
             x = cols - 1;
             break;
 
-        case home: // Home KEY
+        case KEY_HOME: // Home 키
             x = 0;
             break;
 
-        case pg_up: // Page Down KEY
-        case pg_dn: // Page Up KEY
-        {
-            int temprows = rows;
-            while (temprows--) {
-                if (key_val == pg_up)
-                    Move(up);
-                else if (key_val == pg_dn)
-                    Move(down);
+        case KEY_PPAGE: // Page Up 키
+            for (int i = 0; i < rows; ++i) {
+                Move(up);
             }
-        }
             break;
 
-        case '\r':  // Enter KEY
+        case KEY_NPAGE: // Page Down 키
+            for (int i = 0; i < rows; ++i) {
+                Move(down);
+            }
+            break;
+
+        case '\r':  // Enter 키
             Newline();
             break;
 
-        case del:  // Delete KEY
+        case KEY_DC:  // Delete 키
             DeleteChar();
             Move(right);
             break;
 
-        case b_s:  // Backspace KEY
+        case KEY_BACKSPACE:  // Backspace 키
             DeleteChar();
             break;
 
-        default:  // Input( )
+        default:  // 일반 입력 처리
             Insertchar(key_val);
             break;
     }
@@ -485,7 +395,8 @@ void presskey() {
 
 void open_file(char *store_file) {
     free(Edit.store_file);
-    Edit.store_file = strdup(store_file);
+    Edit.store_file = malloc(strlen(store_file) + 1);
+    strcpy(Edit.store_file, store_file);
 
     FILE *file = fopen(store_file, "r");
     if (!file) {
@@ -529,13 +440,16 @@ void status_bar(char* file_name) {
 
 void tilde(){
   for (int i; i < scrren_rows; ++i){
-    printf("~\r");
+    printw("~\r");
   }
 }
 
 void init() {
   
-    Raw();
+    initscr();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
     getmaxyx(stdscr, rows, cols);
     x = 0;
     y = 0;
@@ -545,9 +459,6 @@ void init() {
     scrren_rows = rows - 2;
 }
 
-void all_refresh(){
-  tilde();
-}
 
 int main(int argc, char *argv[]) {
   system(CLEAR);
@@ -559,8 +470,6 @@ int main(int argc, char *argv[]) {
   }
 
   while (1) {
-    printf("%d", Edit.total);
-    // status_bar(file_name);
     presskey();
   }
   endwin();

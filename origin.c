@@ -339,7 +339,7 @@ int main() {
   state();
   status_bar(rows);
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find", rows);
-  move_cursor_init();
+  // move_cursor_init();
   // char* filename = argv[1];
   // if (argc >= 2) {
   //   open_file(argv[1]);

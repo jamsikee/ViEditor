@@ -27,8 +27,6 @@
 #define INIT_LINE_SIZE 125
 #define CONTROL(k) ((k) & 0x1f) // control + k
 
-struct termios orig_termios;
-
 enum P_key {
 
     left = 1000,
@@ -44,14 +42,12 @@ enum P_key {
     
 };
 
-bool error = false;
-
-int x;
-int y;
-int rows;
-int cols;
-int move_rows;
-int move_cols;
+int x = 0;
+int y = 0;
+int rows = 0;
+int cols = 0;
+int move_rows = 0;
+int move_cols = 0;
 
 typedef struct Row {
 
@@ -332,13 +328,9 @@ int main() {
   initscr();
   noecho();
   getmaxyx(stdscr, rows, cols);
-  state();
-  x = 0;
-  y = 0;
-  Edit.total = 0;
-  move_cols = 0;
-  move_rows = 0;
   Edit.filename = "No Name";
+  move_cursor_init();
+  state();
   status_bar(rows);
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find", rows);
   move_cursor_init();

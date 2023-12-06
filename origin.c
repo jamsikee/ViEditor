@@ -560,11 +560,15 @@ int main(int argc, char *argv[]) {
     l = read(STDIN_FILENO, &buf[0], 1);
     
     if(buf[0] == CONTROL('q')) break;
+    write(STDOUT_FILENO, &buf[0], 1);
     l = read(STDIN_FILENO, &buf[1], 1);
+    write(STDOUT_FILENO, &buf[1], 1);
     l = read(STDIN_FILENO, &buf[2], 1);
+    write(STDOUT_FILENO, &buf[2], 1);
     l = read(STDIN_FILENO, &buf[3], 1);
+    write(STDOUT_FILENO, &buf[3], 1);
     
-    write(STDOUT_FILENO, buf, 4);
+    
     // printf("%c ", buf);
     
     

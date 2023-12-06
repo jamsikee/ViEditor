@@ -299,7 +299,7 @@ void move_cursor_init(){
 
 void status_bar(int rows) {
     C_M(1, rows - 1);
-    printf("\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
+    printf("\e[7m[%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
             10, 
             10);
     printf("\x1b[0m");
@@ -315,7 +315,7 @@ void state() {
 
     for (i = 0; i < rows; i++) {
       write(STDOUT_FILENO, "\033[K", strlen("\033[K"));
-      write(STDOUT_FILENO, "~\r", strlen("\r\n"));
+      write(STDOUT_FILENO, "~\n", strlen("\r\n"));
     }
 }
 

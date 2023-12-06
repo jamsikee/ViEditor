@@ -520,8 +520,9 @@ int main(int argc, char *argv[]) {
 
   
   printf("Total lines: %d\n", Edit.total);
-
-  printf("~\r\n");
+  for (int i; i < 23; ++i){
+    printf("~\r\n");
+  }
   while (1) {
     presskey();
     

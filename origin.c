@@ -81,17 +81,17 @@ void Raw() {
     struct termios don;
     tcgetattr(STDIN_FILENO, &don);
 
-    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); 
+    don.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); 
     // Non Sigint sign, change ctrl-M, Non INPCK, erase 8bit, ctrl-s, ctrl-q
-    raw.c_oflag &= ~(OPOST); 
+    don.c_oflag &= ~(OPOST); 
     // Non Output processing
-    raw.c_cflag |= (CS8); 
+    don.c_cflag |= (CS8); 
     // Set 8 bit
-    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG); 
+    don.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG); 
     // Non canonical, Echo, ctrl-v, ctrl-c, ctrl-z
-    raw.c_cc[VMIN] = 0;  
+    don.c_cc[VMIN] = 0;  
     // If input then return read( )
-    raw.c_cc[VTIME] = 1; 
+    don.c_cc[VTIME] = 1; 
     // Maximum time before read( )
 
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &don);

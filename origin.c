@@ -296,9 +296,16 @@ void state() {
         } else {
             mvprintw(i, 0, "~");
         }
+        refresh(); // 화면 갱신
     }
 
-    refresh(); // 화면 갱신
+}
+
+void end_message(const char *message, const TextEditor *editor, int rows) {
+    int msg_length = strlen(message);
+    mvprintw(rows - 1, 0, "%s", message);
+    print_status(editor, rows);
+    refresh();
 }
 
 int main() {

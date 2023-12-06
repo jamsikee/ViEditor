@@ -313,8 +313,8 @@ int main() {
   move_rows = 0;
   Edit.filename = "No Name";
   state();
-  status_bar();
-  
+  status_bar(rows);
+
   move_cursor_init();
   // char* filename = argv[1];
   // if (argc >= 2) {

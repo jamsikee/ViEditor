@@ -314,7 +314,7 @@ void state() {
   // write(STDOUT_FILENO, buf, strlen(buf));
 
     for (i = 0; i < rows; i++) {
-      write(STDOUT_FILENO, "\033[K", strlen("\033[K"));
+      //write(STDOUT_FILENO, "\033[K", strlen("\033[K"));
       write(STDOUT_FILENO, "~\r\n", strlen("~\r\n"));
     }
 }

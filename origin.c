@@ -326,7 +326,7 @@ void end_message(const char *message, int rows) {
 int main() {
   system("clear");
   initscr();
-  noecho();
+  // noecho();
   getmaxyx(stdscr, rows, cols);
   Edit.filename = "No Name";
   move_cursor_init();

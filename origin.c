@@ -321,9 +321,7 @@ int Read_Key() {
 
   int Return_value;
   char c;
-  while ((Return_value = read(STDIN_FILENO, &c, 1)) != 1) {
-    error = true;
-  }
+  
 
   char ESCAPE = '\x1b';                  // For defualt value ANSI ESCAPE SEQUENCE 
 

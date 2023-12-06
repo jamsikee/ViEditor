@@ -72,41 +72,6 @@ struct Visual_Text_Editor{
 struct Visual_Text_Editor Edit;
 
 
-void disRaw() {
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
-}
-
-void Raw() {
-
-    struct termios don;
-    tcgetattr(STDIN_FILENO, &don);
-
-    don.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); 
-    // Non Sigint sign, change ctrl-M, Non INPCK, erase 8bit, ctrl-s, ctrl-q
-    don.c_oflag &= ~(OPOST); 
-    // Non Output processing
-    don.c_cflag |= (CS8); 
-    // Set 8 bit
-    don.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG); 
-    // Non canonical, Echo, ctrl-v, ctrl-c, ctrl-z
-    don.c_cc[VMIN] = 0;  
-    // If input then return read( )
-    don.c_cc[VTIME] = 1; 
-    // Maximum time before read( )
-
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &don);
-    atexit(disRaw); 
-    // If exit a program then automatically invoked
-
-}
-
-void for_quit(){
-
-    write(STDOUT_FILENO, "\x1b[2J", 4); // clear UI
-    write(STDOUT_FILENO, "\x1b[H", 3);  // cursor (0, 0)
-
-}
-
 Row *get_line(Row *line, int pos) {
 
     return &line[pos];
@@ -305,23 +270,48 @@ void DeleteChar(){
 
 }
 
-void init() {
-  
-    Raw();
-    initscr();
-    getmaxyx(stdscr, rows, cols);
-    x = 0;
-    y = 0;
-    Edit.total = 0;
-    move_cols = 0;
-    move_rows = 0;
+void C_M(int x, int y) {
+    printf("\033[%d;%dH", y, x);
+}
 
+void move_cursor_init(){
+  C_M(1,1);
+}
+
+void status_bar(int rows) {
+    C_M(1, rows - 1);
+    printf("\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
+            y, 
+            x);
+    printf("\x1b[0m");
+}
+
+void state() {
+    clear(); // 기존 내용을 지우고 새로 그림
+    int columns = 80;
+    int i = 0;
+    for (i = 0; i < rows; i++) {
+        if (i == rows / 2 && i == 7) {
+            int padding = (columns - strlen("visual text editor — version 0.0.1")) / 2;
+            mvprintw(i, 0, "~%*cvisual text editor — version 0.0.1", padding, ' ');
+        } else {
+            mvprintw(i, 0, "~");
+        }
+    }
+
+    refresh(); // 화면 갱신
 }
 
 int main() {
   system(CLEAR);
-  Raw();
+  noecho();
   init();
+  getmaxyx(stdscr, rows, cols);
+  x = 0;
+  y = 0;
+  Edit.total = 0;
+  move_cols = 0;
+  move_rows = 0;
   // char* filename = argv[1];
   // if (argc >= 2) {
   //   open_file(argv[1]);

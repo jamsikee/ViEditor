@@ -485,8 +485,7 @@ void presskey() {
 
 void open_file(char *store_file) {
     free(Edit.store_file);
-    Edit.store_file = malloc(strlen(store_file) + 1);
-    strcpy(Edit.store_file, store_file);
+    Edit.store_file = strdup(store_file);
 
     FILE *file = fopen(store_file, "r");
     if (!file) {

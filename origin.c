@@ -559,7 +559,7 @@ int main(int argc, char *argv[]) {
   while (1) {
     l = read(STDIN_FILENO, &buf[0], 1);
     
-    if(buf == CONTROL('q')) break;
+    if(buf[0] == CONTROL('q')) break;
     l = read(STDIN_FILENO, &buf[1], 1);
     l = read(STDIN_FILENO, &buf[2], 1);
     l = read(STDIN_FILENO, &buf[3], 1);

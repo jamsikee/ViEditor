@@ -555,13 +555,15 @@ int main(int argc, char *argv[]) {
     open_file(argv[1]);
   }
 
+  for (int i = 0; i < Edit.total; i++) {
+    printf("%s\r",  Edit.line[i].c);
+  }
+
+
   while (1) {
     presskey();
     tilde();
     status_bar(file_name);
-    for (int i = 0; i < Edit.total; i++) {
-    printf("%s\r",  Edit.line[i].c);
-  }
   }
   endwin();
   return 0;

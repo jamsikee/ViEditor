@@ -383,26 +383,27 @@ int Read_Key() {
 }
 
 void Move(int key) {
+    Row *line = (y >= Edit.total)? NULL: &Edit.line[y];
 
     switch (key) {
         case left:
             if (x != 0) {
                 x--;
-            } /*
+            } 
             else if (y > 0) {
                 y--;
+                x = Edit.line[y].len;
             }
-            */
             break;
         case right:
-        /*
-            if (row && x < row->size) {
+        
+            if (line && x < line->len) {
                 x++;
-            } else if (row && x == row->size) {
+            } else if (line && x == line->len) {
                 y++;
                 x = 0;
             }
-            */
+            
             break;
         case up:
             if (y != 0) {
@@ -558,11 +559,8 @@ int main(int argc, char *argv[]) {
   }
 
   while (1) {
-    tilde();
-    status_bar(file_name);
-    for (int i = 0; i < Edit.total; i++) {
-    printf("%s\r",  Edit.line[i].c);
-  }
+    printf("%d", Edit.total);
+    // status_bar(file_name);
     presskey();
   }
   endwin();

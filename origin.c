@@ -330,7 +330,7 @@ void end_message(const char *message, int rows) {
 int main() {
   system("clear");
   initscr();
-  // noecho();
+  noecho();
   getmaxyx(stdscr, rows, cols);
   // char location[30];
   // sprintf(location, "\033[%d;%dH", 1,1);

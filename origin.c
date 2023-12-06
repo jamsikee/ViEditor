@@ -528,21 +528,24 @@ void status_bar(char* file_name) {
 
 void tilde(){
   for (int i; i < scrren_rows; ++i){
-   write(STDOUT_FILENO, "~\r\n", 3);
+    printw("~\r");
   }
 }
 
 void init() {
   
     Raw();
+    getmaxyx(stdscr, rows, cols);
     x = 0;
     y = 0;
     Edit.total = 0;
     move_cols = 0;
     move_rows = 0;
     scrren_rows = rows - 2;
-    rows = 23;
-    cols = 23;
+}
+
+void(all_refresh){
+  tilde();
 }
 
 int main(int argc, char *argv[]) {
@@ -555,7 +558,7 @@ int main(int argc, char *argv[]) {
   }
 
   for (int i = 0; i < Edit.total; i++) {
-    printf("%s\r",  Edit.line[i].c);
+    printw("%s\r",  Edit.line[i].c);
   }
 
   while (1) {
@@ -563,7 +566,7 @@ int main(int argc, char *argv[]) {
     status_bar(file_name);
     presskey();
   }
-
+  endwin();
   return 0;
 
 }

@@ -558,8 +558,9 @@ int main(int argc, char *argv[]) {
   int l;
   while (1) {
     l = read(STDIN_FILENO, &buf, 1);
-    printf("%c ", buf);
 
+    // printf("%c ", buf);
+    write(STDOUT_FILENO, buf, strlen(buf));
     if(buf == CONTROL('q')) break;
     
     //presskey();

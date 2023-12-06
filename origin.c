@@ -328,6 +328,9 @@ int main() {
   initscr();
   // noecho();
   getmaxyx(stdscr, rows, cols);
+  char buf[30];
+  sprintf(buf, "size : %d %d",rows, cols);
+  write(STDOUT_FILENO, buf, strlen(buf));
   Edit.filename = "No Name";
   move_cursor_init();
   state();

@@ -23,7 +23,7 @@
 
 // #endif
 
-#define INIT_ROW_SIZE 500
+#define INIT_ROW_SIZE 1000
 #define INIT_LINE_SIZE 125
 #define CONTROL(k) ((k) & 0x1f) // control + k
 
@@ -141,7 +141,7 @@ void InsertRow(int edit_y, char *line, int line_len) {
   // If y < 0 or y > total then return
 
   if (Edit.total == 0) {
-    Edit.line = malloc(sizeof(Row) * 20);
+    Edit.line = malloc(sizeof(Row) * INIT_ROW_SIZE);
   } else if (Edit.total % INIT_ROW_SIZE == 0) {
     Edit.line = realloc(Edit.line, sizeof(Row) * (Edit.total * 2));
   }
@@ -557,13 +557,14 @@ void init() {
 
 int main(int argc, char *argv[]) {
   system(CLEAR);
+  write(STDOUT_FILENO, "\x1b[H", 3); 
   init();
   
   char *file_name = argv[1];
   if (argc >= 2) {
     open_file(argv[1]);
   }
-  tilde();
+  
   while (1) {
     presskey();
   

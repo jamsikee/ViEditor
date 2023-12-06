@@ -500,7 +500,7 @@ int main(int argc, char *argv[]) {
     open_file(argv[1]);
   }
 
-  for (int i; i < 5; ++i){
+  for (int i; i < 10; ++i){
     presskey();
   }
 

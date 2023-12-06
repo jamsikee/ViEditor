@@ -338,7 +338,11 @@ int main() {
   // if (argc >= 2) {
   //   open_file(argv[1]);
   // }
-  printf("else");
+  printf("~\r\n");
+  printf("~\r\n");
+  printf("~\r\n");
+  printf("~\r\n");
+  printf("~\r\n");
   // while (1) {
   //   presskey();
     

@@ -8,14 +8,13 @@
 #include <ctype.h>
 #include <ncurses.h>
 #include <stdbool.h>
-/*
+
 #define _XOPEN_SOURCE 700
 
 #ifdef _WIN32
     
 #elif __linux__
-*/
-#define _XOPEN_SOURCE 700
+
 #define BUFFER_SIZE 8000000
 
 typedef struct Node {
@@ -78,15 +77,13 @@ int main() {
     state();
 
     initBuffer(&editor.text_buffer);
-
     print_status(&editor, rows);
+    
     end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find", &editor, rows);
     moveCursorToTop();  // 이 부분을 추가하여 커서를 맨 위로 이동시킴
 
     while (1) {
         handle_command(&editor);  // 명령을 계속해서 처리
-        print_status(&editor, rows);
-        refresh();
     }
     endwin();   // ncurses 종료
     return 0;
@@ -118,15 +115,9 @@ void state() {
     int columns = 80;
     int i = 0;
     for (i = 0; i < rows; i++) {
-        if (i == rows / 2 && i == 7) {
-            int padding = (columns - strlen("visual text editor — version 0.0.1")) / 2;
-            mvprintw(i, 0, "~%*cvisual text editor — version 0.0.1", padding, ' ');
-        } else {
             mvprintw(i, 0, "~");
-        }
+        
     }
-
-    refresh(); // 화면 갱신
 }
 
 
@@ -135,25 +126,27 @@ void end_message(const char *message, const TextEditor *editor, int rows) {
     mvprintw(rows - 1, 0, "%s", message);
     print_status(editor, rows);
     refresh();
-}
+}// handle_command 함수 일부
+
+
 
 void handle_command(TextEditor *editor) {
     int command = getch();
 
-    if (command == KEY_ENTER || command == '\n') {
+    if (command == '\n') {
         // Enter 키 입력 시, 문자열을 입력받고 텍스트 버퍼에 추가
         char input_buffer[BUFFER_SIZE];
         mvgetnstr(editor->text_buffer.cursor_position_row, editor->text_buffer.cursor_position_column, input_buffer, sizeof(input_buffer));
 
         int i = 0;
         for (i = 0; i < strlen(input_buffer); i++) {
-            insertCharacter(&editor->text_buffer, input_buffer[i]);
-
-            // 입력한 문자를 화면에 출력
-            mvprintw(editor->text_buffer.cursor_position_row, editor->text_buffer.cursor_position_column, "%c", input_buffer[i]);
-
-            // 커서를 다음 위치로 이동
-            moveCursorRight(&editor->text_buffer);
+            if (input_buffer[i] != '\n') {
+                insertCharacter(&editor->text_buffer, input_buffer[i]);
+                // 입력한 문자를 화면에 출력
+                mvprintw(editor->text_buffer.cursor_position_row, editor->text_buffer.cursor_position_column, "%c", input_buffer[i]);
+                // 커서를 다음 위치로 이동
+                moveCursorRight(&editor->text_buffer);
+            }
         }
     } else if (command == 127) {
         // 백스페이스 키 입력 시, 문자열에서 한 글자 삭제
@@ -168,14 +161,18 @@ void handle_command(TextEditor *editor) {
 
         // 커서 위치 조정
         move(row, col);
+        refresh(); // 화면 갱신 추가
     } else {
         // 다른 키 입력 시, Insert mode에서의 처리
         insertCharacter(&editor->text_buffer, (char) command);
 
         // 입력한 문자를 화면에 출력
         mvprintw(editor->text_buffer.cursor_position_row, editor->text_buffer.cursor_position_column - 1, "%c", (char) command);
+        moveCursorRight(&editor->text_buffer); // 커서를 다음 위치로 이동
+        refresh(); // 화면 갱신 추가
     }
 }
+
 
 
 void initBuffer(TextBuffer *buffer) {
@@ -365,3 +362,46 @@ void insertCharacter(TextBuffer *buffer, char character) {
     buffer->line_lengths[buffer->cursor_position_row]++;
     buffer->cursor_position_column++;
 }
+
+
+
+
+
+/*
+void saveFile(TextEditor *editor) {
+   FILE *file = fopen(editor->filename, "w");
+   if (file == NULL) {
+          fprintf(stderr, "Error: Unable to open file for writing.\n");
+          exit(EXIT_FAILURE);
+   }
+
+   Node *currentNode = editor->head;
+   while (currentNode != NULL) {
+      fprintf(file, "%s\n", currentNode->line);
+      currentNode = currentNode->next;
+   }
+
+   fclose(file);
+}
+
+void handleSaveCommand(TextEditor *editor) {
+   if (editor->head == NULL) {
+      printf("Error: No content to save.\n");
+      return;
+   }
+
+   if (editor->filename == NULL) {
+      printf("Enter a new file name: ");
+      char filename[256];
+      scanf(" %s[^\n]", filename);
+      editor->filename = strdup(filename);
+   }
+
+   saveFile(editor);
+
+   editor->isModified = 0;
+
+   displayStatusBar(editor);
+   printf("File saved successfully.\n");
+}
+*/

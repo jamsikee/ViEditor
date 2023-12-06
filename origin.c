@@ -444,6 +444,7 @@ void tilde(){
   }
 }
 
+
 void init() {
   
     initscr();

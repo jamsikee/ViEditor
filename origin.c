@@ -559,11 +559,10 @@ int main(int argc, char *argv[]) {
     printf("%s\r",  Edit.line[i].c);
   }
 
-
   while (1) {
-    presskey();
     tilde();
     status_bar(file_name);
+    presskey();
   }
   endwin();
   return 0;

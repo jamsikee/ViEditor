@@ -64,11 +64,13 @@ void print_status(const TextEditor *editor, int rows);
 void end_message(const char *message, const TextEditor *editor, int rows);
 
 
+int rows;
+
 int main() {
     initscr();
     noecho();  // 입력한 키를 화면에 표시하지 않음
 
-    int rows, column;
+    int column;
     getmaxyx(stdscr, rows, column);  // 터미널 창의 행과 열 크기 가져오기 
 
     TextEditor editor;

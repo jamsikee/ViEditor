@@ -539,14 +539,14 @@ void tilde(){
 void init() {
   
     Raw();
-    initscr();
-    getmaxyx(stdscr, rows, cols);
     x = 0;
     y = 0;
     Edit.total = 0;
     move_cols = 0;
     move_rows = 0;
+    rows = 23;
     scrren_rows = rows - 2;
+    cols = 0;
 }
 
 
@@ -558,18 +558,12 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-  char buf[4];
-  int l;
+  tilde();
   while (1) {
-    
-    
-    
-    
-   
-    
     presskey();
+    
   }
-  endwin();
+
   return 0;
 
-}
+}`

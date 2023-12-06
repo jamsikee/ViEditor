@@ -321,74 +321,9 @@ void DeleteChar(){
 
 }
 
-int Read_Key() {
-  int Return_value;
-  char c;
-  
-  while ((Return_value = read(STDIN_FILENO, &c, 1)) != 1) {
-    error = true;
-  }
-  
-  char ESCAPE = '\x1b';                  // For defualt value ANSI ESCAPE SEQUENCE 
-
-  if (c == ESCAPE) {
-    char List[3];
-    if ((Return_value = read(STDIN_FILENO, &List[0], 1)) != 1)
-      return ESCAPE;
-    if ((Return_value = read(STDIN_FILENO, &List[1], 1)) != 1)
-      return ESCAPE;
-    
-    if (List[0] == '[') {             // For processing ANSI ESCAPE SEQUENCE
-      if (List[1] >= '0' && List[1] <= '9') {
-        if (read(STDIN_FILENO, &List[2], 1) != 1) {
-          return ESCAPE;
-        }
-        if (List[2] == '~') {
-          if (List[1] == '1') {
-            return home;              // \x1b[1~
-          } else if (List[1] == '3') {
-            return del;               // \x1b[3~
-          } else if (List[1] == '4') {
-            return end;               // \x1b[4~
-          } else if (List[1] == '5') {
-            return pg_up;             // \x1b[5~
-          } else if (List[1] == '6') {
-            return pg_dn;             // \x1b[6~
-          }
-        }
-      } else {
-        if (List[1] == 'A') {
-          return up;                  // \x1b[A
-        } else if (List[1] == 'B') {
-          return down;                // \x1b[B
-        } else if (List[1] == 'C') {
-          return right;               // \x1b[C
-        } else if (List[1] == 'D') {
-          return left;                // \x1b[D
-        } else if (List[1] == 'H') {
-          return home;                // \x1b[H
-        } else if (List[1] == 'F') {
-          return end;                 // \x1b[F
-        } else {
-          return ESCAPE;
-        }
-      }
-    } else if (List[0] == 'O') {
-      if (List[1] == 'H') {
-       return home;                 // \x1bOH
-      } else if (List[1] == 'F') {
-        return end;                 // \x1bOF
-      }
-    }
-      return ESCAPE;
-  } else {
-    return c;
-  }
-}
-
 void presskey() {
 
-    int key_val = Read_Key();
+    int key_val = getchar();
 
     switch (key_val) {
         case CONTROL('q'):  // Ctrl + Q

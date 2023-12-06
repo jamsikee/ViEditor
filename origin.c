@@ -322,10 +322,10 @@ int main(int argc, char *argv[]) {
   system(CLEAR);
   Raw();
   init();
-  // filename = argv[1];
-  // if (argc >= 2) {
-  //   open_file(argv[1]);
-  // }
+   filename = argv[1];
+  if (argc >= 2) {
+    open_file(argv[1]);
+  }
 
   for (int i; i < 23; ++i){
     printf("~\r\n");

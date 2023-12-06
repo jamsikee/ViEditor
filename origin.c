@@ -481,51 +481,51 @@ void presskey() {
     }
 }
 
-// void open_file(char *store_file) {
-//     free(Edit.store_file);
-//     Edit.store_file = malloc(strlen(store_file) + 1);
-//     strcpy(Edit.store_file, store_file);
+void open_file(char *store_file) {
+    free(Edit.store_file);
+    Edit.store_file = malloc(strlen(store_file) + 1);
+    strcpy(Edit.store_file, store_file);
 
-//     FILE *file = fopen(store_file, "r");
-//     if (!file) {
-//         fprintf(stderr, "Cannot open file: %s\n", store_file);
-//         exit(EXIT_FAILURE);
-//     }
+    FILE *file = fopen(store_file, "r");
+    if (!file) {
+        fprintf(stderr, "Cannot open file: %s\n", store_file);
+        exit(EXIT_FAILURE);
+    }
 
-//     File_Inf Inf;
-//     Inf.temp = NULL;
-//     Inf.size = 0;
-//     Inf.length = 0;
+    File_Inf Inf;
+    Inf.temp = NULL;
+    Inf.size = 0;
+    Inf.length = 0;
 
-//     while ((Inf.length = getline(&(Inf.temp), &(Inf.size), file)) != -1) {
-//         int read = Inf.length;
-//         while (Inf.length > 0 && (Inf.temp[Inf.length - 1] == '\r' || Inf.temp[Inf.length - 1] == '\n')) {
-//             Inf.length--;
-//         }
-//         InsertRow(Edit.total, Inf.temp, read);
-//     }
+    while ((Inf.length = getline(&(Inf.temp), &(Inf.size), file)) != -1) {
+        int read = Inf.length;
+        while (Inf.length > 0 && (Inf.temp[Inf.length - 1] == '\r' || Inf.temp[Inf.length - 1] == '\n')) {
+            Inf.length--;
+        }
+        InsertRow(Edit.total, Inf.temp, read);
+    }
 
-//     free(Inf.temp);
-//     fclose(file);
-// }
+    free(Inf.temp);
+    fclose(file);
+}
 
-// void status_bar(char* file_name) {
-//     char left_Inf[50];
-//     char right_Inf[40];
+void status_bar(char* file_name) {
+    char left_Inf[50];
+    char right_Inf[40];
 
-//     if (file_name == NULL || file_name[0] == '\0') {
-//         snprintf(left_Inf, sizeof(left_Inf), "[No Name] - %d lines", Edit.total);
-//     } else {
-//         snprintf(left_Inf, sizeof(left_Inf), "%.20s - %d lines", file_name, Edit.total);
-//     }
+    if (file_name == NULL || file_name[0] == '\0') {
+        snprintf(left_Inf, sizeof(left_Inf), "[No Name] - %d lines", Edit.total);
+    } else {
+        snprintf(left_Inf, sizeof(left_Inf), "%.20s - %d lines", file_name, Edit.total);
+    }
 
-//     int remained_len = cols - strlen(left_Inf) - strlen(right_Inf);
-//     snprintf(right_Inf, sizeof(right_Inf), "no ft / %d/%d", y + 1, Edit.total);
+    int remained_len = cols - strlen(left_Inf) - strlen(right_Inf);
+    snprintf(right_Inf, sizeof(right_Inf), "no ft / %d/%d", y + 1, Edit.total);
 
-//     printf("\1xb[%d;0H", rows - 2); // 상태바 위치로 커서 이동
-//     printf("\1xb[K"); // 해당 라인 지우기
-//     printf("%-s%*s", left_Inf, remained_len, right_Inf);
-// }
+    printf("\1xb[%d;0H", rows - 2); // 상태바 위치로 커서 이동
+    printf("\1xb[K"); // 해당 라인 지우기
+    printf("%-s%*s", left_Inf, remained_len, right_Inf);
+}
 
 void tilde(){
   for (int i; i < scrren_rows; ++i){
@@ -550,18 +550,18 @@ int main(int argc, char *argv[]) {
   system(CLEAR);
   init();
   
-  // char *file_name = argv[1];
-  // if (argc >= 2) {
-  //   open_file(argv[1]);
-  // }
+  char *file_name = argv[1];
+  if (argc >= 2) {
+    open_file(argv[1]);
+  }
 
   while (1) {
     presskey();
     tilde();
-    // status_bar(file_name);
-    // for (int i = 0; i < Edit.total; i++) {
-    // printf("%s\r",  Edit.line[i].c);
-  // }
+    status_bar(file_name);
+    for (int i = 0; i < Edit.total; i++) {
+    printf("%s\r",  Edit.line[i].c);
+  }
   }
   endwin();
   return 0;

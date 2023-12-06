@@ -25,7 +25,7 @@
 
 #define INIT_ROW_SIZE 500
 #define INIT_LINE_SIZE 125
-#define CONTROL(k) ((k) & 0x1f) // control + k
+#define KEY_CTRL(ch) ((ch) & 0x1f)
 
 struct termios orig_termios;
 
@@ -86,7 +86,7 @@ typedef struct {
 void for_quit(){
 
     system(CLEAR);
-    vmove(stdscr, 0, 0);
+    move(0, 0);
 
 }
 
@@ -472,6 +472,7 @@ int main(int argc, char *argv[]) {
 
   while (1) {
     presskey();
+    refresh();
   }
   endwin();
   return 0;

@@ -287,7 +287,6 @@ void status_bar(int rows) {
 }
 
 void state() {
-    clear(); // 기존 내용을 지우고 새로 그림
     int columns = 80;
     int i = 0;
     for (i = 0; i < rows; i++) {

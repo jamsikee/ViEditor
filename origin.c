@@ -310,6 +310,7 @@ void status_bar(int rows) {
 }
 
 void state() {
+    clear();
     int columns = 80;
     int i = 0;
     for (i = 0; i < rows; i++) {
@@ -328,17 +329,16 @@ void end_message(const char *message, int rows) {
 
 int main() {
   system(CLEAR);
+  initscr();
+  noecho();
+  getmaxyx(stdscr, rows, cols);
+  state();
   x = 0;
   y = 0;
   Edit.total = 0;
   move_cols = 0;
   move_rows = 0;
   Edit.filename = "No Name";
-  initscr();
-  noecho();
-  getmaxyx(stdscr, rows, cols);
-  state();
- 
   status_bar(rows);
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find", rows);
   move_cursor_init();

@@ -321,7 +321,10 @@ int Read_Key() {
 
   int Return_value;
   char c;
-  
+
+  while ((Return_value = read(STDIN_FILENO, &c, 1)) != 1) {
+    error = true;
+  }
 
   char ESCAPE = '\x1b';                  // For defualt value ANSI ESCAPE SEQUENCE 
 
@@ -557,7 +560,7 @@ int main(int argc, char *argv[]) {
   }
 
   while (1) {
-    printf("%d", Edit.total);
+    // printf("%d", Edit.total);
     // status_bar(file_name);
     presskey();
   }

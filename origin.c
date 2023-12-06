@@ -557,7 +557,7 @@ int main(int argc, char *argv[]) {
   char buf;
   int l;
   while (1) {
-    l = read(STDIN_FILE, &buf, 1);
+    l = read(STDIN_FILENO, &buf, 1);
     printf("%c ", buf);
 
     if(buf == CONTROL('q')) break;

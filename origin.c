@@ -84,14 +84,18 @@ typedef struct {
 
 
 void disRaw() {
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1) {
+      exit(EXIT_FAILURE);
+    }
 }
 
 void Raw() {
+    
+   
+    if(tcgetattr(STDIN_FILENO, &orig_termios) == -1) exit(EXIT_FAILURE);
     atexit(disRaw); 
-    struct termios raw = orig_termios;
-    tcgetattr(STDIN_FILENO, &orig_termios);
 
+    struct termios raw = orig_termios;
     raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); 
     // Non Sigint sign, change ctrl-M, Non INPCK, erase 8bit, ctrl-s, ctrl-q
     raw.c_oflag &= ~(OPOST); 
@@ -105,7 +109,7 @@ void Raw() {
     raw.c_cc[VTIME] = 1; 
     // Maximum time before read( )
 
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) exit(EXIT_FAILURE);
     
     // If exit a program then automatically invoked
 
@@ -320,7 +324,6 @@ int Read_Key() {
   int Return_value;
   char c;
   
-
   while ((Return_value = read(STDIN_FILENO, &c, 1)) != 1) {
     error = true;
   }
@@ -382,6 +385,69 @@ int Read_Key() {
   }
 }
 
+void presskey() {
+
+    int key_val = Read_Key();
+
+    switch (key_val) {
+        case CONTROL('q'):  // Ctrl + Q
+            for_quit();
+            exit(EXIT_SUCCESS);
+            break;
+
+        case CONTROL('s'):  // Ctrl + S
+            break;
+
+        case CONTROL('f'):  // Ctrl + F
+            break;
+
+        case left: // Arrow Left KEY
+        case right: // Arrow Right KEY
+        case up: // Arrow Up KEY
+        case down: // Arrow Down KEY
+            Move(key_val);
+            break;
+            
+        case end: // End KEY
+            x = cols - 1;
+            break;
+
+        case home: // Home KEY
+            x = 0;
+            break;
+
+        case pg_up: // Page Down KEY
+        case pg_dn: // Page Up KEY
+        {
+            // int temprows = rows;
+            // while (temprows--) {
+            //     if (key_val == pg_up)
+            //         Move(up);
+            //     else if (key_val == pg_dn)
+            //         Move(down);
+            // }
+        }
+            break;
+
+        case '\r':  // Enter KEY
+            Newline();
+            break;
+
+        case del:  // Delete KEY
+            Move(right);
+            DeleteChar();
+            break;
+
+        case b_s:  // Backspace KEY
+            DeleteChar();
+            break;
+
+        default:  // Input( )
+            Insertchar(key_val);
+            
+    }
+}
+
 void Move(int key) {
     Row *line = (y >= Edit.total)? NULL: &Edit.line[y];
 
@@ -418,69 +484,6 @@ void Move(int key) {
     }
 }
 
-
-void presskey() {
-
-    int key_val = Read_Key();
-
-    switch (key_val) {
-        case CONTROL('q'):  // Ctrl + Q
-            for_quit();
-            exit(0);
-            break;
-
-        case CONTROL('s'):  // Ctrl + S
-            break;
-
-        case CONTROL('f'):  // Ctrl + F
-            break;
-
-        case left: // Arrow Left KEY
-        case right: // Arrow Right KEY
-        case up: // Arrow Up KEY
-        case down: // Arrow Down KEY
-            Move(key_val);
-            break;
-            
-        case end: // End KEY
-            x = cols - 1;
-            break;
-
-        case home: // Home KEY
-            x = 0;
-            break;
-
-        case pg_up: // Page Down KEY
-        case pg_dn: // Page Up KEY
-        {
-            int temprows = rows;
-            while (temprows--) {
-                if (key_val == pg_up)
-                    Move(up);
-                else if (key_val == pg_dn)
-                    Move(down);
-            }
-        }
-            break;
-
-        case '\r':  // Enter KEY
-            Newline();
-            break;
-
-        case del:  // Delete KEY
-            DeleteChar();
-            Move(right);
-            break;
-
-        case b_s:  // Backspace KEY
-            DeleteChar();
-            break;
-
-        default:  // Input( )
-            Insertchar(key_val);
-            break;
-    }
-}
 
 void open_file(char *store_file) {
     free(Edit.store_file);
@@ -557,22 +560,13 @@ int main(int argc, char *argv[]) {
   char buf[4];
   int l;
   while (1) {
-    l = read(STDIN_FILENO, &buf[0], 1);
-    
-    if(buf[0] == CONTROL('q')) break;
-    write(STDOUT_FILENO, &buf[0], 1);
-    l = read(STDIN_FILENO, &buf[1], 1);
-    write(STDOUT_FILENO, &buf[1], 1);
-    l = read(STDIN_FILENO, &buf[2], 1);
-    write(STDOUT_FILENO, &buf[2], 1);
-    l = read(STDIN_FILENO, &buf[3], 1);
-    write(STDOUT_FILENO, &buf[3], 1);
     
     
-    // printf("%c ", buf);
     
     
-    //presskey();
+   
+    
+    presskey();
   }
   endwin();
   return 0;

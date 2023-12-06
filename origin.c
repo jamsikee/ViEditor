@@ -325,6 +325,7 @@ int Read_Key() {
   while ((Return_value = read(STDIN_FILENO, &c, 1)) != 1) {
     error = true;
   }
+  printf("%c", c);
 
   
   char ESCAPE = '\x1b';                  // For defualt value ANSI ESCAPE SEQUENCE 
@@ -335,12 +336,14 @@ int Read_Key() {
       return ESCAPE;
     if ((Return_value = read(STDIN_FILENO, &List[1], 1)) != 1)
       return ESCAPE;
-
+    printf("%c", List[0]);
+    printf("%c", List[1]);
     if (List[0] == '[') {             // For processing ANSI ESCAPE SEQUENCE
       if (List[1] >= '0' && List[1] <= '9') {
         if (read(STDIN_FILENO, &List[2], 1) != 1) {
           return ESCAPE;
         }
+        printf("%c", List[2]);
         if (List[2] == '~') {
           if (List[1] == '1') {
             return home;              // \x1b[1~
@@ -558,11 +561,7 @@ int main(int argc, char *argv[]) {
   }
   char buf[4];
   while (1) {
-    int length;
-    length = read(STDIN_FILENO, buf, 4);
-
-    printf("%c %c %c %c\n", buf[0],buf[1],buf[2],buf[3]);
-
+    
     
     presskey();
   }

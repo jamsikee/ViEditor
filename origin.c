@@ -341,6 +341,7 @@ int main() {
   mvprintw(1, 0, "~");
   mvprintw(2, 0, "~");
   mvprintw(3, 0, "~");
+  refresh();
   // while (1) {
   //   presskey();
     

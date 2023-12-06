@@ -554,14 +554,19 @@ int main(int argc, char *argv[]) {
   if (argc >= 2) {
     open_file(argv[1]);
   }
-  char buf;
+  char buf[4];
   int l;
   while (1) {
-    l = read(STDIN_FILENO, &buf, 1);
+    l = read(STDIN_FILENO, &buf[0], 1);
     
-    // printf("%c ", buf);
-    write(STDOUT_FILENO, &buf, 1);
     if(buf == CONTROL('q')) break;
+    l = read(STDIN_FILENO, &buf[1], 1);
+    l = read(STDIN_FILENO, &buf[2], 1);
+    l = read(STDIN_FILENO, &buf[3], 1);
+    
+    write(STDOUT_FILENO, buf, 4);
+    // printf("%c ", buf);
+    
     
     //presskey();
   }

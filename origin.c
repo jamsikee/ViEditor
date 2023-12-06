@@ -529,8 +529,8 @@ void open_file(char *store_file) {
 
 void tilde(){
   for (int i; i < scrren_rows; ++i){
-    write(STIOUT_FILENO, "~\r", 2);
-    write(STDOUT_FILENO, '\n', 2);
+    write(STDOUT_FILENO, "~\r", 2);
+    write(STDOUT_FILENO, '\n', 1);
   }
 }
 

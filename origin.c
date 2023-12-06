@@ -557,7 +557,7 @@ int main(int argc, char *argv[]) {
   char buf;
   int l;
   while (1) {
-    while(l = read(STDIN_FILENO, &buf, 1) != -1){
+    while(l = read(STDIN_FILENO, &buf, 1) != 1){
       perror("exit");
       exit(1);
     };

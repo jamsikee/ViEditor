@@ -557,7 +557,10 @@ int main(int argc, char *argv[]) {
   char buf;
   int l;
   while (1) {
-    l = read(STDIN_FILENO, &buf, 1);
+    while(l = read(STDIN_FILENO, &buf, 1) != -1){
+      perror("exit");
+      exit(1);
+    };
 
     // printf("%c ", buf);
     write(STDOUT_FILENO, buf, strlen(buf));

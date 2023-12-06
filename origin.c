@@ -309,11 +309,12 @@ void state() {
     // clear();
     int columns = 80;
     int i = 0;
-    char buf[30];
-  sprintf(buf, "size : %d %d\r\n",rows, cols);
-  write(STDOUT_FILENO, buf, strlen(buf));
+  //   char buf[30];
+  // sprintf(buf, "size : %d %d\r\n",rows, cols);
+  // write(STDOUT_FILENO, buf, strlen(buf));
 
     for (i = 0; i < rows; i++) {
+      write(STDOUT_FILENO, "\033[K", strlen("\033[K"));
       write(STDOUT_FILENO, "~\r\n", strlen("\r\n"));
     }
 }

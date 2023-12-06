@@ -310,6 +310,7 @@ void status_bar(int rows) {
 }
 
 void state() {
+    clear();
     int columns = 80;
     int i = 0;
     for (i = 0; i < rows; i++) {

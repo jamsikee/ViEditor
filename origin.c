@@ -528,7 +528,7 @@ void status_bar(char* file_name) {
 
 void tilde(){
   for (int i; i < scrren_rows; ++i){
-    printw("~\r");
+    printf("~\r");
   }
 }
 
@@ -558,7 +558,7 @@ int main(int argc, char *argv[]) {
   }
 
   for (int i = 0; i < Edit.total; i++) {
-    printw("%s\r",  Edit.line[i].c);
+    printf("%s\r",  Edit.line[i].c);
   }
 
   while (1) {

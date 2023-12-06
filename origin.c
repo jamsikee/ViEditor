@@ -315,7 +315,7 @@ void DeleteChar(){
     Del_current_line_char();
   }
   else{
-    Del_current_line();
+    Del_current_line(); 
   }
 
 }
@@ -405,7 +405,7 @@ void presskey() {
         case right: // Arrow Right KEY
         case up: // Arrow Up KEY
         case down: // Arrow Down KEY
-            Move(key_val);
+            Move_cursor(key_val);
             break;
             
         case end: // End KEY
@@ -434,7 +434,7 @@ void presskey() {
             break;
 
         case del:  // Delete KEY
-            Move(right);
+            Move_cursor(right);
             DeleteChar();
             break;
 
@@ -448,7 +448,7 @@ void presskey() {
     }
 }
 
-void Move(int key) {
+void Move_cursor(int key) {
     Row *line = (y >= Edit.total)? NULL: &Edit.line[y];
 
     switch (key) {

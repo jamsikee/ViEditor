@@ -11,9 +11,9 @@
 
 #define _XOPEN_SOURCE 700
 
-#ifdef _WIN32
+// #ifdef _WIN32
     
-#elif __linux__
+// #elif __linux__
 
 #define BUFFER_SIZE 8000000
 

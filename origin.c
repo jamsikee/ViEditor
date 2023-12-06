@@ -78,9 +78,8 @@ void disRaw() {
 
 void Raw() {
 
-    struct termios raw;
-    tcgetattr(STDIN_FILENO, &orig_termios);
-    tcgetattr(STDIN_FILENO, &raw);
+    struct termios don;
+    tcgetattr(STDIN_FILENO, &don);
 
     raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON); 
     // Non Sigint sign, change ctrl-M, Non INPCK, erase 8bit, ctrl-s, ctrl-q
@@ -95,7 +94,7 @@ void Raw() {
     raw.c_cc[VTIME] = 1; 
     // Maximum time before read( )
 
-    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &don);
     atexit(disRaw); 
     // If exit a program then automatically invoked
 
@@ -306,197 +305,6 @@ void DeleteChar(){
 
 }
 
-int Read_Key() {
-
-  int Return_value;
-  char c;
-  while ((Return_value = read(STDIN_FILENO, &c, 1)) != 1) {
-    error = true;
-  }
-
-  char ESCAPE = '\x1b';                  // For defualt value ANSI ESCAPE SEQUENCE 
-
-  if (c == ESCAPE) {
-    char List[3];
-    if ((Return_value = read(STDIN_FILENO, &List[0], 1)) != 1)
-      return ESCAPE;
-    if ((Return_value = read(STDIN_FILENO, &List[1], 1)) != 1)
-      return ESCAPE;
-
-    if (List[0] == '[') {             // For processing ANSI ESCAPE SEQUENCE
-      if (List[1] >= '0' && List[1] <= '9') {
-        if ((Return_value = read(STDIN_FILENO, &List[2], 1)) != 1) {
-          return ESCAPE;
-        }
-        if (List[2] == '~') {
-          if (List[1] == '1') {
-            return home;              // \x1b[1~
-          } else if (List[1] == '3') {
-            return del;               // \x1b[3~
-          } else if (List[1] == '4') {
-            return end;               // \x1b[4~
-          } else if (List[1] == '5') {
-            return pg_up;             // \x1b[5~
-          } else if (List[1] == '6') {
-            return pg_dn;             // \x1b[6~
-          }
-        }
-      } else {
-        if (List[1] == 'A') {
-          return up;                  // \x1b[A
-        } else if (List[1] == 'B') {
-          return down;                // \x1b[B
-        } else if (List[1] == 'C') {
-          return right;               // \x1b[C
-        } else if (List[1] == 'D') {
-          return left;                // \x1b[D
-        } else if (List[1] == 'H') {
-          return home;                // \x1b[H
-        } else if (List[1] == 'F') {
-          return end;                 // \x1b[F
-        } else {
-          return ESCAPE;
-        }
-      }
-    } else if (List[0] == '0') {
-      if (List[1] == 'H') {
-       return home;                 // \x1bOH
-      } else if (List[1] == 'F') {
-        return end;                 // \x1bOF
-      }
-    }
-      return ESCAPE;
-  } else {
-    return c;
-  }
-}
-
-void Move(int key) {
-
-    switch (key) {
-        case left:
-            if (x != 0) {
-                x--;
-            } /*
-            else if (y > 0) {
-                y--;
-            }
-            */
-            break;
-        case right:
-        /*
-            if (row && x < row->size) {
-                x++;
-            } else if (row && x == row->size) {
-                y++;
-                x = 0;
-            }
-            */
-            break;
-        case up:
-            if (y != 0) {
-                y--;
-            }
-            break;
-        case down:
-            if (y < Edit.total) {
-                y++;
-            }
-            break;
-    }
-}
-
-
-void presskey() {
-
-    int key_val = Read_Key();
-
-    switch (key_val) {
-        case CONTROL('q'):  // Ctrl + Q
-            for_quit();
-            exit(0);
-            break;
-
-        case CONTROL('s'):  // Ctrl + S
-            break;
-
-        case CONTROL('f'):  // Ctrl + F
-            break;
-
-        case left: // Arrow Left KEY
-        case right: // Arrow Right KEY
-        case up: // Arrow Up KEY
-        case down: // Arrow Down KEY
-            Move(key_val);
-            break;
-            
-        case end: // End KEY
-            x = cols - 1;
-            break;
-
-        case home: // Home KEY
-            x = 0;
-            break;
-
-        case pg_up: // Page Down KEY
-        case pg_dn: // Page Up KEY
-        {
-            int temprows = rows;
-            while (temprows--) {
-                if (key_val == pg_up)
-                    Move(up);
-                else if (key_val == pg_dn)
-                    Move(down);
-            }
-        }
-            break;
-
-        case '\r':  // Enter KEY
-            Newline();
-            break;
-
-        case del:  // Delete KEY
-            DeleteChar();
-            Move(right);
-            break;
-
-        case b_s:  // Backspace KEY
-            DeleteChar();
-            break;
-
-        default:  // Input( )
-            Insertchar(key_val);
-            printf("%d", key_val);
-            break;
-    }
-}
-
-void open_file(char *filename) {
-  free(Edit.filename);
-  Edit.filename = strdup(filename);
-
-  FILE *file= fopen(filename, "rt");
-
-  char *line = NULL;
-  size_t size = 0;
-  int line_len;
-  int i = 0;
-
-  while ((line_len = getline(&line, &size, file)) != -1) {
-    int read = line_len;
-    while (line_len > 0 && (line[line_len - 1] == '\r' ||line[line_len - 1] == '\n')){
-      line_len--;
-    }
-    
-    InsertRow(Edit.total, line, read);
-
-  }
-
-  free(line);
-  fclose(file);
-}
-
-
 void init() {
   
     Raw();
@@ -512,6 +320,7 @@ void init() {
 
 int main(int argc, char *argv[]) {
   system(CLEAR);
+  Raw();
   init();
   // filename = argv[1];
   // if (argc >= 2) {
@@ -521,9 +330,6 @@ int main(int argc, char *argv[]) {
   for (int i; i < 23; ++i){
     printf("~\r\n");
   }
-  printf("Total lines: %d\n", Edit.total);
-  
-  write(STDOUT_FILENO, "\x1b[H", 3);  // cursor (0, 0)
 
   while (1) {
     presskey();

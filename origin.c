@@ -191,7 +191,7 @@ void DeleteRow(int pos){
 void RowInsertString(Row *line, char *str, size_t del_line_len){
 
   // This function will use delete char at x = 0 then delete row
-  line.c = realloc(line->c, line->len + del_line_len + 1);
+  line->c = realloc(line->c, line->len + del_line_len + 1);
   /*
     While line_capacity is full then size*=2 and realloc 
     because 126 * 2 = 252 > line_capacity then run until satisfied condition
@@ -223,7 +223,7 @@ void RowInsertchar(Row *line, int word, int pos){
     pos = line->len;
   }
   
-  line.c = realloc(line->c, line->len + 2);
+  line->c = realloc(line->c, line->len + 2);
   
   // it seems like RowInsertString capacity*2
   memmove(&line->c[pos+1], &line->c[pos], line->len - pos + 1);

@@ -1,292 +1,120 @@
-// #ifdef __WIN32
-//   #include <stdio.h>
-//   #include <stdlib.h>
-//   #include <string.h>
-//   #include <fcntl.h>
-//   #include <ctype.h>
-//   #include <stdbool.h>
-//   #define CLEAR "cls"
-// #elif __linux__
-  #include <stdio.h>
-  #include <stdlib.h>
-  #include <string.h>
-  #include <termios.h>
-  #include <unistd.h>
-  #include <fcntl.h>
-  #include <sys/ioctl.h>
-  #include <ctype.h>
-  #include <ncurses.h>
-  #include <stdbool.h>
-  #define CLEAR "clear"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <termios.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <ctype.h>
+#include <ncurses.h>
+#include <stdbool.h>
+/*
+#define _XOPEN_SOURCE 700
 
-// #elif __APPLE__
-
-// #endif
-
-#define INIT_ROW_SIZE 500
-#define INIT_LINE_SIZE 125
-#define CONTROL(k) ((k) & 0x1f) // control + k
-
-struct termios orig_termios;
-
-enum P_key {
-
-    left = 1000,
-    right,
-    up,
-    down,
-    del,
-    home,
-    end,
-    pg_up,
-    pg_dn,
-    b_s = 127
+#ifdef _WIN32
     
-};
+#elif __linux__
+*/
+#define _XOPEN_SOURCE 700
+#define BUFFER_SIZE 8000000
 
-bool error = false;
+typedef struct Node {
+    char *line;
+    struct Node *prev;
+    struct Node *next;
+} Node;
 
-int x;
-int y;
-int rows;
-int cols;
-int move_rows;
-int move_cols;
-
-typedef struct Row {
-
-  int len;
-  char *c;
-  int line_capacity;
-
-} Row;
-
-struct Visual_Text_Editor{
-
-  int total;
-  Row *line;
-  char *filename;
-
-};
-
-struct Visual_Text_Editor Edit;
+typedef struct {
+    char **lines;  // 각 라인을 저장하는 배열
+    int capacity;
+    int num_lines;  // 현재 라인 수
+    int *line_lengths;  // 각 라인의 길이를 저장하는 배열
+    int cursor_position_row; 
+    int cursor_position_column;  
+} TextBuffer;
 
 
-Row *get_line(Row *line, int pos) {
+typedef struct {
+    int row;
+    int column;
+} CursorPosition;
 
-    return &line[pos];
-    // get line index
+typedef struct TextEditor {
+    Node *head;
+    Node *tail;
+    Node *current;
+    char *filename;
+    int line_count;
+    CursorPosition cursor_position; 
+    TextBuffer text_buffer;
+} TextEditor;
 
+
+void state();
+void handle_command(TextEditor *editor);
+void initBuffer(TextBuffer *buffer);
+void insertCharacter(TextBuffer *buffer, char character);
+void deleteCharacter(TextBuffer *buffer);
+void moveCursorToTop();
+void moveCursorUp(TextBuffer *buffer);
+void moveCursorDown(TextBuffer *buffer);
+void moveCursorLeft(TextBuffer *buffer);
+void moveCursorRight(TextBuffer *buffer);
+void moveCursor(TextBuffer *buffer, int direction);
+void print_status(const TextEditor *editor, int rows);
+void end_message(const char *message, const TextEditor *editor, int rows);
+
+
+int main() {
+    initscr();
+    noecho();  // 입력한 키를 화면에 표시하지 않음
+
+    int rows, column;
+    getmaxyx(stdscr, rows, column);  // 터미널 창의 행과 열 크기 가져오기 
+
+    TextEditor editor;
+    editor.line_count = 10;
+    editor.filename = "No name";
+    state();
+
+    initBuffer(&editor.text_buffer);
+
+    print_status(&editor, rows);
+    end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find", &editor, rows);
+    moveCursorToTop();  // 이 부분을 추가하여 커서를 맨 위로 이동시킴
+
+    while (1) {
+        handle_command(&editor);  // 명령을 계속해서 처리
+        print_status(&editor, rows);
+        refresh();
+    }
+    endwin();   // ncurses 종료
+    return 0;
 }
 
 
-void InsertRow(int edit_y, char *line, int line_len) {
-  if (edit_y < 0) {
-    return;
-  }
-  else if(edit_y > Edit.total){
-    return;
-  }
-  // If y < 0 or y > total then return
+int rows = 30;
 
-  if (Edit.total == 0) {
-    Edit.line = malloc(sizeof(Row) * INIT_ROW_SIZE);
-  } else if (Edit.total % INIT_ROW_SIZE == 0) {
-    Edit.line = realloc(Edit.line, sizeof(Row) * (Edit.total * 2));
-  }
-  /*
-  Edit.line's memory = INIT_ROW_SIZE(1000)
-  If total % 1000 == 0 then realloc 1000 * 2
-  */
-  memmove(&Edit.line[edit_y + 1], &Edit.line[edit_y], sizeof(Row) * (Edit.total - edit_y));
-  // Memory move line[y] -> line[y + 1]
-  Edit.line[edit_y].len = line_len;   
-  Edit.line[edit_y].c = malloc(INIT_LINE_SIZE + 1);
-  Edit.line[edit_y].line_capacity = INIT_LINE_SIZE + 1; 
-  // Line_capacity is (Edit.line[y].c)'s size
-  memcpy(Edit.line[edit_y].c, line, line_len);
-  Edit.line[edit_y].c[line_len] = '\0'; 
-  // The end of the string is null
-  Edit.total+=1;
-
-}
-
-void FreeRow(Row *line){  // Efficient method for free memory
-
-  free(line->c);
-
-}
-
-void DeleteRow(int pos){
-
-  if (pos < 0){  
-    return;
-  }
-  else if(pos >= Edit.total){
-    return;
-  }
-  // If y < 0 or y > total then return
-
-  FreeRow(&Edit.line[pos]); // Line[pos]'s memory free
-  memmove(&Edit.line[pos], &Edit.line[pos+1], sizeof(Row) * (Edit.total - pos - 1));
-  // Line[pos+1]'s memory move to free memory(line[pos]) 
-  Edit.total-=1;
-
-}
-
-void RowInsertString(Row *line, char *str, size_t del_line_len){
-
-  // This function will use delete char at x = 0 then delete row
-  while (line->len + del_line_len > line->line_capacity){   
-    line->line_capacity *= 2;
-    line->c = realloc(line->c, line->line_capacity);
-  }
-  /*
-    While line_capacity is full then size*=2 and realloc 
-    because 126 * 2 = 252 > line_capacity then run until satisfied condition
-  */
-  memcpy(&line->c[line->len], str, del_line_len);
-  line->len += del_line_len;
-  line->c[line->len] = '\0';
-
-}
-
-void RowDeletechar(Row *line, int pos){
-
-  if (pos < 0 || pos >= line->len){
-    return;
-  }
-  /*
-  If x < 0 or x >= line's len then return
-  It means The cursor moved out of its intended position
-  */
-  memmove(&line->c[pos], &line->c[pos+1], line->len - pos);
-  line->len-=1;
-  // memory move c[pos+1] -> c[pos]
-
-}
-
-void RowInsertchar(Row *line, int word, int pos){
-
-  if (pos < 0 || pos > line->len){
-    pos = line->len;
-  }
-  
-  if (line->len + 1> line->line_capacity){
-    line->line_capacity*=2;
-    line->c = realloc(line->c, line->line_capacity);
-  }
-  
-  // it seems like RowInsertString capacity*2
-  memmove(&line->c[pos+1], &line->c[pos], line->len - pos + 1);
-  // memory move line->len - pos + 1 size
-  line->len += 1;
-  line->c[pos] = word;
-
-}
-
-void empty_new_line(int pos){
-
-  InsertRow(pos, "", 0);
-  // If the line is empty or outside the screen add a empty line.
-
-}
-
-void Insertchar(int word){
-
-  if(y == Edit.total) {
-    empty_new_line(Edit.total); 
-    // if cursor y = total then add line;
-  }
-  RowInsertchar(&Edit.line[y], word, x);
-  x += 1;
-  // Insert char at cursor x
-
-}
-
-void contained_new_line(Row *line, int pos_y, int pos_x) {
-
-    InsertRow(pos_y + 1, &line->c[pos_x], line->len - pos_x);
-    // Insert current line's string(pos_x to line->len) to new line
-    line = &Edit.line[pos_y];
-    line->len = pos_x;
-    line->c[line->len] = '\0';
-
-}
-
-void Newline(){
-
-  Row *line = get_line(Edit.line, y);
-  // get line Edit.line[y]
-  if(x == 0){
-    empty_new_line(y);
-  }
-  else{
-    contained_new_line(line, y, x);
-  }
-  y += 1;
-  x = 0;
-
-}
-
-void Del_current_line_char() {
-
-  Row *line = get_line(Edit.line, y);
-  // get line Edit.line[y]
-  RowDeletechar(line, x - 1);
-  x -= 1;
-
-}
-
-void Del_current_line() {
-
-  Row *line = get_line(Edit.line, y);
-  // get line Edit.line[y]
-  x = Edit.line[y - 1].len;
-  RowInsertString(&Edit.line[y - 1], line->c, line->len);
-  DeleteRow(y);
-  y -= 1;
-  // x cursor is prev line's len and y cursor -1 and insert string at line's len
-
-}
-
-void DeleteChar(){
-
-  Row *line = get_line(Edit.line, y);
-
-  if( y == Edit.total){
-    return;
-  }
-  if( x == 0 && y == 0){
-    return;
-  }
-
-  if(x > 0){
-    Del_current_line_char();
-  }
-  else{
-    Del_current_line();
-  }
-
-}
-
-void C_M(int x, int y) {
+void gotoxy(int x, int y) {
     printf("\033[%d;%dH", y, x);
 }
 
-void move_cursor_init(){
-  C_M(1,1);
+void moveCursorToTop() {
+    gotoxy(1, 1);
 }
 
-void status_bar(int rows) {
-    C_M(1, rows - 1);
-    printf("\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
-            10, 
-            10);
+void print_status(const TextEditor *editor, int rows) {
+    gotoxy(1, rows - 1);
+    printf("\e[7m [%s] - %d lines - Cursor: (%d, %d)", editor->filename, editor->text_buffer.num_lines, 
+            editor->text_buffer.cursor_position_row, 
+            editor->text_buffer.cursor_position_column);
     printf("\x1b[0m");
 }
 
+
+
 void state() {
+    clear(); // 기존 내용을 지우고 새로 그림
     int columns = 80;
     int i = 0;
     for (i = 0; i < rows; i++) {
@@ -296,44 +124,244 @@ void state() {
         } else {
             mvprintw(i, 0, "~");
         }
-        refresh(); // 화면 갱신
     }
 
+    refresh(); // 화면 갱신
 }
 
-void end_message(const char *message, int rows) {
+
+void end_message(const char *message, const TextEditor *editor, int rows) {
     int msg_length = strlen(message);
     mvprintw(rows - 1, 0, "%s", message);
-    status_bar(rows);
+    print_status(editor, rows);
     refresh();
 }
 
-int main() {
-  system(CLEAR);
-  initscr();
-  noecho();
-  getmaxyx(stdscr, rows, cols);
-  x = 0;
-  y = 0;
-  Edit.total = 0;
-  move_cols = 0;
-  move_rows = 0;
-  Edit.filename = "No Name";
-  state();
-  status_bar(rows);
-  end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find", rows);
-  move_cursor_init();
-  // char* filename = argv[1];
-  // if (argc >= 2) {
-  //   open_file(argv[1]);
-  // }
+void handle_command(TextEditor *editor) {
+    int command = getch();
 
-  // while (1) {
-  //   presskey();
-    
-  // }
+    if (command == KEY_ENTER || command == '\n') {
+        // Enter 키 입력 시, 문자열을 입력받고 텍스트 버퍼에 추가
+        char input_buffer[BUFFER_SIZE];
+        mvgetnstr(editor->text_buffer.cursor_position_row, editor->text_buffer.cursor_position_column, input_buffer, sizeof(input_buffer));
 
-  endwin();
-  return 0;
+        int i = 0;
+        for (i = 0; i < strlen(input_buffer); i++) {
+            insertCharacter(&editor->text_buffer, input_buffer[i]);
 
+            // 입력한 문자를 화면에 출력
+            mvprintw(editor->text_buffer.cursor_position_row, editor->text_buffer.cursor_position_column, "%c", input_buffer[i]);
+
+            // 커서를 다음 위치로 이동
+            moveCursorRight(&editor->text_buffer);
+        }
+    } else if (command == 127) {
+        // 백스페이스 키 입력 시, 문자열에서 한 글자 삭제
+        deleteCharacter(&editor->text_buffer);
+
+        // 삭제 후 텍스트 버퍼의 내용을 화면에 업데이트
+        int row = editor->text_buffer.cursor_position_row;
+        int col = editor->text_buffer.cursor_position_column;
+
+        // 백스페이스 입력 시 현재 위치에 공백 출력
+        mvprintw(row, col, " ");
+
+        // 커서 위치 조정
+        move(row, col);
+    } else {
+        // 다른 키 입력 시, Insert mode에서의 처리
+        insertCharacter(&editor->text_buffer, (char) command);
+
+        // 입력한 문자를 화면에 출력
+        mvprintw(editor->text_buffer.cursor_position_row, editor->text_buffer.cursor_position_column - 1, "%c", (char) command);
+    }
+}
+
+
+void initBuffer(TextBuffer *buffer) {
+    buffer->capacity = BUFFER_SIZE;
+    buffer->lines = (char **)malloc(buffer->capacity * sizeof(char *));
+    buffer->line_lengths = (int *)malloc(buffer->capacity * sizeof(int));
+    if (buffer->lines == NULL || buffer->line_lengths == NULL) {
+        fprintf(stderr, "Error: Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    buffer->num_lines = 0;
+    buffer->cursor_position_row = 0;
+    buffer->cursor_position_column = 0;
+
+    // 초기에 25개의 라인을 생성
+    /*int i =0;
+    for (i = 0; i < 25; ++i) {
+        insertCharacter(buffer, '\n');
+    }*/
+}
+
+
+
+void deleteCharacter(TextBuffer *buffer) {
+    if (buffer->cursor_position_column > 0) {
+        char *line = buffer->lines[buffer->cursor_position_row];
+        int length = buffer->line_lengths[buffer->cursor_position_row];
+
+        // 커서 위치의 문자를 왼쪽으로 이동
+        memmove(line + buffer->cursor_position_column - 1, line + buffer->cursor_position_column, length - buffer->cursor_position_column);
+
+        // 라인 길이 갱신
+        buffer->line_lengths[buffer->cursor_position_row]--;
+
+        // 커서 위치 이동
+        buffer->cursor_position_column--;
+
+        // 만약 라인이 비어있다면 라인을 삭제
+        if (buffer->line_lengths[buffer->cursor_position_row] == 0) {
+            free(line);
+            buffer->lines[buffer->cursor_position_row] = NULL;
+
+            // 라인 수 갱신
+            buffer->num_lines--;
+
+            // 커서 위치 위의 라인을 현재 라인으로 복사
+            if (buffer->cursor_position_row < buffer->num_lines) {
+                buffer->lines[buffer->cursor_position_row] = buffer->lines[buffer->cursor_position_row + 1];
+                buffer->line_lengths[buffer->cursor_position_row] = buffer->line_lengths[buffer->cursor_position_row + 1];
+                buffer->lines[buffer->cursor_position_row + 1] = NULL;
+                buffer->line_lengths[buffer->cursor_position_row + 1] = 0;
+            }
+        }
+    }
+}
+
+
+void moveCursorUp(TextBuffer *buffer) {
+    if (buffer->cursor_position_row > 0) {
+        buffer->cursor_position_row--;
+        int prev_line_length = buffer->line_lengths[buffer->cursor_position_row];
+        if (buffer->cursor_position_column > prev_line_length) {
+            // 이전 라인의 길이보다 커서 열이 크면 커서 열을 이전 라인의 끝으로 조정
+            buffer->cursor_position_column = prev_line_length;
+        }
+    }
+}
+
+void moveCursorDown(TextBuffer *buffer) {
+    if (buffer->cursor_position_row < buffer->num_lines - 1) {
+        buffer->cursor_position_row++;
+        int next_line_length = buffer->line_lengths[buffer->cursor_position_row];
+        if (buffer->cursor_position_column > next_line_length) {
+            // 다음 라인의 길이보다 커서 열이 크면 커서 열을 다음 라인의 끝으로 조정
+            buffer->cursor_position_column = next_line_length;
+        }
+    }
+}
+
+void moveCursorLeft(TextBuffer *buffer) {
+    if (buffer->cursor_position_column > 0) {
+        buffer->cursor_position_column--;
+    } else if (buffer->cursor_position_row > 0) {
+        // 현재 라인의 맨 앞에 도달했으면 이전 라인으로 이동
+        buffer->cursor_position_row--;
+        buffer->cursor_position_column = buffer->line_lengths[buffer->cursor_position_row];
+    }
+}
+
+
+void moveCursorRight(TextBuffer *buffer) {
+    char *line = buffer->lines[buffer->cursor_position_row];
+    int length = buffer->line_lengths[buffer->cursor_position_row];
+
+    if (buffer->cursor_position_column < length) {
+        buffer->cursor_position_column++;
+    } else if (buffer->cursor_position_row < buffer->num_lines - 1) {
+        // 현재 라인의 끝에 도달했으면 다음 라인으로 이동
+        buffer->cursor_position_row++;
+        buffer->cursor_position_column = 0;
+    }
+}
+
+
+void moveCursor(TextBuffer *buffer, int direction) {
+    switch (direction) {
+        case 65:  // 위쪽 화살표 키의 ASCII 코드
+            moveCursorUp(buffer);
+            break;
+        case 66:  // 아래쪽 화살표 키
+            moveCursorDown(buffer);
+            break;
+        case 68:  // 왼쪽 화살표 키
+            moveCursorLeft(buffer);
+            break;
+        case 67:  // 오른쪽 화살표 키
+            moveCursorRight(buffer);
+            break;
+        default:
+            // 다른 키에 대한 처리
+            break;
+    }
+}
+
+void insertCharacter(TextBuffer *buffer, char character) {
+    if (buffer->num_lines == 0) {
+        // 초기에 라인이 없을 때는 새로운 라인을 할당
+        buffer->lines = (char **)malloc(sizeof(char *));
+        buffer->line_lengths = (int *)malloc(sizeof(int));
+        if (buffer->lines == NULL || buffer->line_lengths == NULL) {
+            fprintf(stderr, "Error: Memory allocation failed.\n");
+            exit(EXIT_FAILURE);
+        }
+
+        buffer->lines[0] = (char *)malloc(sizeof(char) * 2);  // 초기 길이는 1
+        if (buffer->lines[0] == NULL) {
+            fprintf(stderr, "Error: Memory allocation failed.\n");
+            exit(EXIT_FAILURE);
+        }
+
+        buffer->line_lengths[0] = 0;
+        buffer->num_lines = 1;
+    }
+
+     if (buffer->cursor_position_row >= buffer->num_lines) {
+        int new_line_count = buffer->num_lines + 1;  // 다음 라인까지 포함
+        buffer->lines = (char **)realloc(buffer->lines, sizeof(char *) * new_line_count);
+        buffer->line_lengths = (int *)realloc(buffer->line_lengths, sizeof(int) * new_line_count);
+        if (buffer->lines == NULL || buffer->line_lengths == NULL) {
+            fprintf(stderr, "Error: Memory allocation failed.\n");
+            exit(EXIT_FAILURE);
+        }
+
+        // 새로 추가된 라인을 초기화
+        buffer->lines[buffer->num_lines] = (char *)malloc(sizeof(char));  // 초기 길이는 0
+        if (buffer->lines[buffer->num_lines] == NULL) {
+            fprintf(stderr, "Error: Memory allocation failed.\n");
+            exit(EXIT_FAILURE);
+        }
+        buffer->lines[buffer->num_lines][0] = '\0';  // 빈 문자열로 초기화
+        buffer->line_lengths[buffer->num_lines] = 0;
+
+        buffer->num_lines = new_line_count;
+    }
+    // 커서 위치에 문자를 삽입
+    char *line = buffer->lines[buffer->cursor_position_row];
+    int length = buffer->line_lengths[buffer->cursor_position_row];
+
+    if (length + 1 >= buffer->capacity) {
+        buffer->capacity *= 2;
+        line = (char *)realloc(line, buffer->capacity * sizeof(char));
+        if (line == NULL) {
+            fprintf(stderr, "Error: Memory allocation failed.\n");
+            exit(EXIT_FAILURE);
+        }
+
+        buffer->lines[buffer->cursor_position_row] = line;
+    }
+
+    // 커서 위치 뒤의 문자들을 오른쪽으로 이동
+    memmove(line + buffer->cursor_position_column + 1, line + buffer->cursor_position_column,
+            length - buffer->cursor_position_column);
+
+    // 문자 삽입
+    line[buffer->cursor_position_column] = character;
+    buffer->line_lengths[buffer->cursor_position_row]++;
+    buffer->cursor_position_column++;
 }

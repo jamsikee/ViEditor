@@ -444,7 +444,7 @@ void presskey() {
 
         default:  // Input( )
             Insertchar(key_val);
-            
+            break;
     }
 }
 
@@ -539,6 +539,7 @@ void tilde(){
 void init() {
   
     Raw();
+    initscr();
     getmaxyx(stdscr, rows, cols);
     x = 0;
     y = 0;

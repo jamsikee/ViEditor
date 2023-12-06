@@ -348,9 +348,9 @@ int main() {
   // if (argc >= 2) {
   //   open_file(argv[1]);
   // }
-  mvprintw(1, 0, "~");
-  mvprintw(2, 0, "~");
-  mvprintw(3, 0, "~");
+  mvprintw(1, 0, "~\r\n");
+  mvprintw(2, 0, "~\r\n");
+  mvprintw(3, 0, "~\r\n");
   refresh();
   // while (1) {
   //   presskey();

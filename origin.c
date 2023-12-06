@@ -23,7 +23,7 @@
 
 // #endif
 
-#define INIT_ROW_SIZE 1000
+#define INIT_ROW_SIZE 500
 #define INIT_LINE_SIZE 125
 #define CONTROL(k) ((k) & 0x1f) // control + k
 
@@ -322,13 +322,13 @@ void state() {
 
 void end_message(const char *message, int rows) {
     int msg_length = strlen(message);
-    mvprintw(rows, 0, "%s", message);
+    mvprintw(rows , 0, "%s", message);
     status_bar(rows);
     refresh();
 }
 
 int main() {
-  system(clear);
+  system(CLEAR);
   initscr();
   noecho();
   getmaxyx(stdscr, rows, cols);

@@ -140,8 +140,12 @@ void InsertRow(int edit_y, char *line, int line_len) {
   }
   // If y < 0 or y > total then return
 
-  if (Edit.total == 0) 
-    Edit.line = malloc(sizeof(Row) * 5);
+  if (Edit.total == 0) {
+    Edit.line = malloc(sizeof(Row) * 1);
+  } 
+  else{
+    Edit.line = realloc(Edit.line, sizeof(Row) * (Edit.total + 1));
+  }
   // } else if (Edit.total % INIT_ROW_SIZE == 0) {
   //   Edit.line = realloc(Edit.line, sizeof(Row) * (Edit.total * 2));
   // }
@@ -152,8 +156,7 @@ void InsertRow(int edit_y, char *line, int line_len) {
   memmove(&Edit.line[edit_y + 1], &Edit.line[edit_y], sizeof(Row) * (Edit.total - edit_y));
   // Memory move line[y] -> line[y + 1]
   Edit.line[edit_y].len = line_len;   
-  Edit.line[edit_y].c = malloc(5);
-  Edit.line[edit_y].line_capacity = INIT_LINE_SIZE + 1; 
+  Edit.line[edit_y].c = malloc(line_len + 1);
   // Line_capacity is (Edit.line[y].c)'s size
   memcpy(Edit.line[edit_y].c, line, line_len);
   Edit.line[edit_y].c[line_len] = '\0'; 
@@ -188,10 +191,7 @@ void DeleteRow(int pos){
 void RowInsertString(Row *line, char *str, size_t del_line_len){
 
   // This function will use delete char at x = 0 then delete row
-  while (line->len + del_line_len > line->line_capacity){   
-    line->line_capacity *= 2;
-    line->c = realloc(line->c, line->line_capacity);
-  }
+  line.c = realloc(line->c, line->len + del_line_len + 1);
   /*
     While line_capacity is full then size*=2 and realloc 
     because 126 * 2 = 252 > line_capacity then run until satisfied condition
@@ -223,10 +223,7 @@ void RowInsertchar(Row *line, int word, int pos){
     pos = line->len;
   }
   
-  if (line->len + 1> line->line_capacity){
-    line->line_capacity*=2;
-    line->c = realloc(line->c, line->line_capacity);
-  }
+  line.c = realloc(line->c, line->len + 2);
   
   // it seems like RowInsertString capacity*2
   memmove(&line->c[pos+1], &line->c[pos], line->len - pos + 1);

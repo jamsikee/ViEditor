@@ -550,10 +550,10 @@ int main(int argc, char *argv[]) {
   system(CLEAR);
   init();
   
-  char *file_name = argv[1];
-  if (argc >= 2) {
-    open_file(argv[1]);
-  }
+  // char *file_name = argv[1];
+  // if (argc >= 2) {
+  //   open_file(argv[1]);
+  // }
 
   while (1) {
     presskey();

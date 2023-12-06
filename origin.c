@@ -27,6 +27,7 @@
 #define INIT_LINE_SIZE 125
 #define CONTROL(k) ((k) & 0x1f) // control + k
 
+void Move_cursor(int key);
 struct termios orig_termios;
 
 enum P_key {
@@ -569,4 +570,4 @@ int main(int argc, char *argv[]) {
 
   return 0;
 
-}`
+}

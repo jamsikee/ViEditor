@@ -330,7 +330,6 @@ void end_message(const char *message, int rows) {
 int main() {
   
   initscr();
-  system(CLEAR);
   noecho();
   getmaxyx(stdscr, rows, cols);
   state();

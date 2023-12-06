@@ -318,14 +318,14 @@ void init() {
 
 }
 
-int main(int argc, char *argv[]) {
+int main() {
   system(CLEAR);
   Raw();
   init();
-  char* filename = argv[1];
-  if (argc >= 2) {
-    open_file(argv[1]);
-  }
+  // char* filename = argv[1];
+  // if (argc >= 2) {
+  //   open_file(argv[1]);
+  // }
 
   for (int i; i < 23; ++i){
     printf("~\r\n");

@@ -481,33 +481,33 @@ void presskey() {
     }
 }
 
-void open_file(char *store_file) {
-    free(Edit.store_file);
-    Edit.store_file = malloc(strlen(store_file) + 1);
-    strcpy(Edit.store_file, store_file);
+// void open_file(char *store_file) {
+//     free(Edit.store_file);
+//     Edit.store_file = malloc(strlen(store_file) + 1);
+//     strcpy(Edit.store_file, store_file);
 
-    FILE *file = fopen(store_file, "r");
-    if (!file) {
-        fprintf(stderr, "Cannot open file: %s\n", store_file);
-        exit(EXIT_FAILURE);
-    }
+//     FILE *file = fopen(store_file, "r");
+//     if (!file) {
+//         fprintf(stderr, "Cannot open file: %s\n", store_file);
+//         exit(EXIT_FAILURE);
+//     }
 
-    File_Inf Inf;
-    Inf.temp = NULL;
-    Inf.size = 0;
-    Inf.length = 0;
+//     File_Inf Inf;
+//     Inf.temp = NULL;
+//     Inf.size = 0;
+//     Inf.length = 0;
 
-    while ((Inf.length = getline(&(Inf.temp), &(Inf.size), file)) != -1) {
-        int read = Inf.length;
-        while (Inf.length > 0 && (Inf.temp[Inf.length - 1] == '\r' || Inf.temp[Inf.length - 1] == '\n')) {
-            Inf.length--;
-        }
-        InsertRow(Edit.total, Inf.temp, read);
-    }
+//     while ((Inf.length = getline(&(Inf.temp), &(Inf.size), file)) != -1) {
+//         int read = Inf.length;
+//         while (Inf.length > 0 && (Inf.temp[Inf.length - 1] == '\r' || Inf.temp[Inf.length - 1] == '\n')) {
+//             Inf.length--;
+//         }
+//         InsertRow(Edit.total, Inf.temp, read);
+//     }
 
-    free(Inf.temp);
-    fclose(file);
-}
+//     free(Inf.temp);
+//     fclose(file);
+// }
 
 // void status_bar(char* file_name) {
 //     char left_Inf[50];

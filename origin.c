@@ -305,7 +305,6 @@ void state() {
 int main() {
   system(CLEAR);
   noecho();
-  init();
   getmaxyx(stdscr, rows, cols);
   x = 0;
   y = 0;

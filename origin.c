@@ -333,16 +333,17 @@ int main(int argc, char *argv[]){
   clear();
   getmaxyx(stdscr, rows, cols);
   keypad(stdscr, TRUE);
-  if (argc >= 2) {
-    editorOpen(argv[1]);
-  }
-  Edit.filename = NULL;
-  if (!Edit.filename){
-    Edit.filename = "No Name";
-  }
-  else{
-    Edit.filename = argv[1];
-  }
+  // if (argc >= 2) {
+  //   editorOpen(argv[1]);
+  // }
+  // Edit.filename = NULL;
+  // if (!Edit.filename){
+  //   Edit.filename = "No Name";
+  // }
+  // else{
+  //   Edit.filename = argv[1];
+  // }
+  Edit.filename = "No Name";
   total = 0;
   all_refresh();
   if(total == 0){

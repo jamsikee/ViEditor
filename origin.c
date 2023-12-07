@@ -276,15 +276,18 @@ void status_bar() {
 
     snprintf(total, sizeof(total), "%d", Edit.total);
     snprintf(st_y, sizeof(st_y), "%d", y);
-
+    
     init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
     attron(COLOR_PAIR(2) | A_REVERSE); // Enable the defined reverse color pair
 
     // 왼쪽에 텍스트 출력
-    mvprintw(rows - 2, 0, "[%s] - %d lines ", Edit.filename, Edit.total);
-
-    // 오른쪽에 텍스트 출력
+    mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, Edit.total);
+    int left_len = strlen(total) + strlen(Edit.filename) + 13;
     int right_len = strlen(total) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
+    for (int i = left_len; i < right_len; i++){
+      printw(" ");
+    }
+    // 오른쪽에 텍스트 출력
     mvprintw(rows - 2, cols - right_len, "no ft | %d/%d", y, Edit.total);
 
     refresh();
@@ -317,6 +320,7 @@ int main(){
   keypad(stdscr, TRUE);
 
   Edit.filename = "No Name";
+  move(0,0);
   all_refresh();
   // while(true){
   //   ch = getch();

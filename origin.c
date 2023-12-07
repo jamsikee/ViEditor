@@ -273,7 +273,8 @@ void state(){
 void status_bar() {
     char total[20];
     char st_y[20];
-
+    Edit.total = 1111;
+    y = 1111;
     snprintf(total, sizeof(total), "%d", Edit.total);
     snprintf(st_y, sizeof(st_y), "%d", y);
     
@@ -284,9 +285,7 @@ void status_bar() {
       printw( " ");
       refresh();
     }
-    Edit.total = 1111;
-    y = 1111;
-    Edit.filename = "helloworld";
+    
     // 왼쪽에 텍스트 출력
     mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, Edit.total);
     int left_len = strlen(total) + strlen(Edit.filename) + 13;

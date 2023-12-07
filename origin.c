@@ -280,10 +280,10 @@ void Visual_Text_editor__version(){
 }
 
 void status_bar() {
-    char total[20];
+    char total_len[20];
     char st_y[20];
   
-    snprintf(total, sizeof(total), "%d", total);
+    snprintf(total_len, sizeof(total_len), "%d", total);
     snprintf(st_y, sizeof(st_y), "%d", y);
     
     init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
@@ -296,8 +296,8 @@ void status_bar() {
     
     // 왼쪽에 텍스트 출력
     mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
-    int left_len = strlen(total) + strlen(Edit.filename) + 13;
-    int right_len = strlen(total) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
+    int left_len = strlen(total_len) + strlen(Edit.filename) + 13;
+    int right_len = strlen(total_len) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
 
     // 오른쪽에 텍스트 출력
     mvprintw(rows - 2, cols - right_len-1, "no ft | %d/%d", y, total);

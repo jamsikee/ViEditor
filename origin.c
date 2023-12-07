@@ -301,7 +301,7 @@ int main(){
   system(CLEAR);
   Edit.filename = "No Name";
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-  get_window_size();
+  get_windows_size();
   printf("%d, %d", rows, cols);
 
   // while(true){

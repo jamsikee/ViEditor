@@ -331,11 +331,10 @@ int main(){
   clear();
   getmaxyx(stdscr, rows, cols);
   keypad(stdscr, TRUE);
-  Visual_Text_editor__version();
-
   Edit.filename = "No Name";
-  move(0,0);
   all_refresh();
+  Visual_Text_editor__version();
+  move(0,0);
   // while(true){
   //   ch = getch();
   //   char buffer[1000];

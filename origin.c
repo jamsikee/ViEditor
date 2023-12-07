@@ -290,14 +290,12 @@ int main(){
   initscr();
   clear();
   noecho();
-  getmaxys(stdscr, rows, column);
+  getmaxys(stdscr, rows, cols);
   Edit.total = "No Name";
   state();
   C_M(1, 1);
-  
+
   endwin();
-  retirn 0;
-
-
+  return 0;
 
 }

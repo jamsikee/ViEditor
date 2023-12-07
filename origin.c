@@ -299,7 +299,7 @@ void move_cursor_init(){
 }
 
 void status_bar() {
-    move(10, 0);
+    move(10, 1);
     printf("\e[7m[%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
             10, 
             10);
@@ -324,7 +324,7 @@ void end_message(const char *format, ...) {
     va_list args;
     va_start(args, format);
     
-    move(10, 0); // 특정 행으로 커서 이동
+    move(10, 1); // 특정 행으로 커서 이동
     vprintf(format, args); // 가변 인자들을 printf 형태로 출력
     
     va_end(args);
@@ -339,9 +339,6 @@ int main() {
   // char location[30];
   // sprintf(location, "\033[%d;%dH", 1,1);
   // write(STDOUT_FILENO, location, strlen(location));
-  char buf[30];
-  sprintf(buf, "size : %d %d\r\n",rows, cols);
-  write(STDOUT_FILENO, buf, strlen(buf));
   Edit.filename = "No Name";
   // move_cursor_init();
   state();

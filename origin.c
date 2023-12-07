@@ -345,7 +345,7 @@ int main(int argc, char *argv[]){
   else{
     Edit.filename = argv[1];
   }
-  total = 10;
+  total = 0;
   all_refresh();
   Visual_Text_editor__version();
   move(0,0);

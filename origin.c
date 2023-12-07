@@ -13,6 +13,7 @@
 
 
 struct Visual_Text_Editor Edit;
+
 void get_windows_size();
 Row *get_line(Row *line, int pos);
 void InsertRow(int edit_y, char *line, int line_len);
@@ -30,9 +31,6 @@ void state();
 void end_message( const char *format, ...);
 void all_refresh();
 void Visual_Text_editor__version()；
-void Del_current_line_char();
-void Del_current_line();
-void DeleteChar();
 
 
 int x = 0;

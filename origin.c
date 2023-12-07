@@ -38,7 +38,7 @@ struct Visual_Text_Editor{
 };
 
 struct Visual_Text_Editor Edit;
-
+void get_windows_size();
 Row *get_line(Row *line, int pos);
 void InsertRow(int edit_y, char *line, int line_len);
 void FreeRow(Row *line);

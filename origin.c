@@ -8,9 +8,11 @@
   #include <ctype.h>
   #include <ncurses.h>
   #include <stdbool.h>
+  
   #include <stdarg.h>
   #define CLEAR "clear"
-#define CONTROL(k) ((k) & 0x1f) // control + k
+  #define CONTROL(k) ((k) & 0x1f) // control + k
+
 int x = 0;
 int y = 0;
 int rows = 0;
@@ -47,8 +49,6 @@ void empty_new_line(int pos);
 void Insertchar(int word);
 void contained_new_line(Row *line, int pos_y, int pos_x);
 void Newline();
-void C_M(int x, int y);
-void move_cursor_init();
 void status_bar();
 void state();
 void end_message( const char *format, ...);
@@ -258,7 +258,43 @@ void DeleteChar(){
 
 }
 
+void state(){
+  clear();
+  for (int i = 0; i < rows; i++){
+    mvprintws(i, 0, "~");
+  }
+}
+
+void C_M(int x, int y) {
+    printf("\033[%d;%dH", y, x);
+}
+
+void status_bar() {
+    C_M(1, rows - 1);
+    printf("\e[7m [%s] - %d lines - Cursor: (%d, %d)", editor->filename, editor->text_buffer.num_lines, 
+            editor->text_buffer.cursor_position_row, 
+            editor->text_buffer.cursor_position_column);
+    printf("\x1b[0m");
+}
+
+
+void end_message(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    move(rows-1, 0); // 특정 행으로 커서 이동
+    vprintf(format, args); // 가변 인자들을 printf 형태로 출력
+    va_end(args);
+}
+
 
 int main(){
-  printf("~");
+  initscr();
+  clear();
+  noecho();
+  getmaxys(stdscr, rows, column);
+
+  state();
+
+
+
 }

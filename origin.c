@@ -296,7 +296,7 @@ int main(){
   Edit.filename = "No Name";
   state();
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-  C_M(1, 1);
+  move(0, 0);
   int ch;
 
   while(true){

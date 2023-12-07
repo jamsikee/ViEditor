@@ -262,7 +262,7 @@ void DeleteChar(){
 void state(){
   clear();
   for (int i = 0; i < rows-3; i++){
-    printf("~\r\n");
+    printw("~\r\n");
   }
 }
 
@@ -272,8 +272,8 @@ void C_M(int x, int y) {
 
 void status_bar() {
     C_M(1, rows - 1);
-    printf("\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, y, Edit.total);
-    printf("\x1b[0m");
+    printw("\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, y, Edit.total);
+    printw("\x1b[0m");
 }
 
 
@@ -301,8 +301,8 @@ int main(){
 
   while(true){
     ch = getch();
-
-    printf("%d", ch);
+    char buffer[1000];
+    printf("%c" ch);
     if(ch == CONTROL('q')){
       endwin();
       return 0;

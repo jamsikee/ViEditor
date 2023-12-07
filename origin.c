@@ -1,19 +1,16 @@
   #include <stdio.h>
   #include <stdlib.h>
   #include <string.h>
-  #include <termios.h>
-  #include <unistd.h>
   #include <fcntl.h>
-  #include <sys/ioctl.h>
   #include <ctype.h>
   #include <ncurses.h>
   #include <stdbool.h>
-  
   #include <stdarg.h>
-  #define CLEAR "clear"
+
   #define CONTROL(k) ((k) & 0x1f) // control + k
   #define INIT_ROW_SIZE 1000
   #define INIT_LINE_SIZE 125
+
 int x = 0;
 int y = 0;
 int rows = 0;
@@ -261,48 +258,39 @@ void DeleteChar(){
 
 void state(){
   clear();
-  for (int i = 0; i < rows-3; i++){
-    printw("~\r\n");
+  for (int i = 0; i < rows-2; i++){
+    mvprintw(i, 0, "~");
   }
 }
 
-void gotoxy(int x, int y) {
-    printf("\033[%d;%df", y, x);
-}
-
-void print_at(int x, int y, char* str) {
-    gotoxy(x, y);
-    printf("%s", str);
-}
-
 void status_bar() {
-    gotoxy(0, rows - 2);
-    printf("\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, y, Edit.total);
-    printf("\x1b[0m");
+
+  init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
+  attron(COLOR_PAIR(2) | A_REVERSE); // Enable the defined reverse color pair
+  mvprintw(rows-2, 0, "\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, y, Edit.total);
+  attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
+
 }
 
 
 void end_message(const char *format, ...) {
     va_list args;
     va_start(args, format);
-    gotoxy(0, rows-1); // 특정 행으로 커서 이동
-    vprintf(format, args); // 가변 인자들을 printf 형태로 출력
+    mvprintw(rows-1, 0, format, args); // 가변 인자들을 printf 형태로 특정 위치에 출력
     va_end(args);
 }
 
-void get_windows_size(){
-  struct winsize w;
-  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-  cols = w.ws_col;
-  rows = w.ws_row;
-}
 
 int main(){
-  system(CLEAR);
+  initscr();
+  raw();
+  start_color();
+  clear();
+  
+  state();
+  status_bar();
   Edit.filename = "No Name";
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-  get_windows_size();
-  printf("%d, %d", rows, cols);
 
   // while(true){
   //   ch = getch();

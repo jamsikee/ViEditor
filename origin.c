@@ -261,7 +261,7 @@ void DeleteChar(){
 
 void state(){
   clear();
-  for (int i = 0; i < rows-3; i++){
+  for (int i = 0; i < rows-2; i++){
     printf("~\r\n");
   }
 }
@@ -271,7 +271,7 @@ void C_M(int x, int y) {
 }
 
 void status_bar() {
-    C_M(1, rows - 1);
+    C_M(0, rows - 1);
     printf("\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, y, Edit.total);
     printf("\x1b[0m");
 }

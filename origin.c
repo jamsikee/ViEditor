@@ -50,7 +50,7 @@ void Newline();
 void status_bar();
 void state();
 void end_message( const char *format, ...);
-
+void all_refresh();
 
 
 Row *get_line(Row *line, int pos) {
@@ -60,6 +60,12 @@ Row *get_line(Row *line, int pos) {
 
 }
 
+void welcome(){
+  const char *message("Visual Text editor -- version 0.0.1");
+  int len = strlen(message);
+  int mid = (cols - len)/2;
+  mvprintw(rows/3, mid, "%s", message);
+}
 
 void InsertRow(int edit_y, char *line, int line_len) {
   if (edit_y < 0) {
@@ -282,18 +288,24 @@ void end_message(const char *format, ...) {
     refresh();
 }
 
+void all_refresh(){
+  state();
+  status_bar();
+  end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+  refresh();
+}
 
 int main(){
   initscr();
   raw();
   start_color();
+  noecho();
   clear();
   getmaxyx(stdscr, rows, cols);
-  state();
-  status_bar();
+  keypad(stdscr, TRUE);
+
   Edit.filename = "No Name";
-  end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-  mvprintw(5, 10, "hello");
+  all_refresh();
   // while(true){
   //   ch = getch();
   //   char buffer[1000];

@@ -280,7 +280,6 @@ void status_bar() {
 void end_message(const char *format, ...) {
     va_list args;
     va_start(args, format);
-    move(rows-1, 0); // 특정 행으로 커서 이동
     vprintf(format, args); // 가변 인자들을 printf 형태로 출력
     va_end(args);
 }

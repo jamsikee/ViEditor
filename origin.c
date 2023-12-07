@@ -17,7 +17,7 @@ int rows = 0;
 int cols = 0;
 int move_rows = 0;
 int move_cols = 0;
-int total = 0;
+int total = 1;
 
 typedef struct Row {
 

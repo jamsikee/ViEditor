@@ -13,7 +13,6 @@
 
 
 struct Visual_Text_Editor Edit;
-
 void get_windows_size();
 Row *get_line(Row *line, int pos);
 void InsertRow(int edit_y, char *line, int line_len);
@@ -31,7 +30,6 @@ void state();
 void end_message( const char *format, ...);
 void all_refresh();
 void Visual_Text_editor__version()；
-
 
 int x = 0;
 int y = 0;
@@ -220,6 +218,10 @@ void Newline(){
   x = 0;
 
 }
+void Del_current_line_char();
+void Del_current_line();
+void DeleteChar();
+
 
 void Del_current_line_char() {
 
@@ -335,13 +337,12 @@ int main(int argc, char *argv[]){
     editorOpen(argv[1]);
   }
   Edit.filename = NULL;
-  if (Edit.filename == NULL){
+  if (!Edit.filename){
     Edit.filename = "No Name";
   }
   else{
     Edit.filename = argv[1];
   }
-
   total = 0;
   all_refresh();
   if(total == 0){

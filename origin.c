@@ -299,11 +299,10 @@ void move_cursor_init(){
 }
 
 void status_bar() {
-    move(rows - 2, 0);
-    mvprintw("\e[7m[%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
+    mvprintw(rows-2, 0,"\e[7m[%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
             10, 
             10);
-    mvprintw("\x1b[0m");
+    mvprintw(rows-2, 0, "\x1b[0m");
     refresh();
 }
 

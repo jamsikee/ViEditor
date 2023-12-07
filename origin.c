@@ -83,7 +83,7 @@ void C_M(int x, int y);
 void move_cursor_init();
 void status_bar(int rows);
 void state();
-void end_message(const char *message, int rows);
+void end_message(int rows, const char *format, ...);
 
 
 

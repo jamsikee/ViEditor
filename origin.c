@@ -288,12 +288,12 @@ int main(){
   raw();
   start_color();
   clear();
-  getmaxys(stdscr, rows, cols);
+  getmaxyx(stdscr, rows, cols);
   state();
   status_bar();
   Edit.filename = "No Name";
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-
+  printw("hello");
   // while(true){
   //   ch = getch();
   //   char buffer[1000];
@@ -304,6 +304,7 @@ int main(){
   //   }
   // }
   refresh();
+
   endwin();
   return 0;
 

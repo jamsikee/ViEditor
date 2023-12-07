@@ -271,12 +271,24 @@ void state(){
 }
 
 void status_bar() {
+    char total[20];
+    char st_y[20];
 
-  init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
-  attron(COLOR_PAIR(2) | A_REVERSE); // Enable the defined reverse color pair
-  mvprintw(rows-2, 0, "\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, y, Edit.total);
-  refresh();
-  attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
+    snprintf(total, sizeof(total), "%d", Edit.total);
+    snprintf(st_y, sizeof(st_y), "%d", y);
+
+    init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
+    attron(COLOR_PAIR(2) | A_REVERSE); // Enable the defined reverse color pair
+
+    // 왼쪽에 텍스트 출력
+    mvprintw(rows - 2, 0, "[%s] - %d lines ", Edit.filename, Edit.total);
+
+    // 오른쪽에 텍스트 출력
+    int right_len = strlen(total) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
+    mvprintw(rows - 2, cols - right_len, "no ft | %d/%d", y, Edit.total);
+
+    refresh();
+    attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
 }
 
 

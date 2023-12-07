@@ -12,7 +12,8 @@
   #include <stdarg.h>
   #define CLEAR "clear"
   #define CONTROL(k) ((k) & 0x1f) // control + k
-
+  #define INIT_ROW_SIZE 1000
+  #define INIT_LINE_SIZE 125
 int x = 0;
 int y = 0;
 int rows = 0;
@@ -271,9 +272,7 @@ void C_M(int x, int y) {
 
 void status_bar() {
     C_M(1, rows - 1);
-    printf("\e[7m [%s] - %d lines - Cursor: (%d, %d)", editor->filename, editor->text_buffer.num_lines, 
-            editor->text_buffer.cursor_position_row, 
-            editor->text_buffer.cursor_position_column);
+    printf("\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, y, Edit.total);
     printf("\x1b[0m");
 }
 

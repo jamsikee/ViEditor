@@ -286,7 +286,7 @@ void status_bar() {
     int right_len = strlen(total) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
     int total_len = cols - left_len - right_len;
     for (int i = left_len; i < total_len; i++){
-      printw(" ");
+      mvprintw(rows-2, i, " ");
     }
     // 오른쪽에 텍스트 출력
     mvprintw(rows - 2, cols - right_len, "no ft | %d/%d", y, Edit.total);

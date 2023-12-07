@@ -275,9 +275,9 @@ void Visual_Text_editor__version(){
   
   int len = snprintf(message, sizeof(message), "Visual Text editor -- version 0.0.1");
   int mid = (cols - len)/2;
-    if(Edit.total == 0){
+    
     mvprintw(rows/3, mid, "Visual Text editor -- version 0.0.1");
-  }
+  
 }
 
 void status_bar() {

@@ -12,7 +12,7 @@
   #define INIT_LINE_SIZE 125
 
 int x = 0;
-int y = 0;
+int y = 1111;
 int rows = 0;
 int cols = 0;
 int move_rows = 0;
@@ -273,8 +273,7 @@ void state(){
 void status_bar() {
     char total[20];
     char st_y[20];
-    Edit.total = 1111;
-    y = 1111;
+  
     snprintf(total, sizeof(total), "%d", Edit.total);
     snprintf(st_y, sizeof(st_y), "%d", y);
     

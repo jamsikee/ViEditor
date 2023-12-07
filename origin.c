@@ -300,10 +300,10 @@ void move_cursor_init(){
 
 void status_bar() {
     move(rows - 2, 0);
-    printw("\e[7m[%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
+    mvprintw("\e[7m[%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
             10, 
             10);
-    printw("\x1b[0m");
+    mvprintw("\x1b[0m");
     refresh();
 }
 

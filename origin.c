@@ -277,9 +277,11 @@ void Visual_Text_editor__version(){
   int mid = (cols - len)/2;
   if (total == 0){
     mvprintw(rows/3, mid, "Visual Text editor -- version 0.0.1");
+    refresh();
   }
   else {
-    mvprintw(rows/3, 10, "                                                                                  ");
+    mvprintw(rows/3, 10, "                                     ");
+    refresh();
   }
   refresh();
 }

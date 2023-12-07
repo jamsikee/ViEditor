@@ -272,11 +272,11 @@ void state(){
 
 void Visual_Text_editor__version(){
   char message[40];
-  message = "Visual Text editor -- version 0.0.1";
+  
   int len = snprintf(message, sizeof(message), "Visual Text editor -- version 0.0.1");
   int mid = (cols - len)/2;
     if(Edit.total == 0){
-    mvprintw(rows/3, mid, message);
+    mvprintw(rows/3, mid, "Visual Text editor -- version 0.0.1");
   }
 }
 

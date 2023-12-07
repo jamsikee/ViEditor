@@ -298,11 +298,11 @@ int main(){
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
   C_M(1, 1);
   int ch;
-  
+
   while(true){
     ch = getch();
 
-    printf(ch);
+    printf("%d", ch);
     if(ch == CONTROL('q')){
       endwin();
       return 0;

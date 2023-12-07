@@ -322,7 +322,7 @@ void all_refresh(){
   refresh();
 }
 
-int main(){
+int main(int argc, char *argv[]){
   initscr();
   raw();
   start_color();

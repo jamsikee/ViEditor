@@ -281,7 +281,7 @@ void status_bar() {
     attron(COLOR_PAIR(2) | A_REVERSE); // Enable the defined reverse color pair
     move(rows-2, 0);
     for (int i = 0; i < 10; i++){
-      printw(rows - 2, i, " ");
+      printw( " ");
     }
 
     // 왼쪽에 텍스트 출력

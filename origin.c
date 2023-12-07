@@ -17,7 +17,7 @@ int rows = 0;
 int cols = 0;
 int move_rows = 0;
 int move_cols = 0;
-int total = 5;
+int total = 0;
 
 typedef struct Row {
 
@@ -280,7 +280,7 @@ void Visual_Text_editor__version(){
     refresh();
   }
   else {
-    mvprintw(rows/3, 10, "                                                                                 ");
+    mvprintw(rows/3, mid, "                                   ");
     refresh();
   }
   refresh();
@@ -345,7 +345,7 @@ int main(int argc, char *argv[]){
   else{
     Edit.filename = argv[1];
   }
-  total = 0;
+  total = 10;
   all_refresh();
   Visual_Text_editor__version();
   move(0,0);

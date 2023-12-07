@@ -13,6 +13,7 @@
 
 
 struct Visual_Text_Editor Edit;
+
 void get_windows_size();
 Row *get_line(Row *line, int pos);
 void InsertRow(int edit_y, char *line, int line_len);
@@ -29,7 +30,7 @@ void status_bar();
 void state();
 void end_message( const char *format, ...);
 void all_refresh();
-void Visual_Text_editor__version()；
+void Visual_Text_editor__version();
 
 int x = 0;
 int y = 0;
@@ -325,7 +326,7 @@ void all_refresh(){
   refresh();
 }
 
-int main(int argc, char *argv[]){
+int main(){
   initscr();
   raw();
   start_color();

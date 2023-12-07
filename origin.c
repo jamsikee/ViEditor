@@ -17,6 +17,7 @@
   #include <ctype.h>
   #include <ncurses.h>
   #include <stdbool.h>
+  #include <stdarg.h>
   #define CLEAR "clear"
 
 // #elif __APPLE__
@@ -318,11 +319,14 @@ void state() {
     }
 }
 
-
-void end_message(const char *message, int rows) {
-    int msg_length = strlen(message);
-    mvprintw(rows , 0, "%s", message);
-    status_bar(rows);
+void end_message(int rows, const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    
+    move(rows, 0); // 특정 행으로 커서 이동
+    vprintf(format, args); // 가변 인자들을 printf 형태로 출력
+    
+    va_end(args);
     refresh();
 }
 
@@ -341,7 +345,7 @@ int main() {
   // move_cursor_init();
   state();
   status_bar(rows);
-  end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find", rows);
+  end_message(rows, "Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
   move_cursor_init();
   // char* filename = argv[1];
   // if (argc >= 2) {

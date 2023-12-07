@@ -287,6 +287,7 @@ void end_message(const char *format, ...) {
 
 
 int main(){
+  system("clear");
   initscr();
   clear();
   noecho();

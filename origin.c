@@ -300,10 +300,10 @@ void move_cursor_init(){
 
 void status_bar() {
     move(10, 1);
-    printf("\e[7m[%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
+    printw("\e[7m[%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
             10, 
             10);
-    printf("\x1b[0m");
+    printw("\x1b[0m");
     refresh();
 }
 

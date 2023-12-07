@@ -288,7 +288,7 @@ int main(){
   raw();
   start_color();
   clear();
-
+  getmaxys(stdscr, rows, cols);
   state();
   status_bar();
   Edit.filename = "No Name";

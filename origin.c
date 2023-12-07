@@ -291,7 +291,7 @@ void status_bar() {
     int right_len = strlen(total) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
 
     // 오른쪽에 텍스트 출력
-    mvprintw(rows - 2, cols - right_len, "no ft | %d/%d", y, Edit.total);
+    mvprintw(rows - 2, cols - right_len-1, "no ft | %d/%d", y, Edit.total);
 
     refresh();
     attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair

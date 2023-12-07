@@ -81,9 +81,9 @@ void contained_new_line(Row *line, int pos_y, int pos_x);
 void Newline();
 void C_M(int x, int y);
 void move_cursor_init();
-void status_bar(int rows);
+void status_bar();
 void state();
-void end_message(int rows, const char *format, ...);
+void end_message( const char *format, ...);
 
 
 
@@ -298,8 +298,8 @@ void move_cursor_init(){
   C_M(1,1);
 }
 
-void status_bar(int rows) {
-    move(rows, 0);
+void status_bar() {
+    move(rows - 2, 0);
     printf("\e[7m[%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
             10, 
             10);
@@ -320,11 +320,11 @@ void state() {
     }
 }
 
-void end_message(int rows, const char *format, ...) {
+void end_message(const char *format, ...) {
     va_list args;
     va_start(args, format);
     
-    move(rows, 0); // 특정 행으로 커서 이동
+    move(rows - 1, 0); // 특정 행으로 커서 이동
     vprintf(format, args); // 가변 인자들을 printf 형태로 출력
     
     va_end(args);
@@ -345,8 +345,8 @@ int main() {
   Edit.filename = "No Name";
   // move_cursor_init();
   state();
-  status_bar(rows-5);
-  end_message(rows-3, "Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+  status_bar();
+  end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
   move_cursor_init();
   // char* filename = argv[1];
   // if (argc >= 2) {

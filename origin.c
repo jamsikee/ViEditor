@@ -17,7 +17,7 @@ int rows = 0;
 int cols = 0;
 int move_rows = 0;
 int move_cols = 0;
-
+int total = 0;
 typedef struct Row {
 
   int len;
@@ -28,7 +28,6 @@ typedef struct Row {
 
 struct Visual_Text_Editor{
 
-  int total;
   Row *line;
   char *filename;
 
@@ -71,21 +70,21 @@ void InsertRow(int edit_y, char *line, int line_len) {
   if (edit_y < 0) {
     return;
   }
-  else if(edit_y > Edit.total){
+  else if(edit_y > total){
     return;
   }
   // If y < 0 or y > total then return
 
-  if (Edit.total == 0) {
+  if (total == 0) {
     Edit.line = malloc(sizeof(Row) * INIT_ROW_SIZE);
-  } else if (Edit.total % INIT_ROW_SIZE == 0) {
-    Edit.line = realloc(Edit.line, sizeof(Row) * (Edit.total * 2));
+  } else if (total % INIT_ROW_SIZE == 0) {
+    Edit.line = realloc(Edit.line, sizeof(Row) * (total * 2));
   }
   /*
   Edit.line's memory = INIT_ROW_SIZE(1000)
   If total % 1000 == 0 then realloc 1000 * 2
   */
-  memmove(&Edit.line[edit_y + 1], &Edit.line[edit_y], sizeof(Row) * (Edit.total - edit_y));
+  memmove(&Edit.line[edit_y + 1], &Edit.line[edit_y], sizeof(Row) * (total - edit_y));
   // Memory move line[y] -> line[y + 1]
   Edit.line[edit_y].len = line_len;   
   Edit.line[edit_y].c = malloc(INIT_LINE_SIZE + 1);
@@ -94,7 +93,7 @@ void InsertRow(int edit_y, char *line, int line_len) {
   memcpy(Edit.line[edit_y].c, line, line_len);
   Edit.line[edit_y].c[line_len] = '\0'; 
   // The end of the string is null
-  Edit.total+=1;
+  total+=1;
 
 }
 
@@ -109,15 +108,15 @@ void DeleteRow(int pos){
   if (pos < 0){  
     return;
   }
-  else if(pos >= Edit.total){
+  else if(pos >= total){
     return;
   }
   // If y < 0 or y > total then return
 
   FreeRow(&Edit.line[pos]); // Line[pos]'s memory free
-  memmove(&Edit.line[pos], &Edit.line[pos+1], sizeof(Row) * (Edit.total - pos - 1));
+  memmove(&Edit.line[pos], &Edit.line[pos+1], sizeof(Row) * (total - pos - 1));
   // Line[pos+1]'s memory move to free memory(line[pos]) 
-  Edit.total-=1;
+  total-=1;
 
 }
 
@@ -182,8 +181,8 @@ void empty_new_line(int pos){
 
 void Insertchar(int word){
 
-  if(y == Edit.total) {
-    empty_new_line(Edit.total); 
+  if(y == total) {
+    empty_new_line(total); 
     // if cursor y = total then add line;
   }
   RowInsertchar(&Edit.line[y], word, x);
@@ -246,7 +245,7 @@ void DeleteChar(){
 
   Row *line = get_line(Edit.line, y);
 
-  if( y == Edit.total){
+  if( y == total){
     return;
   }
   if( x == 0 && y == 0){
@@ -284,7 +283,7 @@ void status_bar() {
     char total[20];
     char st_y[20];
   
-    snprintf(total, sizeof(total), "%d", Edit.total);
+    snprintf(total, sizeof(total), "%d", total);
     snprintf(st_y, sizeof(st_y), "%d", y);
     
     init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
@@ -296,12 +295,12 @@ void status_bar() {
     }
     
     // 왼쪽에 텍스트 출력
-    mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, Edit.total);
+    mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
     int left_len = strlen(total) + strlen(Edit.filename) + 13;
     int right_len = strlen(total) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
 
     // 오른쪽에 텍스트 출력
-    mvprintw(rows - 2, cols - right_len-1, "no ft | %d/%d", y, Edit.total);
+    mvprintw(rows - 2, cols - right_len-1, "no ft | %d/%d", y, total);
 
     refresh();
     attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
@@ -332,8 +331,9 @@ int main(){
   getmaxyx(stdscr, rows, cols);
   keypad(stdscr, TRUE);
   Edit.filename = "No Name";
+  total = 0;
   all_refresh();
-  if(Edit.total == 0){
+  if(total == 0){
   Visual_Text_editor__version();
   }
   move(0,0);

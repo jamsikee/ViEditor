@@ -293,7 +293,7 @@ int main(){
   status_bar();
   Edit.filename = "No Name";
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-  printw("hello");
+  mvprintw(5, 10, "hello");
   // while(true){
   //   ch = getch();
   //   char buffer[1000];
@@ -304,7 +304,7 @@ int main(){
   //   }
   // }
   refresh();
-
+  getch();
   endwin();
   return 0;
 

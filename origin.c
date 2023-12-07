@@ -299,15 +299,15 @@ int main(){
   move(0, 0);
   int ch;
 
-  while(true){
-    ch = getch();
-    char buffer[1000];
-    printf("%c" ch);
-    if(ch == CONTROL('q')){
-      endwin();
-      return 0;
-    }
-  }
+  // while(true){
+  //   ch = getch();
+  //   char buffer[1000];
+  //   printf("%c" ch);
+  //   if(ch == CONTROL('q')){
+  //     endwin();
+  //     return 0;
+  //   }
+  // }
 
   endwin();
   return 0;

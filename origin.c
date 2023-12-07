@@ -276,7 +276,7 @@ void print_at(int x, int y, char* str) {
 }
 
 void status_bar() {
-    gotoxy(0, rows - 1)
+    gotoxy(0, rows - 2);
     printf("\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, y, Edit.total);
     printf("\x1b[0m");
 }
@@ -285,7 +285,7 @@ void status_bar() {
 void end_message(const char *format, ...) {
     va_list args;
     va_start(args, format);
-    move(rows-1, 0); // 특정 행으로 커서 이동
+    gotoxy(0, rows-1); // 특정 행으로 커서 이동
     vprintf(format, args); // 가변 인자들을 printf 형태로 출력
     va_end(args);
 }

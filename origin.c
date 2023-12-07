@@ -18,6 +18,7 @@ int cols = 0;
 int move_rows = 0;
 int move_cols = 0;
 int total = 0;
+
 typedef struct Row {
 
   int len;
@@ -44,6 +45,10 @@ void RowDeletechar(Row *line, int pos);
 void RowInsertchar(Row *line, int word, int pos);
 void empty_new_line(int pos);
 void Insertchar(int word);
+void Del_current_line_char();
+void Del_current_line();
+void DeleteChar();
+
 void contained_new_line(Row *line, int pos_y, int pos_x);
 void Newline();
 void status_bar();
@@ -215,10 +220,6 @@ void Newline(){
   x = 0;
 
 }
-void Del_current_line_char();
-void Del_current_line();
-void DeleteChar();
-
 
 void Del_current_line_char() {
 

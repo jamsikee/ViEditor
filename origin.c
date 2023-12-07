@@ -262,7 +262,7 @@ void DeleteChar(){
 void state(){
   clear();
   for (int i = 0; i < rows-3; i++){
-    mvprintw(i, 0, "~");
+    printf("~\r\n");
   }
 }
 

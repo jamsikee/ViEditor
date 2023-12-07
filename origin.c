@@ -11,27 +11,6 @@
   #define INIT_ROW_SIZE 1000
   #define INIT_LINE_SIZE 125
 
-int x = 0;
-int y = 0;
-int rows = 0;
-int cols = 0;
-int move_rows = 0;
-int move_cols = 0;
-int total = 0;
-typedef struct Row {
-
-  int len;
-  char *c;
-  int line_capacity;
-
-} Row;
-
-struct Visual_Text_Editor{
-
-  Row *line;
-  char *filename;
-
-};
 
 struct Visual_Text_Editor Edit;
 void get_windows_size();
@@ -50,6 +29,34 @@ void status_bar();
 void state();
 void end_message( const char *format, ...);
 void all_refresh();
+void Visual_Text_editor__version()；
+void Del_current_line_char();
+void Del_current_line();
+void DeleteChar();
+
+
+int x = 0;
+int y = 0;
+int rows = 0;
+int cols = 0;
+int move_rows = 0;
+int move_cols = 0;
+int total = 0;
+
+typedef struct Row {
+
+  int len;
+  char *c;
+  int line_capacity;
+
+} Row;
+
+struct Visual_Text_Editor{
+
+  Row *line;
+  char *filename;
+
+};
 
 
 Row *get_line(Row *line, int pos) {
@@ -215,10 +222,6 @@ void Newline(){
   x = 0;
 
 }
-void Del_current_line_char();
-void Del_current_line();
-void DeleteChar();
-
 
 void Del_current_line_char() {
 
@@ -290,7 +293,7 @@ void status_bar() {
     attron(COLOR_PAIR(2) | A_REVERSE); // Enable the defined reverse color pair
     move(rows-2, 0);
     for (int i = 0; i < cols; i++){
-      printw( " ");
+      printw(" ");
       refresh();
     }
     
@@ -322,7 +325,7 @@ void all_refresh(){
   refresh();
 }
 
-int main(){
+int main(int argc, char *argv[]){
   initscr();
   raw();
   start_color();
@@ -330,11 +333,21 @@ int main(){
   clear();
   getmaxyx(stdscr, rows, cols);
   keypad(stdscr, TRUE);
-  Edit.filename = "No Name";
+  if (argc >= 2) {
+    editorOpen(argv[1]);
+  }
+  Edit.filename = NULL;
+  if (Edit.filename == NULL){
+    Edit.filename = "No Name";
+  }
+  else{
+    Edit.filename = argv[1];
+  }
+
   total = 0;
   all_refresh();
   if(total == 0){
-  Visual_Text_editor__version();
+    Visual_Text_editor__version();
   }
   move(0,0);
   // while(true){

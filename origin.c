@@ -12,7 +12,7 @@
   #define INIT_LINE_SIZE 125
 
 int x = 0;
-int y = 1111;
+int y = 0;
 int rows = 0;
 int cols = 0;
 int move_rows = 0;
@@ -270,6 +270,15 @@ void state(){
   refresh();
 }
 
+void Visual_Text_editor__version(){
+  char message[40];
+  int len = snprintf(message, sizeof(message), "Visual Text editor -- version 0.0.1");
+  int mid = (cols - len)/2;
+    if(Edit.total == 0){
+    mvpirntw(rows/3, mid, message);
+  }
+}
+
 void status_bar() {
     char total[20];
     char st_y[20];
@@ -321,7 +330,8 @@ int main(){
   clear();
   getmaxyx(stdscr, rows, cols);
   keypad(stdscr, TRUE);
-
+  Visual_Text_Editor();
+  
   Edit.filename = "No Name";
   move(0,0);
   all_refresh();

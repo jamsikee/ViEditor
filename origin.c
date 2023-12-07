@@ -261,6 +261,7 @@ void state(){
   for (int i = 0; i < rows-2; i++){
     mvprintw(i, 0, "~");
   }
+  refresh();
 }
 
 void status_bar() {
@@ -268,8 +269,8 @@ void status_bar() {
   init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
   attron(COLOR_PAIR(2) | A_REVERSE); // Enable the defined reverse color pair
   mvprintw(rows-2, 0, "\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, y, Edit.total);
+  refresh();
   attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
-
 }
 
 
@@ -278,6 +279,7 @@ void end_message(const char *format, ...) {
     va_start(args, format);
     mvprintw(rows-1, 0, format, args); // 가변 인자들을 printf 형태로 특정 위치에 출력
     va_end(args);
+    refesh();
 }
 
 
@@ -286,7 +288,7 @@ int main(){
   raw();
   start_color();
   clear();
-  
+
   state();
   status_bar();
   Edit.filename = "No Name";
@@ -301,7 +303,7 @@ int main(){
   //     return 0;
   //   }
   // }
-
+  refresh();
   endwin();
   return 0;
 

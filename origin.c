@@ -275,7 +275,7 @@ void Visual_Text_editor__version(){
   int len = snprintf(message, sizeof(message), "Visual Text editor -- version 0.0.1");
   int mid = (cols - len)/2;
     if(Edit.total == 0){
-    mvpirntw(rows/3, mid, message);
+    mvprintw(rows/3, mid, message);
   }
 }
 
@@ -330,8 +330,8 @@ int main(){
   clear();
   getmaxyx(stdscr, rows, cols);
   keypad(stdscr, TRUE);
-  Visual_Text_Editor();
-  
+  Visual_Text_editor__version();
+
   Edit.filename = "No Name";
   move(0,0);
   all_refresh();

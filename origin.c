@@ -261,8 +261,8 @@ void DeleteChar(){
 
 void state(){
   clear();
-  for (int i = 0; i < rows; i++){
-    mvprintws(i, 0, "~");
+  for (int i = 0; i < rows-3; i++){
+    mvprintw(i, 0, "~");
   }
 }
 
@@ -291,8 +291,12 @@ int main(){
   clear();
   noecho();
   getmaxys(stdscr, rows, column);
-
+  Edit.total = "No Name";
   state();
+  C_M(1, 1);
+  
+  endwin();
+  retirn 0;
 
 
 

@@ -333,7 +333,9 @@ int main(){
   keypad(stdscr, TRUE);
   Edit.filename = "No Name";
   all_refresh();
+  if(Edit.total > 0){
   Visual_Text_editor__version();
+  }
   move(0,0);
   // while(true){
   //   ch = getch();

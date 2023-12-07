@@ -11,6 +11,20 @@
   #define INIT_ROW_SIZE 1000
   #define INIT_LINE_SIZE 125
 
+typedef struct Row {
+
+  int len;
+  char *c;
+  int line_capacity;
+
+} Row;
+
+struct Visual_Text_Editor{
+
+  Row *line;
+  char *filename;
+
+};
 
 struct Visual_Text_Editor Edit;
 
@@ -39,21 +53,6 @@ int cols = 0;
 int move_rows = 0;
 int move_cols = 0;
 int total = 0;
-
-typedef struct Row {
-
-  int len;
-  char *c;
-  int line_capacity;
-
-} Row;
-
-struct Visual_Text_Editor{
-
-  Row *line;
-  char *filename;
-
-};
 
 
 Row *get_line(Row *line, int pos) {

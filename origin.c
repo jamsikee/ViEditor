@@ -290,8 +290,9 @@ int main(){
   initscr();
   clear();
   noecho();
-  getmaxys(stdscr, rows, cols);
-  Edit.total = "No Name";
+  getmaxy(stdscr, rows, cols);
+
+  Edit.filename = "No Name";
   state();
   C_M(1, 1);
 

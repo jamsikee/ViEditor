@@ -314,7 +314,7 @@ void state() {
   // sprintf(buf, "size : %d %d\r\n",rows, cols);
   // write(STDOUT_FILENO, buf, strlen(buf));
 
-    for (i = 0; i < rows-5; i++) {
+    for (i = 0; i < rows-3; i++) {
       write(STDOUT_FILENO, "~\r\n", strlen("~\r\n"));
     }
 }

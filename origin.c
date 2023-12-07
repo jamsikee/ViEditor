@@ -290,7 +290,7 @@ int main(){
   initscr();
   clear();
   noecho();
-  getmaxy(stdscr, rows, cols);
+  getmaxyx(stdscr, rows, cols);
 
   Edit.filename = "No Name";
   state();

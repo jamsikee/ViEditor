@@ -266,14 +266,19 @@ void state(){
   }
 }
 
-void C_M(int x, int y) {
-    printf("\033[%d;%dH", y, x);
+void gotoxy(int x, int y) {
+    printf("\033[%d;%df", y, x);
+}
+
+void print_at(int x, int y, char* str) {
+    gotoxy(x, y);
+    printf("%s", str);
 }
 
 void status_bar() {
-    C_M(1, rows - 1);
-    printw("\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, y, Edit.total);
-    printw("\x1b[0m");
+    gotoxy(0, rows - 1)
+    printf("\e[7m [%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, y, Edit.total);
+    printf("\x1b[0m");
 }
 
 
@@ -285,19 +290,19 @@ void end_message(const char *format, ...) {
     va_end(args);
 }
 
+void get_windows_size(){
+  struct winsize w;
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+  cols = w.ws_col;
+  rows = w.ws_row;
+}
 
 int main(){
-  initscr();
-  clear();
-  noecho();
-  getmaxyx(stdscr, rows, cols);
-  keypad(stdscr, true);
-
+  system(CLEAR);
   Edit.filename = "No Name";
-  state();
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-  move(0, 0);
-  int ch;
+  get_window_size();
+  printf("%d, %d", rows, cols);
 
   // while(true){
   //   ch = getch();

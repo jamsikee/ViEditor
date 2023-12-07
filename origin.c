@@ -34,6 +34,7 @@ struct Visual_Text_Editor{
 
 };
 
+// total function
 struct Visual_Text_Editor Edit;
 void get_windows_size();
 Row *get_line(Row *line, int pos);
@@ -48,7 +49,6 @@ void Insertchar(int word);
 void Del_current_line_char();
 void Del_current_line();
 void DeleteChar();
-
 void contained_new_line(Row *line, int pos_y, int pos_x);
 void Newline();
 void status_bar();
@@ -331,7 +331,14 @@ int main(int argc, char *argv[]){
   clear();
   getmaxyx(stdscr, rows, cols);
   keypad(stdscr, TRUE);
-  Edit.filename = "No Name";
+  Edit.filename = '\0';
+
+  if (Edit.filename = '\0'){
+    Edit.filename = "No Name";
+  }
+  else{
+    Edit.filename = argv[1];
+  }
   total = 0;
   all_refresh();
   if(total == 0){

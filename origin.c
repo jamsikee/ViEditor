@@ -1,12 +1,3 @@
-// #ifdef __WIN32
-//   #include <stdio.h>
-//   #include <stdlib.h>
-//   #include <string.h>
-//   #include <fcntl.h>
-//   #include <ctype.h>
-//   #include <stdbool.h>
-//   #define CLEAR "cls"
-// #elif __linux__
   #include <stdio.h>
   #include <stdlib.h>
   #include <string.h>
@@ -19,30 +10,7 @@
   #include <stdbool.h>
   #include <stdarg.h>
   #define CLEAR "clear"
-
-// #elif __APPLE__
-
-// #endif
-
-#define INIT_ROW_SIZE 500
-#define INIT_LINE_SIZE 125
 #define CONTROL(k) ((k) & 0x1f) // control + k
-
-enum P_key {
-
-    left = 1000,
-    right,
-    up,
-    down,
-    del,
-    home,
-    end,
-    pg_up,
-    pg_dn,
-    b_s = 127
-    
-};
-
 int x = 0;
 int y = 0;
 int rows = 0;
@@ -290,74 +258,7 @@ void DeleteChar(){
 
 }
 
-void C_M(int x, int y) {
-    printf("\033[%d;%dH", y, x);
-}
 
-void move_cursor_init(){
-  C_M(1,1);
-}
-
-void status_bar() {
-    mvprintw(rows-2, 1,"\e[7m[%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
-            10, 
-            10);
-    mvprintw(rows-2, 1, "\x1b[0m");
-    refresh();
-}
-
-void state() {
-    // clear();
-    int columns = 80;
-    int i = 0;
-  //   char buf[30];
-  // sprintf(buf, "size : %d %d\r\n",rows, cols);
-  // write(STDOUT_FILENO, buf, strlen(buf));
-
-    for (i = 0; i < rows-2; i++) {
-      write(STDOUT_FILENO, "~\r\n", strlen("~\r\n"));
-    }
-}
-
-void end_message(const char *format, ...) {
-    va_list args;
-    va_start(args, format);
-    
-    move(10, 1); // 특정 행으로 커서 이동
-    vprintf(format, args); // 가변 인자들을 printf 형태로 출력
-    
-    va_end(args);
-    refresh();
-}
-
-int main() {
-  system("clear");
-  initscr();
-  noecho();
-  getmaxyx(stdscr, rows, cols);
-  // char location[30];
-  // sprintf(location, "\033[%d;%dH", 1,1);
-  // write(STDOUT_FILENO, location, strlen(location));
-  Edit.filename = "No Name";
-  // move_cursor_init();
-  state();
-  status_bar();
-  end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-  move_cursor_init();
-  // char* filename = argv[1];
-  // if (argc >= 2) {
-  //   open_file(argv[1]);
-  // }
-  // mvprintw(1, 0, "~\r\n");
-  // mvprintw(2, 0, "~\r\n");
-  // mvprintw(3, 0, "~\r\n");
-  refresh();
-  // while (1) {
-  //   presskey();
-    
-  // }
-
-  endwin();
-  return 0;
-
+int main(){
+  printf("~");
 }

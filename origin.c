@@ -286,6 +286,7 @@ void status_bar() {
     }
     Edit.total = 1111;
     y = 1111;
+    Edit.filename = "helloworld";
     // 왼쪽에 텍스트 출력
     mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, Edit.total);
     int left_len = strlen(total) + strlen(Edit.filename) + 13;

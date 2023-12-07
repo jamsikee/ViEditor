@@ -345,9 +345,7 @@ int main(int argc, char *argv[]){
   }
   total = 0;
   all_refresh();
-  if(total == 0){
   Visual_Text_editor__version();
-  }
   move(0,0);
   // while(true){
   //   ch = getch();

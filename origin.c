@@ -279,7 +279,7 @@ void Visual_Text_editor__version(){
     mvprintw(rows/3, mid, "Visual Text editor -- version 0.0.1");
   }
   else {
-    mvprintw(rows/3, mid, "                                   ");
+    mvprintw(rows/3, 10, "                                                                                  ");
   }
   refresh();
 }

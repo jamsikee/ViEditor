@@ -331,9 +331,9 @@ int main(int argc, char *argv[]){
   clear();
   getmaxyx(stdscr, rows, cols);
   keypad(stdscr, TRUE);
-  Edit.filename = '\0';
+  Edit.filename = NULL;
 
-  if (Edit.filename = '\0'){
+  if (Edit.filename == NULL){
     Edit.filename = "No Name";
   }
   else{

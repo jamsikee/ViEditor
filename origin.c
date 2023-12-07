@@ -344,8 +344,8 @@ int main() {
   Edit.filename = "No Name";
   // move_cursor_init();
   state();
-  status_bar(rows-1);
-  end_message(rows, "Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+  status_bar(rows-2);
+  end_message(rows-1, "Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
   move_cursor_init();
   // char* filename = argv[1];
   // if (argc >= 2) {

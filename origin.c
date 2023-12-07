@@ -284,7 +284,8 @@ void status_bar() {
     mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, Edit.total);
     int left_len = strlen(total) + strlen(Edit.filename) + 13;
     int right_len = strlen(total) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
-    for (int i = left_len; i < right_len; i++){
+    int total_len = cols - left_len - right_len;
+    for (int i = left_len; i < total_len; i++){
       printw(" ");
     }
     // 오른쪽에 텍스트 출력

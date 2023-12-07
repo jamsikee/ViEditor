@@ -299,7 +299,7 @@ void move_cursor_init(){
 }
 
 void status_bar(int rows) {
-    C_M(1, rows - 1);
+    move(rows-1, 0);
     printf("\e[7m[%s] - %d lines - Cursor: (%d, %d)", Edit.filename, Edit.total, 
             10, 
             10);

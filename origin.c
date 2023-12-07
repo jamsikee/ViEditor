@@ -279,7 +279,7 @@ void end_message(const char *format, ...) {
     va_start(args, format);
     mvprintw(rows-1, 0, format, args); // 가변 인자들을 printf 형태로 특정 위치에 출력
     va_end(args);
-    refesh();
+    refresh();
 }
 
 

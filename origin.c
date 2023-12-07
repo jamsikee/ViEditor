@@ -285,13 +285,13 @@ void status_bar() {
       refresh();
     }
 
-    // 왼쪽에 텍스트 출력
-    // mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, Edit.total);
-    // int left_len = strlen(total) + strlen(Edit.filename) + 13;
-    // int right_len = strlen(total) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
+    왼쪽에 텍스트 출력
+    mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, Edit.total);
+    int left_len = strlen(total) + strlen(Edit.filename) + 13;
+    int right_len = strlen(total) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
 
-    // // 오른쪽에 텍스트 출력
-    // mvprintw(rows - 2, cols - right_len, "no ft | %d/%d", y, Edit.total);
+    // 오른쪽에 텍스트 출력
+    mvprintw(rows - 2, cols - right_len, "no ft | %d/%d", y, Edit.total);
 
     refresh();
     attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair

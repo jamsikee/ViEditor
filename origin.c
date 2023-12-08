@@ -332,7 +332,7 @@ void all_refresh(){
 void Move(int key) {
     
     switch (key) {
-        case KEY_UP:
+        case KEY_LEFT:
             if (x != 0) {
                 x--;
             } else if (y > 0) {
@@ -404,20 +404,20 @@ void presskey() {
 
         case KEY_ENTER:
         case '\n':
-            editorInsertNewline();
+            Newline();
             break;
 
         case KEY_DC:
-            Move(right);
-            editorDelChar();
+            Move(KEY_RIGHT);
+            DeleteChar();
             break;
 
         case KEY_BACKSPACE:
-            editorDelChar();
+            DeleteChar();
             break;
 
         default:
-            editorInsertChar(c);
+            Insertchar(c);
             break;
     }
 }

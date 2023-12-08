@@ -436,11 +436,10 @@ void presskey() {
         default:
             char ch = (char)c;
             Insertchar(ch);
+            mvprintw(y, 0, "%s", Edit.line[y].c);
             break;
     }
-    for (int i = 0; i < total; i++){
-      mvprintw(i, 0, "%s", Edit.line[i].c);
-    }
+
     refresh();
 }
 

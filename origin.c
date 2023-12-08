@@ -418,9 +418,9 @@ void presskey() {
 
         default:
             Insertchar(c);
+            printw("%d", c);
             break;
     }
-    mvprintw(y, x, "%d", c);
 }
 
 int main(int argc, char *argv[]){

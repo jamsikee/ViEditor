@@ -420,7 +420,7 @@ void presskey() {
             Insertchar(c);
             break;
     }
-    mvprintw(y, x, c);
+    mvprintw(y, x, "%d", c);
 }
 
 int main(int argc, char *argv[]){

@@ -419,11 +419,11 @@ void presskey() {
             break;
 
         case KEY_DC:
-            Move(KEY_RIGHT);
+            // Move(KEY_RIGHT);
             DeleteChar();
             mvprintw(y-1, 0, "%s", Edit.line[y].c);
             mvprintw(y, 0, "%s", Edit.line[y].c);
-            move(y, x-1);
+
             refresh();
             break;
 

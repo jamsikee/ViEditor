@@ -429,8 +429,8 @@ void presskey() {
             refresh();
             break;
         default:
-            char ch = (char)c;
             Insertchar(c);
+            char ch = (char)c;
             printw("%c", ch);
             break;
     }
@@ -473,9 +473,7 @@ int main(int argc, char *argv[]){
 
 
   while(true){
-    move(y,x);
-    status_bar();
-    refresh();
+    all_refresh();
     presskey();
   }
 

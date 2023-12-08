@@ -469,10 +469,11 @@ int main(int argc, char *argv[]){
   all_refresh();
   move(0,0);
   refresh();
-
+  Visual_Text_editor__version();
+  
   while(true){
+    clear();
     status_bar();
-    Visual_Text_editor__version();
     move(y,x);
     refresh();
     presskey();

@@ -452,7 +452,6 @@ int main(int argc, char *argv[]){
     all_refresh();
     presskey();
   }
-  getch();
   endwin();
   return 0;
 

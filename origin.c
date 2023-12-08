@@ -423,7 +423,7 @@ void presskey() {
             DeleteChar();
             mvprintw(y-1, 0, "%s", Edit.line[y].c);
             mvprintw(y, 0, "%s", Edit.line[y].c);
-            move(y, x);
+            move(y, x-1);
             refresh();
             break;
 

@@ -436,13 +436,13 @@ int main(int argc, char *argv[]){
   getmaxyx(stdscr, rows, cols);
   keypad(stdscr, TRUE);
   Edit.filename = NULL;
-  int x = 0;
-  int y = 0;
-  int rows = 0;
-  int cols = 0;
-  int move_rows = 0;
-  int move_cols = 0;
-  int total = 0;
+  x = 0;
+  y = 0;
+  rows = 0;
+  cols = 0;
+  move_rows = 0;
+  move_cols = 0;
+  total = 0;
 
   if (Edit.filename == NULL){
     Edit.filename = "No Name";
@@ -451,7 +451,6 @@ int main(int argc, char *argv[]){
     Edit.filename = argv[1];
   }
 
-  total = 0;
   all_refresh();
   Visual_Text_editor__version();
   move(0,0);

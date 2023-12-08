@@ -328,6 +328,7 @@ void all_refresh(){
   state();
   status_bar();
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+  move(y,x);
   printw("323213213213123");
   refresh();
 }

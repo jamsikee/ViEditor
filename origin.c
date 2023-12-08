@@ -464,8 +464,8 @@ int main(int argc, char *argv[]){
 
 
   while(true){
-    all_refresh();
     presskey();
+    all_refresh();
   }
 
   endwin();

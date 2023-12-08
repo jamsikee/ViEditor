@@ -413,20 +413,20 @@ void presskey() {
         case KEY_ENTER:
         case '\n':
             Newline();
-            move(y,x);
+            mvprintw(y, 0, "%s", Edit.line[y].c);
             refresh();
             break;
 
         case KEY_DC:
             Move(KEY_RIGHT);
             DeleteChar();
-            move(y,x);
+            mvprintw(y, 0, "%s", Edit.line[y].c);
             refresh();
             break;
 
         case KEY_BACKSPACE:
             DeleteChar();
-            move(y,x);
+            mvprintw(y, 0, "%s", Edit.line[y].c);
             refresh();
             break;
         default:

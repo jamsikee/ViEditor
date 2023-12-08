@@ -467,11 +467,11 @@ int main(int argc, char *argv[]){
   else{
     Edit.filename = argv[1];
   }
-
+  Visual_Text_editor__version();
   all_refresh();
   move(0,0);
   refresh();
-  Visual_Text_editor__version();
+
 
   while(true){
     status_bar();

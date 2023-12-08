@@ -433,7 +433,9 @@ void presskey() {
             Insertchar(ch);
             break;
     }
-    mvprintw(y, 0, "%s", Edit.line[y].c);
+    for (int i = 0; i < y; i++){
+      mvprintw(y, 0, "%s", Edit.line[i].c);
+    }
     refresh();
 }
 

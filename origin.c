@@ -418,6 +418,7 @@ void presskey() {
             mvprintw(y, 0, "%*s", Edit.line[y].len, "");
             Newline();
             mvprintw(y-1, 0, "%s", Edit.line[y-1].c);
+            mvprintw(y, 0, "%*s", Edit.line[y].len, "");
             mvprintw(y, 0, "%s", Edit.line[y].c);
             refresh();
             break;

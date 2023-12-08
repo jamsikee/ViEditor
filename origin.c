@@ -328,6 +328,7 @@ void all_refresh(){
   state();
   status_bar();
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+  move(y,x);
   refresh();
 }
 
@@ -420,8 +421,6 @@ void presskey() {
 
         default:
             Insertchar(c);
-              mvprintw(y, 2, "1");
-              refresh();
             break;
     }
     refresh();

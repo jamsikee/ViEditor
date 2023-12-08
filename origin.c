@@ -241,7 +241,7 @@ void Del_current_line() {
 
 }
 
-void DeleteChar(){
+void DeleteChar(){    // 수정 필요 백스페이스키 안먹는거 같음 !!
 
   Row *line = get_line(Edit.line, y);
 
@@ -255,7 +255,6 @@ void DeleteChar(){
   if(x > 0){
     mvprintw(y, 0, "%*s", Edit.line[y].len, "");
     Del_current_line_char();
-    move(y, x);
   }
   else{
     mvprintw(y, 0, "%*s", Edit.line[y].len, "");

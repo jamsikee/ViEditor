@@ -427,9 +427,12 @@ void presskey() {
             break;
 
         default:
+            c = (char)c;
             Insertchar(c);
+            printw(c);
             break;
     }
+
     refresh();
 }
 
@@ -439,6 +442,7 @@ int main(int argc, char *argv[]){
   start_color();
   noecho();
   clear();
+  cbreak();
   x = 0;
   y = 0;
   rows = 0;

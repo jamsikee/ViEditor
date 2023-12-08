@@ -158,7 +158,7 @@ void RowDeletechar(Row *line, int pos){
 }
 
 
-void RowInsertchar(Row *line, char word, int pos){
+void RowInsertchar(Row *line, int word, int pos){
 
   if (pos < 0 || pos > line->len){
     pos = line->len;

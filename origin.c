@@ -275,7 +275,7 @@ void Visual_Text_editor__version(){
   
   int len = snprintf(message, sizeof(message), "Visual Text editor -- version 0.0.1");
   int mid = (cols - len)/2;
-  if (total == 0){
+  if (total == 1){
     mvprintw(rows/3, mid, "Visual Text editor -- version 0.0.1");
     refresh();
   }
@@ -418,7 +418,6 @@ void presskey() {
 
         default:
             Insertchar(c);
-            printw("%d", c);
             break;
     }
     refresh();

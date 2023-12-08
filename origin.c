@@ -454,6 +454,8 @@ int main(int argc, char *argv[]){
   while(true){
     all_refresh();
     presskey();
+    move(0,0);
+
   }
   endwin();
   return 0;

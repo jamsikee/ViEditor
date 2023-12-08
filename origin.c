@@ -328,7 +328,7 @@ void all_refresh(){
   state();
   status_bar();
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-  move(y,x);
+  mvprintf(y, x, "1");
   refresh();
 }
 
@@ -465,8 +465,8 @@ int main(int argc, char *argv[]){
   while(true){
     all_refresh();
     presskey();
-
   }
+
   endwin();
   return 0;
 

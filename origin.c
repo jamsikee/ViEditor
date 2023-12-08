@@ -255,6 +255,7 @@ void DeleteChar(){
   if(x > 0){
     mvprintw(y, 0, "%*s", Edit.line[y].len, "");
     Del_current_line_char();
+    move(y, x);
   }
   else{
     mvprintw(y, 0, "%*s", Edit.line[y].len, "");

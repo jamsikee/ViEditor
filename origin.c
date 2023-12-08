@@ -363,10 +363,6 @@ void Move(int key) {
 
 void presskey() {
 
-     for (int i = 0; i < total; i++){
-      mvprintw(i, x, "%*s", cols - x, " ");
-    }
-
     int c = getch();
 
     switch (c) {

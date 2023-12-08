@@ -332,6 +332,7 @@ void all_refresh(){
   status_bar();
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
   move(y,x);
+  printw(Edit.line[y].c);
   refresh();
 }
 

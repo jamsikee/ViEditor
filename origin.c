@@ -191,8 +191,8 @@ void Insertchar(char word){
     // if cursor y = total then add line;
   }
   RowInsertchar(&Edit.line[y], word, x);
-  x += 1;
   printw("%c", Edit.line[y].c[x]);
+  x += 1;
   // Insert char at cursor x
 }
 

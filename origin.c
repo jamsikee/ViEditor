@@ -271,7 +271,7 @@ void state(){
 
 void Visual_Text_editor__version(){
   char message[40];
-  
+  move(y,x);
   int len = snprintf(message, sizeof(message), "Visual Text editor -- version 0.0.1");
   int mid = (cols - len)/2;
   if (total == 0){
@@ -454,7 +454,7 @@ int main(int argc, char *argv[]){
   move_cols = 0;
   total = 0;
   getmaxyx(stdscr, rows, cols);
-  Visual_Text_editor__version();
+
   Edit.filename = NULL;
 
 
@@ -473,6 +473,7 @@ int main(int argc, char *argv[]){
 
   while(true){
     status_bar();
+    Visual_Text_editor__version();
     move(y,x);
     refresh();
     presskey();

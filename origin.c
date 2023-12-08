@@ -328,7 +328,7 @@ void all_refresh(){
   state();
   status_bar();
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-  mvprintw(y, x, "박진성");
+  printw(y, x, "323213213213123");
   refresh();
 }
 

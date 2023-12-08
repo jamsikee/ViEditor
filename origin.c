@@ -192,10 +192,7 @@ void Insertchar(int word){
   }
   RowInsertchar(&Edit.line[y], word, x);
   x += 1;
-  mvprintw(y, 0, "%s", Edit.line[y].c);
-  refresh();
   // Insert char at cursor x
-
 }
 
 void contained_new_line(Row *line, int pos_y, int pos_x) {
@@ -423,6 +420,8 @@ void presskey() {
 
         default:
             Insertchar(c);
+              mvprintw(y, 0, "%s", Edit.line[y].c);
+              refresh();
             break;
     }
     refresh();

@@ -429,7 +429,7 @@ void presskey() {
         default:
             char ch = (char)c;
             Insertchar(c);
-            printw("%c", char(ch));
+            printw("%c", ch);
             break;
     }
 

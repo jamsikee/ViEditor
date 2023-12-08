@@ -476,9 +476,7 @@ int main(int argc, char *argv[]){
   Visual_Text_editor__version();
 
   while(true){
-    state();
     status_bar();
-    end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     move(y,x);
     refresh();
     presskey();

@@ -420,7 +420,7 @@ void presskey() {
 
         default:
             Insertchar(c);
-              mvprintw(y, 0, "%s", Edit.line[y].c);
+              mvprintw(y, strlen(Edit.line[y].c), "1");
               refresh();
             break;
     }

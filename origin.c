@@ -427,9 +427,8 @@ void presskey() {
             break;
 
         default:
-            c = (char)c;
-            Insertchar(c);
-            printw(c);
+            Insertchar(char(c));
+            printw(char(c));
             break;
     }
 

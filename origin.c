@@ -471,7 +471,9 @@ int main(int argc, char *argv[]){
   Visual_Text_editor__version();
   move(0,0);
   refresh();
-
+  presskey();
+  Visual_Text_editor__version();
+  refresh();
 
   while(true){
     status_bar();

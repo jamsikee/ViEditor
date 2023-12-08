@@ -421,6 +421,7 @@ void presskey() {
             printw("%d", c);
             break;
     }
+    refresh();
 }
 
 int main(int argc, char *argv[]){

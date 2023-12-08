@@ -192,6 +192,7 @@ void Insertchar(char word){
   }
   RowInsertchar(&Edit.line[y], word, x);
   x += 1;
+  printw("%c", Edit.line[y].c);
   // Insert char at cursor x
 }
 
@@ -431,9 +432,6 @@ void presskey() {
         default:
             char ch = (char)c;
             Insertchar(ch);
-            for (int i = 0; i < Edit.line[y].len; ++i){
-              printw("%c", Edit.line[y].c[i]);
-            }
             break;
     }
 

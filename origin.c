@@ -384,11 +384,11 @@ void presskey() {
             Move(c);
             break;
             
-        case END_KEY: // End 키
+        case KEY_END: // End 키
             x = cols - 1;
             break;
 
-        case HOME_KEY: // Home 키
+        case KEY_HOME: // Home 키
             x = 0;
             break;
 

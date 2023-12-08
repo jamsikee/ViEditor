@@ -192,9 +192,6 @@ void Insertchar(int word){
   }
   RowInsertchar(&Edit.line[y], word, x);
   x += 1;
-  move(y,x);
-  printw("%d", word);
-  refresh();
   // Insert char at cursor x
 }
 
@@ -415,15 +412,21 @@ void presskey() {
         case KEY_ENTER:
         case '\n':
             Newline();
+            move(y,x);
+            refresh();
             break;
 
         case KEY_DC:
             Move(KEY_RIGHT);
             DeleteChar();
+            move(y,x);
+            refresh();
             break;
 
         case KEY_BACKSPACE:
             DeleteChar();
+            move(y,x);
+            refresh();
             break;
 
         default:
@@ -443,6 +446,7 @@ int main(int argc, char *argv[]){
   noecho();
   clear();
   cbreak();
+  keypad(stdscr, TRUE);
   x = 0;
   y = 0;
   rows = 0;
@@ -451,7 +455,7 @@ int main(int argc, char *argv[]){
   move_cols = 0;
   total = 0;
   getmaxyx(stdscr, rows, cols);
-  keypad(stdscr, TRUE);
+
   Edit.filename = NULL;
 
 

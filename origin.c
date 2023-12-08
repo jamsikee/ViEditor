@@ -48,9 +48,9 @@ void empty_new_line(int pos);
 void Insertchar(char word);
 void Del_current_line_char();
 void Del_current_line();
-void DeleteChar();
-void contained_new_line(Row *line, int pos_y, int pos_x);
+void DeleteChar();_line(Row *line, int pos_y, int pos_x);
 void Newline();
+void contained_new
 void status_bar();
 void state();
 void end_message( const char *format, ...);
@@ -274,7 +274,7 @@ void Visual_Text_editor__version(){
   
   int len = snprintf(message, sizeof(message), "Visual Text editor -- version 0.0.1");
   int mid = (cols - len)/2;
-  if (total == 1){
+  if (total == 0){
     mvprintw(rows/3, mid, "Visual Text editor -- version 0.0.1");
     refresh();
   }

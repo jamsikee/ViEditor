@@ -473,8 +473,8 @@ int main(int argc, char *argv[]){
 
 
   while(true){
-    move(y,x);
     status_bar();
+    move(y,x);
     refresh();
     presskey();
   }

@@ -328,8 +328,6 @@ void all_refresh(){
   state();
   status_bar();
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-  move(y,x);
-  printw("323213213213123");
   refresh();
 }
 
@@ -429,6 +427,8 @@ void presskey() {
             break;
     }
     refresh();
+    move(y,x);
+    printw("%d", c);
 }
 
 int main(int argc, char *argv[]){

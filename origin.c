@@ -433,9 +433,6 @@ int main(int argc, char *argv[]){
   start_color();
   noecho();
   clear();
-  getmaxyx(stdscr, rows, cols);
-  keypad(stdscr, TRUE);
-  Edit.filename = NULL;
   x = 0;
   y = 0;
   rows = 0;
@@ -443,6 +440,10 @@ int main(int argc, char *argv[]){
   move_rows = 0;
   move_cols = 0;
   total = 0;
+  getmaxyx(stdscr, rows, cols);
+  keypad(stdscr, TRUE);
+  Edit.filename = NULL;
+
 
   if (Edit.filename == NULL){
     Edit.filename = "No Name";

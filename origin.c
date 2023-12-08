@@ -362,6 +362,7 @@ void Move(int key) {
 
 
 void presskey() {
+    clear();
     int c = getch();
 
     switch (c) {

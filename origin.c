@@ -329,6 +329,99 @@ void all_refresh(){
   refresh();
 }
 
+void Move(int key) {
+    
+    switch (key) {
+        case KEY_UP:
+            if (x != 0) {
+                x--;
+            } else if (y > 0) {
+                y--;
+            }
+            break;
+        case KEY_RIGHT:
+            x += 1;
+            break;
+        case KEY_UP:
+            if (y != 0) {
+                y--;
+            }
+            break;
+        case KEY_DOWN:
+            if (y < total) {
+                y++;
+            }
+            break;
+    }
+    move(y, x);
+    refresh();
+}
+
+
+void presskey() {
+    int c = getch();
+
+    switch (c) {
+        case CONTROL('q'):
+            clear();
+            endwin();
+            exit(0);
+            break;
+
+        case CONTROL('s'):
+            break;
+
+        case CONTROL('f'):
+            break;
+
+        case KEY_LEFT: // 왼쪽 화살표 키
+        case KEY_RIGHT: // 오른쪽 화살표 키
+        case KEY_UP: // 위쪽 화살표 키
+        case KEY_DOWN: // 아래쪽 화살표 키
+            Move(c);
+            break;
+            
+        case KEY_END: // End 키
+            x = cols - 1;
+            break;
+
+        case KEY_HOME: // Home 키
+            x = 0;
+            break;
+
+        case KEY_NPAGE: // Page Down 키
+        case KEY_PPAGE: // Page Up 키
+        {
+            int temprows = rows;
+            while (temprows--) {
+                if (c == KEY_PPAGE)
+                    Move(KEY_UP);
+                else if (c == KEY_NPAGE)
+                    Move(KEY_DOWN);
+            }
+        }
+            break;
+
+        case KEY_ENTER:
+        case '\n':
+            editorInsertNewline();
+            break;
+
+        case KEY_DC:
+            Move(right);
+            editorDelChar();
+            break;
+
+        case KEY_BACKSPACE:
+            editorDelChar();
+            break;
+
+        default:
+            editorInsertChar(c);
+            break;
+    }
+}
+
 int main(int argc, char *argv[]){
   initscr();
   raw();
@@ -345,20 +438,18 @@ int main(int argc, char *argv[]){
   else{
     Edit.filename = argv[1];
   }
+
   total = 0;
   all_refresh();
   Visual_Text_editor__version();
   move(0,0);
-  // while(true){
-  //   ch = getch();
-  //   char buffer[1000];
-  //   printf("%c" ch);
-  //   if(ch == CONTROL('q')){
-  //     endwin();
-  //     return 0;
-  //   }
-  // }
   refresh();
+
+
+  while(true){
+    all_refresh();
+    presskey();
+  }
   getch();
   endwin();
   return 0;

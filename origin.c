@@ -158,7 +158,7 @@ void RowDeletechar(Row *line, int pos){
 }
 
 
-void RowInsertchar(Row *line, int word, int pos){
+void RowInsertchar(Row *line, char word, int pos){
 
   if (pos < 0 || pos > line->len){
     pos = line->len;
@@ -192,7 +192,6 @@ void Insertchar(int word){
   }
   RowInsertchar(&Edit.line[y], word, x);
   x += 1;
-  printw("%d", word);
   // Insert char at cursor x
 }
 
@@ -431,8 +430,8 @@ void presskey() {
             break;
         default:
             Insertchar(c);
-            //char ch = (char)c;
-           // printw("%c", ch);
+            char ch = (char)c;
+            printw("%c", ch);
             break;
     }
 

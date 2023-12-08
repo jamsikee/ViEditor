@@ -49,9 +49,8 @@ void Insertchar(char word);
 void Del_current_line_char();
 void Del_current_line();
 void DeleteChar();_
-void line(Row *line, int pos_y, int pos_x);
+void contained_new_line(Row *line, int pos_y, int pos_x);
 void Newline();
-void contained_new();
 void status_bar();
 void state();
 void end_message( const char *format, ...);

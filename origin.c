@@ -427,7 +427,6 @@ void presskey() {
             Insertchar(c);
             break;
     }
-    printw("%d", c);
     refresh();
 }
 
@@ -461,11 +460,9 @@ int main(int argc, char *argv[]){
   move(0,0);
   refresh();
 
-  getch();
 
 
   while(true){
-    clear();
     all_refresh();
     presskey();
 

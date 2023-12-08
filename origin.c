@@ -158,7 +158,7 @@ void RowDeletechar(Row *line, int pos){
 }
 
 
-void RowInsertchar(Row *line, int word, int pos){
+void RowInsertchar(Row *line, char word, int pos){
 
   if (pos < 0 || pos > line->len){
     pos = line->len;
@@ -184,7 +184,7 @@ void empty_new_line(int pos){
 
 }
 
-void Insertchar(int word){
+void Insertchar(char word){
 
   if(y == total) {
     empty_new_line(total); 
@@ -429,8 +429,8 @@ void presskey() {
             refresh();
             break;
         default:
-            Insertchar(c);
             char ch = (char)c;
+            Insertchar(ch);
             printw("%c", ch);
             break;
     }

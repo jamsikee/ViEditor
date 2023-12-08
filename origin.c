@@ -192,6 +192,9 @@ void Insertchar(int word){
   }
   RowInsertchar(&Edit.line[y], word, x);
   x += 1;
+  move(y,x);
+  printw("%d", word);
+  refresh();
   // Insert char at cursor x
 }
 
@@ -427,8 +430,6 @@ void presskey() {
             break;
     }
     refresh();
-    move(y,x);
-    printw("%d", c);
 }
 
 int main(int argc, char *argv[]){
@@ -464,8 +465,8 @@ int main(int argc, char *argv[]){
 
 
   while(true){
-    presskey();
     all_refresh();
+    presskey();
   }
 
   endwin();

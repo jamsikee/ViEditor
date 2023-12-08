@@ -256,7 +256,9 @@ void DeleteChar(){
     Del_current_line_char();
   }
   else{
+    mvprintw(y, 0, "%*s", Edit.line[y].len, "");
     Del_current_line();
+
   }
 
 }
@@ -412,18 +414,18 @@ void presskey() {
 
         case KEY_ENTER:
         case '\n':
+            mvprintw(y, 0, "%*s", Edit.line[y].len, "");
             Newline();
-            mvprintw(y-1, 0, "%s", Edit.line[y].c);
+            mvprintw(y-1, 0, "%s", Edit.line[y-1].c);
             mvprintw(y, 0, "%s", Edit.line[y].c);
             refresh();
             break;
 
         case KEY_DC:
-            // Move(KEY_RIGHT);
+            Move(KEY_RIGHT);
             DeleteChar();
             mvprintw(y-1, 0, "%s", Edit.line[y].c);
             mvprintw(y, 0, "%s", Edit.line[y].c);
-
             refresh();
             break;
 

@@ -454,7 +454,7 @@ int main(int argc, char *argv[]){
   move_cols = 0;
   total = 0;
   getmaxyx(stdscr, rows, cols);
-
+  Visual_Text_editor__version();
   Edit.filename = NULL;
 
 
@@ -466,7 +466,6 @@ int main(int argc, char *argv[]){
   }
 
   all_refresh();
-  Visual_Text_editor__version();
   move(0,0);
   refresh();
 

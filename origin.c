@@ -452,6 +452,7 @@ int main(int argc, char *argv[]){
 
 
   while(true){
+    clear();
     all_refresh();
     presskey();
 

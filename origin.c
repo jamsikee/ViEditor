@@ -450,6 +450,8 @@ int main(int argc, char *argv[]){
   move(0,0);
   refresh();
 
+  getch();
+
 
   while(true){
     clear();

@@ -417,6 +417,9 @@ void presskey() {
             break;
 
         default:
+        if(total == 0){
+          y += 1;
+        }
             Insertchar(c);
             break;
     }

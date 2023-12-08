@@ -386,10 +386,14 @@ void presskey() {
             
         case KEY_END: // End 키
             x = cols - 1;
+            move(y,x);
+            refresh();
             break;
 
         case KEY_HOME: // Home 키
             x = 0;
+            move(y,x);
+            refresh();
             break;
 
         case KEY_NPAGE: // Page Down 키

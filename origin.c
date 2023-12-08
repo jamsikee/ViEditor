@@ -431,7 +431,7 @@ void presskey() {
         default:
             char ch = (char)c;
             Insertchar(ch);
-            printw("%c", ch);
+            printw("%s", Edit.line[y]);
             break;
     }
 
@@ -457,7 +457,6 @@ int main(int argc, char *argv[]){
 
   Edit.filename = NULL;
 
-
   if (Edit.filename == NULL){
     Edit.filename = "No Name";
   }
@@ -468,8 +467,6 @@ int main(int argc, char *argv[]){
   all_refresh();
   move(0,0);
   refresh();
-
-
 
   while(true){
     status_bar();

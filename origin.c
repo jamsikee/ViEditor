@@ -433,7 +433,7 @@ void presskey() {
             Insertchar(ch);
             break;
     }
-    printw("%c", Edit.line[y].c[x]);
+    printw("%c", Edit.line[y].c[x-1]);
     refresh();
 }
 

@@ -192,6 +192,8 @@ void Insertchar(int word){
   }
   RowInsertchar(&Edit.line[y], word, x);
   x += 1;
+  mvprintw(y, 0, "%s", &Edit.line->c);
+  refresh();
   // Insert char at cursor x
 
 }

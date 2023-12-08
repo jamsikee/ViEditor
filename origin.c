@@ -191,7 +191,6 @@ void Insertchar(char word){
     // if cursor y = total then add line;
   }
   RowInsertchar(&Edit.line[y], word, x);
-  printw("%c", Edit.line[y].c[x]);
   x += 1;
   // Insert char at cursor x
 }
@@ -434,7 +433,7 @@ void presskey() {
             Insertchar(ch);
             break;
     }
-
+    printw("%c", Edit.line[y].c[x]);
     refresh();
 }
 

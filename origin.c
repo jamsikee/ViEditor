@@ -393,7 +393,7 @@ void presskey() {
         case KEY_HOME: // Home 키
             x = 0;
             move(y,x);
-            printw("%d" c);
+            printw("%d", c);
             refresh();
             break;
 

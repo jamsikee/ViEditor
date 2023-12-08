@@ -435,15 +435,10 @@ void presskey() {
         default:
             char ch = (char)c;
             Insertchar(ch);
+            mvprintw(y, 0, "%s", Edit.line[y].c);
             break;
     }
-    if(y == 0){
-      return;
-    }
-    else{
-      mvprintw(y-1, 0, "%s", Edit.line[y].c);
-    }
-    mvprintw(y, 0, "%s", Edit.line[y].c);
+
     refresh();
 }
 

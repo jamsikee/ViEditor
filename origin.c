@@ -431,7 +431,9 @@ void presskey() {
         default:
             char ch = (char)c;
             Insertchar(ch);
-            printw("%s", Edit.line[y]);
+            for (int i = 0; i < Edit.line[y].c[i]; ++i){
+              printw("%c", Edit.line[y].c[i]);
+            }
             break;
     }
 

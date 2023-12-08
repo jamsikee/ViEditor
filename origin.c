@@ -192,7 +192,7 @@ void Insertchar(char word){
   }
   RowInsertchar(&Edit.line[y], word, x);
   x += 1;
-  printw("%s", Edit.line[y].c[x]);
+  printw("%c", Edit.line[y].c[x]);
   // Insert char at cursor x
 }
 

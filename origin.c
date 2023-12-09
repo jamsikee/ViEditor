@@ -363,14 +363,18 @@ void Move(int key) {
     refresh();
 }
 
+int value(int ch) {
+    if (ch >= 32 && ch <= 126 || ch == 9) {
+        return 1; 
+    }
+    else
+        return 0; 
+}
+
 void presskey() {
 
     int c = 0;
-    
-    if (c == 0){
-      c = getch();
-    }
-    if (c < 32 || c > 126){
+    int special_key = value(c);
     switch (c) {
         case CONTROL('q'):
             clear();
@@ -416,19 +420,18 @@ void presskey() {
             Newline();
             break;
 
-        case 127: // Delete Key
+        case KEY_DEL: // Delete Key
             Move(KEY_RIGHT);
             DeleteChar();
             break;
 
-        case 8:
+        case KEY_BACKSPACE:
             DeleteChar();
             break;
         default:
             char ch = (char)c;
             Insertchar(ch);
             break;
-    }
     }
     mvprintw(y, 0, Edit.line[y].c);
     refresh();

@@ -374,8 +374,8 @@ enum P_key {
 
 void presskey() {
 
-    int c = getch();
-
+    char c = getch();
+    
     switch (c) {
         case CONTROL('q'):
             clear();

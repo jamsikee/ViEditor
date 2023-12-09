@@ -300,7 +300,6 @@ void status_bar() {
     move(rows-2, 0);
     for (int i = 0; i < cols; i++){
       printw( " ");
-      refresh();
     }
     
     // 왼쪽에 텍스트 출력
@@ -314,7 +313,6 @@ void status_bar() {
     }
     mvprintw(rows - 2, cols - right_len-1, "no ft | %d/%d", y_1, total);
 
-    refresh();
     attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
 }
 

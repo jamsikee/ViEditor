@@ -1,16 +1,16 @@
-  #include <stdio.h>
-  #include <stdlib.h>
-  #include <string.h>
-  #include <fcntl.h>
-  #include <ctype.h>
-  #include <ncurses.h>
-  #include <stdbool.h>
-  #include <stdarg.h>
-  #include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <ctype.h>
+#include <curses.h>
+#include <stdbool.h>
+#include <stdarg.h>
 
-  #define CONTROL(k) ((k) & 0x1f) // control + k
-  #define INIT_ROW_SIZE 1000
-  #define INIT_LINE_SIZE 125
+
+#define CONTROL(k) ((k) & 0x1f) // control + k
+#define INIT_ROW_SIZE 1000
+#define INIT_LINE_SIZE 125
 
 int x = 0;
 int y = 0;
@@ -22,181 +22,182 @@ int total = 0;
 
 typedef struct Row {
 
-  int len;
-  char *c;
-  int line_capacity;
+    int len;
+    char* c;
+    int line_capacity;
 
 } Row;
 
-struct Visual_Text_Editor{
+struct Visual_Text_Editor {
 
-  Row *line;
-  char *filename;
+    Row* line;
+    char* filename;
 
 };
 
 // total function
 struct Visual_Text_Editor Edit;
 void get_windows_size();
-Row *get_line(Row *line, int pos);
-void InsertRow(int edit_y, char *line, int line_len);
-void FreeRow(Row *line);
+Row* get_line(Row* line, int pos);
+void InsertRow(int edit_y, char* line, int line_len);
+void FreeRow(Row* line);
 void DeleteRow(int pos);
-void RowInsertString(Row *line, char *str, size_t del_line_len);
-void RowDeletechar(Row *line, int pos);
-void RowInsertchar(Row *line, char word, int pos);
+void RowInsertString(Row* line, char* str, size_t del_line_len);
+void RowDeletechar(Row* line, int pos);
+void RowInsertchar(Row* line, char word, int pos);
 void empty_new_line(int pos);
 void Insertchar(char word);
 void Del_current_line_char();
 void Del_current_line();
 void DeleteChar();
-void contained_new_line(Row *line, int pos_y, int pos_x);
+void contained_new_line(Row* line, int pos_y, int pos_x);
 void Newline();
 void status_bar();
 void state();
-void end_message( const char *format, ...);
+void end_message(const char* format, ...);
 void all_refresh();
 
 
-Row *get_line(Row *line, int pos) {
+Row* get_line(Row* line, int pos) {
 
     return &line[pos];
     // get line index
 
 }
 
-void welcome(){
-  const char *message = "Visual Text editor -- version 0.0.1";
-  int len = strlen(message);
-  int mid = (cols - len)/2;
-  mvprintw(rows/3, mid, "%s", message);
+void welcome() {
+    const char* message = "Visual Text editor -- version 0.0.1";
+    int len = strlen(message);
+    int mid = (cols - len) / 2;
+    mvprintw(rows / 3, mid, "%s", message);
 }
 
-void InsertRow(int edit_y, char *line, int line_len) {
-  if (edit_y < 0) {
-    return;
-  }
-  else if(edit_y > total){
-    return;
-  }
-  // If y < 0 or y > total then return
+void InsertRow(int edit_y, char* line, int line_len) {
+    if (edit_y < 0) {
+        return;
+    }
+    else if (edit_y > total) {
+        return;
+    }
+    // If y < 0 or y > total then return
 
-  if (total == 0) {
-    Edit.line = malloc(sizeof(Row) * INIT_ROW_SIZE);
-  } else if (total % INIT_ROW_SIZE == 0) {
-    Edit.line = realloc(Edit.line, sizeof(Row) * (total * 2));
-  }
-  /*
-  Edit.line's memory = INIT_ROW_SIZE(1000)
-  If total % 1000 == 0 then realloc 1000 * 2
-  */
-  memmove(&Edit.line[edit_y + 1], &Edit.line[edit_y], sizeof(Row) * (total - edit_y));
-  // Memory move line[y] -> line[y + 1]
-  Edit.line[edit_y].len = line_len;   
-  Edit.line[edit_y].c = malloc(INIT_LINE_SIZE + 1);
-  Edit.line[edit_y].line_capacity = INIT_LINE_SIZE + 1; 
-  // Line_capacity is (Edit.line[y].c)'s size
-  memcpy(Edit.line[edit_y].c, line, line_len);
-  Edit.line[edit_y].c[line_len] = '\0'; 
-  // The end of the string is null
-  total+=1;
-
-}
-
-void FreeRow(Row *line){  // Efficient method for free memory
-
-  free(line->c);
+    if (total == 0) {
+        Edit.line = malloc(sizeof(Row) * INIT_ROW_SIZE);
+    }
+    else if (total % INIT_ROW_SIZE == 0) {
+        Edit.line = realloc(Edit.line, sizeof(Row) * (total * 2));
+    }
+    /*
+    Edit.line's memory = INIT_ROW_SIZE(1000)
+    If total % 1000 == 0 then realloc 1000 * 2
+    */
+    memmove(&Edit.line[edit_y + 1], &Edit.line[edit_y], sizeof(Row) * (total - edit_y));
+    // Memory move line[y] -> line[y + 1]
+    Edit.line[edit_y].len = line_len;
+    Edit.line[edit_y].c = malloc(INIT_LINE_SIZE + 1);
+    Edit.line[edit_y].line_capacity = INIT_LINE_SIZE + 1;
+    // Line_capacity is (Edit.line[y].c)'s size
+    memcpy(Edit.line[edit_y].c, line, line_len);
+    Edit.line[edit_y].c[line_len] = '\0';
+    // The end of the string is null
+    total += 1;
 
 }
 
-void DeleteRow(int pos){
+void FreeRow(Row* line) {  // Efficient method for free memory
 
-  if (pos < 0){  
-    return;
-  }
-  else if(pos >= total){
-    return;
-  }
-  // If y < 0 or y > total then return
-
-  FreeRow(&Edit.line[pos]); // Line[pos]'s memory free
-  memmove(&Edit.line[pos], &Edit.line[pos+1], sizeof(Row) * (total - pos - 1));
-  // Line[pos+1]'s memory move to free memory(line[pos]) 
-  total-=1;
+    free(line->c);
 
 }
 
-void RowInsertString(Row *line, char *str, size_t del_line_len){
+void DeleteRow(int pos) {
 
-  // This function will use delete char at x = 0 then delete row
-  while (line->len + del_line_len > line->line_capacity){   
-    line->line_capacity *= 2;
-    line->c = realloc(line->c, line->line_capacity);
-  }
-  /*
-    While line_capacity is full then size*=2 and realloc 
-    because 126 * 2 = 252 > line_capacity then run until satisfied condition
-  */
-  memcpy(&line->c[line->len], str, del_line_len);
-  line->len += del_line_len;
-  line->c[line->len] = '\0';
+    if (pos < 0) {
+        return;
+    }
+    else if (pos >= total) {
+        return;
+    }
+    // If y < 0 or y > total then return
 
-}
-
-void RowDeletechar(Row *line, int pos){
-
-  if (pos < 0 || pos >= line->len){
-    return;
-  }
-  /*
-  If x < 0 or x >= line's len then return
-  It means The cursor moved out of its intended position
-  */
-  memmove(&line->c[pos], &line->c[pos+1], line->len - pos);
-  line->len-=1;
-  // memory move c[pos+1] -> c[pos]
+    FreeRow(&Edit.line[pos]); // Line[pos]'s memory free
+    memmove(&Edit.line[pos], &Edit.line[pos + 1], sizeof(Row) * (total - pos - 1));
+    // Line[pos+1]'s memory move to free memory(line[pos]) 
+    total -= 1;
 
 }
 
+void RowInsertString(Row* line, char* str, size_t del_line_len) {
 
-void RowInsertchar(Row *line, char word, int pos){
-
-  if (pos < 0 || pos > line->len){
-    pos = line->len;
-  }
-  
-  if (line->len + 1> line->line_capacity){
-    line->line_capacity*=2;
-    line->c = realloc(line->c, line->line_capacity);
-  }
-  
-  // it seems like RowInsertString capacity*2
-  memmove(&line->c[pos+1], &line->c[pos], line->len - pos + 1);
-  // memory move line->len - pos + 1 size
-  line->len += 1;
-  line->c[pos] = word;
+    // This function will use delete char at x = 0 then delete row
+    while (line->len + del_line_len > line->line_capacity) {
+        line->line_capacity *= 2;
+        line->c = realloc(line->c, line->line_capacity);
+    }
+    /*
+      While line_capacity is full then size*=2 and realloc
+      because 126 * 2 = 252 > line_capacity then run until satisfied condition
+    */
+    memcpy(&line->c[line->len], str, del_line_len);
+    line->len += del_line_len;
+    line->c[line->len] = '\0';
 
 }
 
-void empty_new_line(int pos){
+void RowDeletechar(Row* line, int pos) {
 
-  InsertRow(pos, "", 0);
-  // If the line is empty or outside the screen add a empty line.
+    if (pos < 0 || pos >= line->len) {
+        return;
+    }
+    /*
+    If x < 0 or x >= line's len then return
+    It means The cursor moved out of its intended position
+    */
+    memmove(&line->c[pos], &line->c[pos + 1], line->len - pos);
+    line->len -= 1;
+    // memory move c[pos+1] -> c[pos]
 
 }
 
-void Insertchar(char word){
 
-  if(y == total) {
-    empty_new_line(total); 
-    // if cursor y = total then add line;
-  }
-  RowInsertchar(&Edit.line[y], word, x);
-  x += 1;
-  // Insert char at cursor x
+void RowInsertchar(Row* line, char word, int pos) {
+
+    if (pos < 0 || pos > line->len) {
+        pos = line->len;
+    }
+
+    if (line->len + 1 > line->line_capacity) {
+        line->line_capacity *= 2;
+        line->c = realloc(line->c, line->line_capacity);
+    }
+
+    // it seems like RowInsertString capacity*2
+    memmove(&line->c[pos + 1], &line->c[pos], line->len - pos + 1);
+    // memory move line->len - pos + 1 size
+    line->len += 1;
+    line->c[pos] = word;
+
 }
 
-void contained_new_line(Row *line, int pos_y, int pos_x) {
+void empty_new_line(int pos) {
+
+    InsertRow(pos, "", 0);
+    // If the line is empty or outside the screen add a empty line.
+
+}
+
+void Insertchar(char word) {
+
+    if (y == total) {
+        empty_new_line(total);
+        // if cursor y = total then add line;
+    }
+    RowInsertchar(&Edit.line[y], word, x);
+    x += 1;
+    // Insert char at cursor x
+}
+
+void contained_new_line(Row* line, int pos_y, int pos_x) {
 
     InsertRow(pos_y + 1, &line->c[pos_x], line->len - pos_x);
     // Insert current line's string(pos_x to line->len) to new line
@@ -206,87 +207,87 @@ void contained_new_line(Row *line, int pos_y, int pos_x) {
 
 }
 
-void Newline(){
+void Newline() {
 
-  Row *line = get_line(Edit.line, y);
-  // get line Edit.line[y]
-  if(x == 0){
-    empty_new_line(y);
-  }
-  else{
-    contained_new_line(line, y, x);
-  }
-  y += 1;
-  x = 0;
+    Row* line = get_line(Edit.line, y);
+    // get line Edit.line[y]
+    if (x == 0) {
+        empty_new_line(y);
+    }
+    else {
+        contained_new_line(line, y, x);
+    }
+    y += 1;
+    x = 0;
 
 }
 
 void Del_current_line_char() {
 
-  Row *line = get_line(Edit.line, y);
-  // get line Edit.line[y]
-  RowDeletechar(line, x - 1);
-  x -= 1;
+    Row* line = get_line(Edit.line, y);
+    // get line Edit.line[y]
+    RowDeletechar(line, x - 1);
+    x -= 1;
 
 }
 
 void Del_current_line() {
 
-  Row *line = get_line(Edit.line, y);
-  // get line Edit.line[y]
-  x = Edit.line[y - 1].len;
-  RowInsertString(&Edit.line[y - 1], line->c, line->len);
-  DeleteRow(y);
-  y -= 1;
-  // x cursor is prev line's len and y cursor -1 and insert string at line's len
+    Row* line = get_line(Edit.line, y);
+    // get line Edit.line[y]
+    x = Edit.line[y - 1].len;
+    RowInsertString(&Edit.line[y - 1], line->c, line->len);
+    DeleteRow(y);
+    y -= 1;
+    // x cursor is prev line's len and y cursor -1 and insert string at line's len
 
 }
 
-void DeleteChar(){    // 수정 필요 백스페이스키 안먹는거 같음 !!
+void DeleteChar() {    // 수정 필요 백스페이스키 안먹는거 같음 !!
 
-  Row *line = get_line(Edit.line, y);
+    Row* line = get_line(Edit.line, y);
 
-  if( y == total){
-    return;
-  }
-  if( x == 0 && y == 0){
-    return;
-  }
+    if (y == total) {
+        return;
+    }
+    if (x == 0 && y == 0) {
+        return;
+    }
 
-  if(x > 0){
-    mvprintw(y, 0, "%*s", Edit.line[y].len, "");
-    Del_current_line_char();
-  }
-  else{
-    mvprintw(y, 0, "%*s", Edit.line[y].len, "");
-    Del_current_line();
+    if (x > 0) {
+        mvprintw(y, 0, "%*s", Edit.line[y].len, "");
+        Del_current_line_char();
+    }
+    else {
+        mvprintw(y, 0, "%*s", Edit.line[y].len, "");
+        Del_current_line();
 
-  }
+    }
 
 }
 
-void state(){
-  clear();
-  for (int i = 0; i < rows-2; i++){
-    mvprintw(i, 0, "~");
-  }
-  refresh();
-}
-
-void Visual_Text_editor__version(){
-  char message[40];
-  move(y,x);
-  int len = snprintf(message, sizeof(message), "Visual Text editor -- version 0.0.1");
-  int mid = (cols - len)/2;
-  if (total == 0){
-    mvprintw(rows/3, mid, "Visual Text editor -- version 0.0.1");
+void state() {
+    clear();
+    for (int i = 0; i < rows - 2; i++) {
+        mvprintw(i, 0, "~");
+    }
     refresh();
-  }
-  else {
-    mvprintw(rows/3, mid, "                                   ");
+}
+
+void Visual_Text_editor__version() {
+    char message[40];
+    move(y, x);
+    int len = snprintf(message, sizeof(message), "Visual Text editor -- version 0.0.1");
+    int mid = (cols - len) / 2;
+    if (total == 0) {
+        mvprintw(rows / 3, mid, "Visual Text editor -- version 0.0.1");
+        refresh();
+    }
+    else {
+        mvprintw(rows / 3, mid, "                                   ");
+        refresh();
+    }
     refresh();
-  }
-  refresh();
 }
 
 void status_bar() {
@@ -295,83 +296,93 @@ void status_bar() {
     int y_1 = y + 1;
     snprintf(total_len, sizeof(total_len), "%d", total);
     snprintf(st_y, sizeof(st_y), "%d", y);
-    
+
     init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
     attron(COLOR_PAIR(2) | A_REVERSE); // Enable the defined reverse color pair
-    move(rows-2, 0);
-    for (int i = 0; i < cols; i++){
-      printw( " ");
-      refresh();
+    move(rows - 2, 0);
+    for (int i = 0; i < cols; i++) {
+        printw(" ");
+        refresh();
     }
-    
+
     // 왼쪽에 텍스트 출력
     mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
     int left_len = strlen(total_len) + strlen(Edit.filename) + 13;
     int right_len = strlen(total_len) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
 
     // 오른쪽에 텍스트 출력
-    if(y_1 > total){
-      y_1 = total;
+    if (y_1 > total) {
+        y_1 = total;
     }
-    mvprintw(rows - 2, cols - right_len-1, "no ft | %d/%d", y_1, total);
+    mvprintw(rows - 2, cols - right_len - 1, "no ft | %d/%d", y_1, total);
 
     attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
 }
 
 
-void end_message(const char *format, ...) {
+void end_message(const char* format, ...) {
     va_list args;
     va_start(args, format);
-    mvprintw(rows-1, 0, format, args); // 가변 인자들을 printf 형태로 특정 위치에 출력
+    mvprintw(rows - 1, 0, format, args); // 가변 인자들을 printf 형태로 특정 위치에 출력
     va_end(args);
     refresh();
 }
 
-void all_refresh(){
-  state();
-  status_bar();
-  end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-  move(y,x);
-  refresh();
+void all_refresh() {
+    state();
+    status_bar();
+    end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+    move(y, x);
+    refresh();
 }
 
 void Move(int key) {
-    
+
     switch (key) {
-        case KEY_LEFT:
-            if (x != 0) {
-                x--;
-            } else if (y > 0) {
-                y--;
-            }
-            break;
-        case KEY_RIGHT:
-            x += 1;
-            break;
-        case KEY_UP:
-            if (y != 0) {
-                y--;
-            }
-            break;
-        case KEY_DOWN:
-            if (y < total) {
-                y++;
-            }
-            break;
+    case KEY_LEFT:
+        if (x != 0) {
+            x--;
+        }
+        else if (y > 0) {
+            y--;
+        }
+        break;
+    case KEY_RIGHT:
+        x += 1;
+        break;
+    case KEY_UP:
+        if (y != 0) {
+            y--;
+        }
+        break;
+    case KEY_DOWN:
+        if (y < total) {
+            y++;
+        }
+        break;
     }
     move(y, x);
     refresh();
 }
 
+int special_or_char(int c) {
+    if (c >= 32 && c <= 126 || c == 9) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
 void presskey() {
 
     int c = 0;
-    
-    if (c == 0){
-      c = getch();
+
+    if (c == 0) {
+        c = getch();
     }
-    if (c < 32 || c > 126){
-    switch (c) {
+    if (c < 32 || c > 126) {
+        switch (c) {
         case CONTROL('q'):
             clear();
             endwin();
@@ -390,55 +401,53 @@ void presskey() {
         case KEY_DOWN: // 아래쪽 화살표 키
             Move(c);
             break;
-        // case KEY_END: // End 키
-        //     x = Edit.line[y].len;
-        //     move(y,x);
-        //     break;
+            // case KEY_END: // End 키
+            //     x = Edit.line[y].len;
+            //     move(y,x);
+            //     break;
 
-        // case KEY_HOME: // Home 키
-        //     move(y,0);
-        //     break;
+            // case KEY_HOME: // Home 키
+            //     move(y,0);
+            //     break;
+        case KEY_HOME:
+            move(y, 0);
+            break;
+        case KEY_END:
+            move(y, 0);
+            break;
 
         case KEY_NPAGE: // Page Down 키
-        {
-            int temprows = rows;
-            while (temprows--) {
-                if (c == KEY_NPAGE)
-                    Move(KEY_DOWN);
-            }
-        }
-        move(y, 0);
-        break;
         case KEY_PPAGE: // Page Up 키
         {
             int temprows = rows;
             while (temprows--) {
-                if (c == KEY_NPAGE)
+                if (c == KEY_PPAGE)
+                    Move(KEY_UP);
+                else if (c == KEY_NPAGE)
                     Move(KEY_DOWN);
             }
         }
-        move(y, Edit.line[y].len);
-            break;
+        break;
         // 이부분 해결해야 될듯
         case '\n':
             Newline();
             break;
 
-        case 8:
+        case KEY_BACKSPACE:
             DeleteChar();
             break;
 
         default:
             c = 0;
             break;
+        }
     }
+    else {
+        char ch = (char)c;
+        Insertchar(ch);
+        mvprintw(y, 0, Edit.line[y].c);
     }
-    else{
-      char ch = (char)c;
-      Insertchar(ch);
-    }
-    
-    mvprintw(y, 0, Edit.line[y].c);
+
     refresh();
 }
 
@@ -448,47 +457,99 @@ void presskey() {
 //   }
 // }
 
-int main(int argc, char *argv[]){
-  initscr();
-  raw();
-  start_color();
-  noecho();
-  clear();
-  cbreak();
-  keypad(stdscr, TRUE);
-  x = 0;
-  y = 0;
-  rows = 0;
-  cols = 0;
-  move_rows = 0;
-  move_cols = 0;
-  total = 0;
-  getmaxyx(stdscr, rows, cols); // rows cols
+int main(int argc, char* argv[]) {
+    initscr();
+    raw();
+    start_color();
+    noecho();
+    clear();
+    cbreak();
+    keypad(stdscr, TRUE);
+    x = 0;
+    y = 0;
+    rows = 0;
+    cols = 0;
+    move_rows = 0;
+    move_cols = 0;
+    total = 0;
+    getmaxyx(stdscr, rows, cols); // rows cols
 
-  Edit.filename = NULL;
+    Edit.filename = NULL;
 
-  if (Edit.filename == NULL){
-    Edit.filename = "No Name";
-  }
-  else{
-    Edit.filename = argv[1];
-  }
-  all_refresh();
-  Visual_Text_editor__version();
-  move(0,0); // 0, 0
-  refresh(); // refresh();
-  presskey();
-  Visual_Text_editor__version();
-  refresh();
-
-  while(true){
-    status_bar();
-    move(y,x);
-    refresh();
+    if (Edit.filename == NULL) {
+        Edit.filename = "No Name";
+    }
+    else {
+        Edit.filename = argv[1];
+    }
+    all_refresh();
+    Visual_Text_editor__version();
+    move(0, 0); // 0, 0
+    refresh(); // refresh();
     presskey();
-  }
+    Visual_Text_editor__version();
+    refresh();
 
-  endwin();
-  return 0;
+    int c;
+    int special_key = 0;
+
+    c = getch();
+    special_key = special_or_char(c);
+   
+    while (true) {
+        status_bar();
+        move(y, x);
+        refresh();
+
+        if (special_key == 1) {
+            char ch = (char)c;
+            Insertchar(ch);
+            mvprintw(y, 0, Edit.line[y].c);
+            move(y, x);
+        }
+        else if (special_key == 0) {
+            if (c == CONTROL('q')) {
+                clear();
+                endwin();
+                exit(0);
+            }
+            if (c == CONTROL('s')) {
+            }
+            if (c == CONTROL('f')) {
+            }
+            if (c == KEY_UP || c == KEY_DOWN || c == KEY_LEFT || c == KEY_RIGHT) {
+                Move(c);
+            }
+            if (c == 13) {
+                Newline();
+            }
+            if (c == KEY_NPAGE) {
+                int temprows = rows;
+                while (temprows--) {
+                    Move(KEY_DOWN);
+                }
+            }
+            if (c == KEY_PPAGE) {
+                int temprows = rows;
+                while (temprows--) {
+                    Move(KEY_UP);
+                }
+            }
+            if (c == 8) {
+                DeleteChar();
+            }
+            if (c == KEY_HOME) {
+                move(y, 0);
+            }
+            if (c == KEY_END) {
+                move(y, Edit.line[y].len);
+            }
+        }
+        c = getch();
+        special_key = special_or_char(c);
+    }
+
+    endwin();
+    return 0;
 
 }

@@ -344,6 +344,7 @@ void Move(int key) {
               y_out += 1;
               flag = 1;
               y = rows - 3;
+              if( total == y + y_out) break; 
             }else{
               if (y < total) {
                 y += 1;

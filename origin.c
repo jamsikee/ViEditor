@@ -403,7 +403,7 @@ void presskey() {
             move(y,x);
             break;
 
-        case '\x1b[1~': // Home 키
+        case 327: // Home 키
             x = 0;
             move(y,x);
             break;
@@ -425,8 +425,12 @@ void presskey() {
             Newline();
             break;
 
+        case 127: // Delete Key
+            Move(KEY_RIGHT);
+            DeleteChar();
+            break;
 
-        case 127:
+        case 8:
             DeleteChar();
             break;
         default:

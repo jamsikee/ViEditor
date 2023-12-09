@@ -374,8 +374,18 @@ enum P_key {
 
 void presskey() {
 
-    char c = getch();
-    
+    int c = getch();
+    char ch = (char)c;
+    switch (ch)
+    {
+      case "^[[1~": // End 키
+            x = Edit.line[y].len;
+            move(y,x);
+            break;
+
+      case "^[[1~": // Home 키
+            move(y,0);
+    }
     switch (c) {
         case CONTROL('q'):
             clear();
@@ -394,15 +404,6 @@ void presskey() {
         case KEY_UP: // 위쪽 화살표 키
         case KEY_DOWN: // 아래쪽 화살표 키
             Move(c);
-            break;
-            
-        case KEY_END: // End 키
-            x = Edit.line[y].len;
-            move(y,x);
-            break;
-
-        case KEY_HOME: // Home 키
-            move(y,0);
             break;
 
         case KEY_NPAGE: // Page Down 키
@@ -431,7 +432,6 @@ void presskey() {
             DeleteChar();
             break;
         default:
-            char ch = (char)c;
             Insertchar(ch);
             break;
     }

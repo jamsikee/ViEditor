@@ -266,14 +266,6 @@ void DeleteChar(){    // 수정 필요 백스페이스키 안먹는거 같음 !!
 
 }
 
-void state(){
-  clear();
-  for (int i = 0; i < rows-2; i++){
-    mvprintw(i, 0, "~");
-  }
-  refresh();
-}
-
 void Visual_Text_editor__version(){
   char message[40];
   move(y,x);
@@ -326,14 +318,6 @@ void end_message(const char *format, ...) {
     mvprintw(rows-1, 0, format, args); // 가변 인자들을 printf 형태로 특정 위치에 출력
     va_end(args);
     refresh();
-}
-
-void all_refresh(){
-  state();
-  status_bar();
-  end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-  move(y,x);
-  refresh();
 }
 
 void Move(int key) {
@@ -438,8 +422,9 @@ void presskey() {
 }
 
 void clean_and_printing(){
-   for(int i=0; i< rows; ++i){
+   for(int i=0; i< rows-2; ++i){
     mvprintw(i, 0, "%*s", cols, "");
+    mvprintw(i, 0, "~");
     if(Edit.line[i + y_out].c == NULL){
       continue;
     }
@@ -455,6 +440,14 @@ void clean_and_printing(){
 //     move_cols += 1;
 //   }
 // }
+
+void all_refresh(){
+  state();
+  status_bar();
+  end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+  move(y,x);
+  refresh();
+}
 
 int main(int argc, char *argv[]){
   initscr();

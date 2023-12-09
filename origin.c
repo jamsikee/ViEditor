@@ -396,7 +396,7 @@ void presskey() {
             Move(c);
             break;
             
-        case KEY_DEL: // End 키
+        case Ky_END: // End 키
             x = Edit.line[y].len;
             move(y,x);
             break;

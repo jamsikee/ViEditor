@@ -416,12 +416,12 @@ void presskey() {
             Newline();
             break;
 
-        case KEY_DL: // Delete Key
+        case 127: // Delete Key
             Move(KEY_RIGHT);
             DeleteChar();
             break;
 
-        case KEY_BACKSPACE:
+        case 8:
             DeleteChar();
             break;
         default:

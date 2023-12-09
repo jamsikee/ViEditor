@@ -6,6 +6,7 @@
   #include <ncurses.h>
   #include <stdbool.h>
   #include <stdarg.h>
+  #include <unistd.h>
 
   #define CONTROL(k) ((k) & 0x1f) // control + k
   #define INIT_ROW_SIZE 1000
@@ -362,30 +363,11 @@ void Move(int key) {
     refresh();
 }
 
-
-enum P_key {
-
-    del = 1000,
-    home,
-    end,
-    b_s = 127
-    
-};
-
 void presskey() {
 
     int c = getch();
     char ch = (char)c;
-    switch (ch)
-    {
-      case "^[[1~": // End 키
-            x = Edit.line[y].len;
-            move(y,x);
-            break;
-
-      case "^[[1~": // Home 키
-            move(y,0);
-    }
+  
     switch (c) {
         case CONTROL('q'):
             clear();
@@ -405,7 +387,15 @@ void presskey() {
         case KEY_DOWN: // 아래쪽 화살표 키
             Move(c);
             break;
+        case KEY_END: // End 키
+            x = Edit.line[y].len;
+            move(y,x);
+            break;
 
+        case KEY_HOME: // Home 키
+            move(y,0);
+            break;
+            
         case KEY_NPAGE: // Page Down 키
         case KEY_PPAGE: // Page Up 키
         {

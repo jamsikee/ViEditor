@@ -362,7 +362,16 @@ void Move(int key) {
     refresh();
 }
 
+enum P_key {
 
+    del,
+    home,
+    end,
+    b_s = 127
+    
+};
+
+#define home;
 void presskey() {
 
     int c = getch();
@@ -415,7 +424,7 @@ void presskey() {
             Newline();
             break;
 
-        case KEY_DC:
+        case 127:
             Move(KEY_RIGHT);
             DeleteChar();
             break;
@@ -431,6 +440,12 @@ void presskey() {
     mvprintw(y, 0, Edit.line[y].c);
     refresh();
 }
+
+// void scroll(){
+//   if (x > cols){
+//     move_cols += 1;
+//   }
+// }
 
 int main(int argc, char *argv[]){
   initscr();

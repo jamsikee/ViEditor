@@ -390,14 +390,14 @@ void presskey() {
         case KEY_DOWN: // 아래쪽 화살표 키
             Move(c);
             break;
-        case KEY_END: // End 키
-            x = Edit.line[y].len;
-            move(y,x);
-            break;
+        // case KEY_END: // End 키
+        //     x = Edit.line[y].len;
+        //     move(y,x);
+        //     break;
 
-        case KEY_HOME: // Home 키
-            move(y,0);
-            break;
+        // case KEY_HOME: // Home 키
+        //     move(y,0);
+        //     break;
 
         case KEY_NPAGE: // Page Down 키
         case KEY_PPAGE: // Page Up 키
@@ -416,14 +416,10 @@ void presskey() {
             Newline();
             break;
 
-        case 127: // Delete Key
-            Move(KEY_RIGHT);
-            DeleteChar();
-            break;
-
         case 8:
             DeleteChar();
             break;
+
         default:
             c = 0;
             break;

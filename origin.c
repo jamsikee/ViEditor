@@ -375,9 +375,7 @@ enum P_key {
 void presskey() {
 
     int c = getch();
-    if (c == 224){
-      c = 256 + getch();  
-    }
+
     switch (c) {
         case CONTROL('q'):
             clear();
@@ -398,7 +396,7 @@ void presskey() {
             Move(c);
             break;
             
-        case 57615: // End 키
+        case 224: // End 키
             x = cols - 1;
             move(y,x);
             break;

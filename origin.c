@@ -403,7 +403,7 @@ void presskey() {
             move(y,x);
             break;
 
-        case 327: // Home 키
+        case '\x1b[1~': // Home 키
             x = 0;
             move(y,x);
             break;

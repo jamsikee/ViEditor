@@ -362,10 +362,19 @@ void Move(int key) {
     refresh();
 }
 
-#define home;
+int get_code(void)
+{
+	int ch = getch();
+
+	if (ch == 0 || ch == 224)
+		ch = 256 + getch();
+
+	return ch;
+}
+
 void presskey() {
 
-    int c = getch();
+    int c = get_code();
 
     switch (c) {
         case CONTROL('q'):

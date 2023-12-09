@@ -387,13 +387,12 @@ void presskey() {
             Move(c);
             break;
             
-        case KEY_END: // End 키
+        case 335: // End 키
             x = cols - 1;
             move(y,x);
             break;
 
-        case KEY_HOME: // Home 키
-            printw("0x%04x\n", KEY_HOME);
+        case 327: // Home 키
             x = 0;
             move(y,x);
             break;

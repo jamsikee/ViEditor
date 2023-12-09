@@ -445,7 +445,7 @@ void clean_and_printing(){
     }
     else
     {
-      mvprintf(i, 0, "%s", Edit.line[i + y_out].c);
+      mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
     }
   }
 }

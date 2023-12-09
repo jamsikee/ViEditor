@@ -420,7 +420,7 @@ void presskey() {
             Newline();
             break;
 
-        case KEY_DEL: // Delete Key
+        case KEY_DL: // Delete Key
             Move(KEY_RIGHT);
             DeleteChar();
             break;

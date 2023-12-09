@@ -425,7 +425,7 @@ void presskey() {
 
         default:
             c = 0;
-            continue;
+            break;
     }
   }
   else{

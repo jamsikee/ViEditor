@@ -391,13 +391,11 @@ void presskey() {
         case KEY_END: // End 키
             x = cols - 1;
             move(y,x);
-            refresh();
             break;
 
         case KEY_HOME: // Home 키
             x = 0;
             move(y,x);
-            refresh();
             break;
 
         case KEY_NPAGE: // Page Down 키
@@ -412,35 +410,23 @@ void presskey() {
             }
         }
             break;
-
+        // 이부분 해결해야 될듯
         case KEY_ENTER:
         case '\n':
-            mvprintw(y, 0, "%*s", Edit.line[y].len, "");
             Newline();
-            mvprintw(y-1, 0, "%s", Edit.line[y-1].c);
-            mvprintw(y, 0, "%*s", Edit.line[y].len, "");
-            mvprintw(y, 0, "%s", Edit.line[y].c);
-            refresh();
             break;
 
         case KEY_DC:
             Move(KEY_RIGHT);
             DeleteChar();
-            mvprintw(y-1, 0, "%s", Edit.line[y].c);
-            mvprintw(y, 0, "%s", Edit.line[y].c);
-            refresh();
             break;
 
         case KEY_BACKSPACE:
             DeleteChar();
-            mvprintw(y-1, 0, "%s", Edit.line[y].c);
-            mvprintw(y, 0, "%s", Edit.line[y].c);
-            refresh();
             break;
         default:
             char ch = (char)c;
             Insertchar(ch);
-            mvprintw(y, 0, "%s", Edit.line[y].c);
             break;
     }
 

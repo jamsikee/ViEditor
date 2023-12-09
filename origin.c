@@ -325,9 +325,9 @@ void Move(int key) {
     switch (key) {
         case KEY_LEFT:
             if (x != 0) {
-                x += 1;
+                x -= 1;
             } else if (y > 0) {
-                y -= 1;
+                y += 1;
             }
             break;
         case KEY_RIGHT:

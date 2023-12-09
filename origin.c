@@ -400,16 +400,24 @@ void presskey() {
         //     break;
 
         case KEY_NPAGE: // Page Down 키
+        {
+            int temprows = rows;
+            while (temprows--) {
+                if (c == KEY_NPAGE)
+                    Move(KEY_DOWN);
+            }
+        }
+        move(y, 0);
+        break;
         case KEY_PPAGE: // Page Up 키
         {
             int temprows = rows;
             while (temprows--) {
-                if (c == KEY_PPAGE)
-                    Move(KEY_UP);
-                else if (c == KEY_NPAGE)
+                if (c == KEY_NPAGE)
                     Move(KEY_DOWN);
             }
         }
+        move(y, Edit.line[y].len);
             break;
         // 이부분 해결해야 될듯
         case '\n':

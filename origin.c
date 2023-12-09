@@ -373,7 +373,7 @@ int value(int ch) {
 
 void presskey() {
 
-    int c = 0;
+    int c = getch();
     int special_key = value(c);
     switch (c) {
         case CONTROL('q'):
@@ -429,7 +429,7 @@ void presskey() {
         case KEY_BACKSPACE:
             DeleteChar();
             break;
-            
+
         default:
             char ch = (char)c;
             Insertchar(ch);

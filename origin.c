@@ -440,6 +440,13 @@ void clean_and_printing(){
 //     move_cols += 1;
 //   }
 // }
+void state() {
+    clear();
+    for (int i = 0; i < rows - 2; i++) {
+        mvprintw(i, 0, "~");
+    }
+    refresh();
+}
 
 void all_refresh(){
   state();

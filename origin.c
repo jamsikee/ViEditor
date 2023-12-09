@@ -343,7 +343,7 @@ void Move(int key) {
             if(y == rows-2){
               y_out += 1;
               flag = 1;
-              y = rows - 2;
+              y = rows - 3;
             }else{
               if (y < total) {
                 y += 1;

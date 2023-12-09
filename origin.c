@@ -396,14 +396,13 @@ void presskey() {
             Move(c);
             break;
             
-        case 224: // End 키
-            x = cols - 1;
+        case KEY_DEL: // End 키
+            x = Edit.line[y].len;
             move(y,x);
             break;
 
-        case 57608: // Home 키
-            x = 0;
-            move(y,x);
+        case KEY_HOME: // Home 키
+            move(y,0);
             break;
 
         case KEY_NPAGE: // Page Down 키

@@ -428,11 +428,12 @@ void presskey() {
             c = 0;
             break;
     }
+    }
     else{
       char ch = (char)c;
       Insertchar(ch);
     }
-    }
+    
     mvprintw(y, 0, Edit.line[y].c);
     refresh();
 }

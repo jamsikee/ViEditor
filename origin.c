@@ -1,274 +1,489 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <ncurses.h>
-#include <string.h>
-#include <math.h>
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <string.h>
+  #include <fcntl.h>
+  #include <ctype.h>
+  #include <ncurses.h>
+  #include <stdbool.h>
+  #include <stdarg.h>
+  #include <unistd.h>
 
-int x = 0, y = 0; // 좌표값
+  #define CONTROL(k) ((k) & 0x1f) // control + k
+  #define INIT_ROW_SIZE 1000
+  #define INIT_LINE_SIZE 125
+
+int x = 0;
+int y = 0;
+int rows = 0;
+int cols = 0;
+int move_rows = 0;
+int move_cols = 0;
+int total = 0;
+
+typedef struct Row {
+
+  int len;
+  char *c;
+  int line_capacity;
+
+} Row;
+
+struct Visual_Text_Editor{
+
+  Row *line;
+  char *filename;
+
+};
+
+// total function
+struct Visual_Text_Editor Edit;
+void get_windows_size();
+Row *get_line(Row *line, int pos);
+void InsertRow(int edit_y, char *line, int line_len);
+void FreeRow(Row *line);
+void DeleteRow(int pos);
+void RowInsertString(Row *line, char *str, size_t del_line_len);
+void RowDeletechar(Row *line, int pos);
+void RowInsertchar(Row *line, char word, int pos);
+void empty_new_line(int pos);
+void Insertchar(char word);
+void Del_current_line_char();
+void Del_current_line();
+void DeleteChar();
+void contained_new_line(Row *line, int pos_y, int pos_x);
+void Newline();
+void status_bar();
+void state();
+void end_message( const char *format, ...);
+void all_refresh();
 
 
-//UI용 전역변수
-int linenum = 1;//현재 몇라인인지 알려주는 전역변수
-int conRows, conCols;//콘솔의 행열
-char* filename = NULL;//파일이름
-char* ft = NULL;//현재라인/전체라인 no ft | y / totamnum;
-int frontLength;//파일이름포함한 길이+라인넘버포함한길이
-int backLength;//뒤에 f|t라인 길이
-int totalnum = 0;
+Row *get_line(Row *line, int pos) {
 
-typedef struct DNode {
-    int strsize;
-    char* str;
-    struct DNode* up;
-    struct DNode* down;
-} node;
+    return &line[pos];
+    // get line index
 
-node* head = NULL;     // 맨 위의 노드를 가리키는 포인터
-node* curNode = NULL;  // 현재 위치한 노드를 가리키는 포인터
+}
 
-//UI세팅함수들
-void setUI() {
-    // 로그를 취한 후 1을 더하여 자릿수 계산
-    int digits;
-    if (totalnum == 0) {
-        digits = 1;
-    }
-    else digits = (int)(log10(totalnum) + 1);
-    attron(A_REVERSE);
-    for (int i = 0; i < conCols - 11 - strlen(filename) - digits - strlen(ft); i++) {
-        if (i == 0) {
-            mvprintw(conRows - 2, 0, "[%s] - %d lines", filename, totalnum);
-        }
-        printw(" ");
-    } 
-    printw("%s\n", ft);
-    attroff(A_REVERSE); // 반전을 해제합니다.
-    printw("HELP: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F = find");
+void welcome(){
+  const char *message = "Visual Text editor -- version 0.0.1";
+  int len = strlen(message);
+  int mid = (cols - len)/2;
+  mvprintw(rows/3, mid, "%s", message);
+}
+
+void InsertRow(int edit_y, char *line, int line_len) {
+  if (edit_y < 0) {
+    return;
+  }
+  else if(edit_y > total){
+    return;
+  }
+  // If y < 0 or y > total then return
+
+  if (total == 0) {
+    Edit.line = malloc(sizeof(Row) * INIT_ROW_SIZE);
+  } else if (total % INIT_ROW_SIZE == 0) {
+    Edit.line = realloc(Edit.line, sizeof(Row) * (total * 2));
+  }
+  /*
+  Edit.line's memory = INIT_ROW_SIZE(1000)
+  If total % 1000 == 0 then realloc 1000 * 2
+  */
+  memmove(&Edit.line[edit_y + 1], &Edit.line[edit_y], sizeof(Row) * (total - edit_y));
+  // Memory move line[y] -> line[y + 1]
+  Edit.line[edit_y].len = line_len;   
+  Edit.line[edit_y].c = malloc(INIT_LINE_SIZE + 1);
+  Edit.line[edit_y].line_capacity = INIT_LINE_SIZE + 1; 
+  // Line_capacity is (Edit.line[y].c)'s size
+  memcpy(Edit.line[edit_y].c, line, line_len);
+  Edit.line[edit_y].c[line_len] = '\0'; 
+  // The end of the string is null
+  total+=1;
+
+}
+
+void FreeRow(Row *line){  // Efficient method for free memory
+
+  free(line->c);
+
+}
+
+void DeleteRow(int pos){
+
+  if (pos < 0){  
+    return;
+  }
+  else if(pos >= total){
+    return;
+  }
+  // If y < 0 or y > total then return
+
+  FreeRow(&Edit.line[pos]); // Line[pos]'s memory free
+  memmove(&Edit.line[pos], &Edit.line[pos+1], sizeof(Row) * (total - pos - 1));
+  // Line[pos+1]'s memory move to free memory(line[pos]) 
+  total-=1;
+
+}
+
+void RowInsertString(Row *line, char *str, size_t del_line_len){
+
+  // This function will use delete char at x = 0 then delete row
+  while (line->len + del_line_len > line->line_capacity){   
+    line->line_capacity *= 2;
+    line->c = realloc(line->c, line->line_capacity);
+  }
+  /*
+    While line_capacity is full then size*=2 and realloc 
+    because 126 * 2 = 252 > line_capacity then run until satisfied condition
+  */
+  memcpy(&line->c[line->len], str, del_line_len);
+  line->len += del_line_len;
+  line->c[line->len] = '\0';
+
+}
+
+void RowDeletechar(Row *line, int pos){
+
+  if (pos < 0 || pos >= line->len){
+    return;
+  }
+  /*
+  If x < 0 or x >= line's len then return
+  It means The cursor moved out of its intended position
+  */
+  memmove(&line->c[pos], &line->c[pos+1], line->len - pos);
+  line->len-=1;
+  // memory move c[pos+1] -> c[pos]
+
+}
+
+
+void RowInsertchar(Row *line, char word, int pos){
+
+  if (pos < 0 || pos > line->len){
+    pos = line->len;
+  }
+  
+  if (line->len + 1> line->line_capacity){
+    line->line_capacity*=2;
+    line->c = realloc(line->c, line->line_capacity);
+  }
+  
+  // it seems like RowInsertString capacity*2
+  memmove(&line->c[pos+1], &line->c[pos], line->len - pos + 1);
+  // memory move line->len - pos + 1 size
+  line->len += 1;
+  line->c[pos] = word;
+
+}
+
+void empty_new_line(int pos){
+
+  InsertRow(pos, "", 0);
+  // If the line is empty or outside the screen add a empty line.
+
+}
+
+void Insertchar(char word){
+
+  if(y == total) {
+    empty_new_line(total); 
+    // if cursor y = total then add line;
+  }
+  RowInsertchar(&Edit.line[y], word, x);
+  x += 1;
+  // Insert char at cursor x
+}
+
+void contained_new_line(Row *line, int pos_y, int pos_x) {
+
+    InsertRow(pos_y + 1, &line->c[pos_x], line->len - pos_x);
+    // Insert current line's string(pos_x to line->len) to new line
+    line = &Edit.line[pos_y];
+    line->len = pos_x;
+    line->c[line->len] = '\0';
+
+}
+
+void Newline(){
+
+  Row *line = get_line(Edit.line, y);
+  // get line Edit.line[y]
+  if(x == 0){
+    empty_new_line(y);
+  }
+  else{
+    contained_new_line(line, y, x);
+  }
+  y += 1;
+  x = 0;
+
+}
+
+void Del_current_line_char() {
+
+  Row *line = get_line(Edit.line, y);
+  // get line Edit.line[y]
+  RowDeletechar(line, x - 1);
+  x -= 1;
+
+}
+
+void Del_current_line() {
+
+  Row *line = get_line(Edit.line, y);
+  // get line Edit.line[y]
+  x = Edit.line[y - 1].len;
+  RowInsertString(&Edit.line[y - 1], line->c, line->len);
+  DeleteRow(y);
+  y -= 1;
+  // x cursor is prev line's len and y cursor -1 and insert string at line's len
+
+}
+
+void DeleteChar(){    // 수정 필요 백스페이스키 안먹는거 같음 !!
+
+  Row *line = get_line(Edit.line, y);
+
+  if( y == total){
+    return;
+  }
+  if( x == 0 && y == 0){
+    return;
+  }
+
+  if(x > 0){
+    mvprintw(y, 0, "%*s", Edit.line[y].len, "");
+    Del_current_line_char();
+  }
+  else{
+    mvprintw(y, 0, "%*s", Edit.line[y].len, "");
+    Del_current_line();
+
+  }
+
+}
+
+void state(){
+  clear();
+  for (int i = 0; i < rows-2; i++){
+    mvprintw(i, 0, "~");
+  }
+  refresh();
+}
+
+void Visual_Text_editor__version(){
+  char message[40];
+  move(y,x);
+  int len = snprintf(message, sizeof(message), "Visual Text editor -- version 0.0.1");
+  int mid = (cols - len)/2;
+  if (total == 0){
+    mvprintw(rows/3, mid, "Visual Text editor -- version 0.0.1");
     refresh();
-    return;
-}
-void setWave(){
-    for (int i = 0; i < conRows - 2; i++) {
-        printw("~\n");
-    }
-    return;
-}
-
-void setFirstUI() {//파일이오픈되면 굳이 실행할필요없음.
-    for (int i = 0; i < conRows - 2; i++) {
-        printw("~");
-        if (i == conRows/3) {
-            for (int j = 0; j <= (conCols - 35) / 2; j++) {
-                printw(" ");
-            }
-            printw("Visual Text editor -- version 0.0.1");
-        }
-        printw("\n");
-    }
-    if (filename == NULL) {
-        filename = "Noname";//나중에 파2일이름가져오기, 없으면 noname
-      //  frontLength = snprintf(NULL, 0, "[%s] - %d lines", filename, linenum);//나중에 no name도 수정해야함
-        ft = "no ft | 1 / 0";
-       // backLength = snprintf(NULL, 0, "%s", ft); // 나중에 변경되는값가져와서 수정
-    }
-    setUI();
-    move(0, 0);
-}
-//여기까지 UI세팅함수
-
-int value(int ch) {//입력된 ch가 문자인지 아닌지여부를판단.
-    if (ch >= 32 && ch <= 126 || ch==9) {
-        return 1; // ch가 문자면 1반환 letter에 1저장, 탭도 문자로본다
-    }
-    else
-        return 0; // 아니면 0반환 letter에 0저장
+  }
+  else {
+    mvprintw(rows/3, mid, "                                   ");
+    refresh();
+  }
+  refresh();
 }
 
-// 화살표 이동 함수
-void curMove(int ch) {
-    if (head != NULL) {
-        switch (ch) {
-        case KEY_UP:
-            if (curNode->up == NULL) {
-                return;
-            }
-            curNode = curNode->up;
-            y--;
-            move(y, x);
-            break;
-        case KEY_DOWN:
-            if (curNode->down == NULL) {
-                return;
-            }
-            curNode = curNode->down;
-            y++;
-            move(y, x);
-            break;
+void status_bar() {
+    char total_len[20];
+    char st_y[20];
+    int y_1 = y + 1;
+    snprintf(total_len, sizeof(total_len), "%d", total);
+    snprintf(st_y, sizeof(st_y), "%d", y);
+    
+    init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
+    attron(COLOR_PAIR(2) | A_REVERSE); // Enable the defined reverse color pair
+    move(rows-2, 0);
+    for (int i = 0; i < cols; i++){
+      printw( " ");
+      refresh();
+    }
+    
+    // 왼쪽에 텍스트 출력
+    mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
+    int left_len = strlen(total_len) + strlen(Edit.filename) + 13;
+    int right_len = strlen(total_len) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
+
+    // 오른쪽에 텍스트 출력
+    if(y_1 > total){
+      y_1 = total;
+    }
+    mvprintw(rows - 2, cols - right_len-1, "no ft | %d/%d", y_1, total);
+
+    attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
+}
+
+
+void end_message(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    mvprintw(rows-1, 0, format, args); // 가변 인자들을 printf 형태로 특정 위치에 출력
+    va_end(args);
+    refresh();
+}
+
+void all_refresh(){
+  state();
+  status_bar();
+  end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+  move(y,x);
+  refresh();
+}
+
+void Move(int key) {
+    
+    switch (key) {
         case KEY_LEFT:
-            x--;
-            move(y, x);
+            if (x != 0) {
+                x--;
+            } else if (y > 0) {
+                y--;
+            }
             break;
         case KEY_RIGHT:
-            x++;
-            move(y, x);
+            x += 1;
             break;
-        }
-    }
-    
-    return;
-}
-
-node* getN() {
-    node* newnode = (node*)malloc(sizeof(node));
-    newnode->strsize = 0;
-    newnode->str = NULL;
-    newnode->up = NULL;
-    newnode->down = NULL;
-    return newnode;
-}
-
-void inputStr(node* tmp, int ch) {
-    tmp->strsize++;
-    tmp->str = (char*)realloc(tmp->str, (tmp->strsize + 1) * sizeof(char));
-    if (tmp->str == NULL) {
-        printw("Memory allocation failed");
-        return; // Exit with an error code
-    }
-    tmp->str[tmp->strsize - 1] = ch;
-    tmp->str[tmp->strsize] = '\0'; // Null-terminate the string
-    mvprintw(y, 0, "%s", tmp->str);
-    refresh();
-    return;
-}
-
-void insertWant(node* tmp) {
-    // 빈 리스트인 경우
-    if (head == NULL) {
-        head = tmp;
-        return;
-    }
-
-    node* cur = head;
-
-    // 리스트의 맨 앞에 삽입
-    if (y == 0) {
-        tmp->down = head;
-        head->up = tmp;
-        head = tmp;
-    }
-    else {
-        // 리스트 중간에 삽입
-        for (int i = 0; i < y - 1; i++) {
-            cur = cur->down;
-        }
-        if (cur == NULL) {
-            printw("삽입할 위치가 리스트의 크기를 벗어났습니다.\n");
-            refresh();
-            return;
-        }
-        tmp->down = cur->down;
-        tmp->up = cur;
-        if (cur->down != NULL) {
-            cur->down->up = tmp;
-        }
-        cur->down = tmp;
-        curNode = tmp;
-    }
-    cur = curNode;
-    
-    if (curNode->down != NULL) {
-        
-        for (int i = y; cur->down != NULL; cur = cur->down, i++) {
-            mvprintw(i, 0, "%s", cur->str);
-            refresh();
-        }
-        
-    }
-    //엔터들어오면 행이하나 밀려야하는데 어케하지. 엔터가일어나고 행이밀리면
-    // 행이밀리면==커서의 넥스트가 널이아니라면 밀릴행이있지.그러면? 새로프린트.
-    // 삽입하고 출력하는 라인
-    totalnum += 1;
-
-    return;
-}
-
-void freeNode() {
-    node* cur = head;
-    if (head == NULL) {
-        return; // 빈 리스트라면 프리돼있는거
-    }
-    while (head != NULL) {
-        head = cur->down;
-        free(cur);
-        cur = head;
-    }
-    return;
-}
-
-int main() {
-    initscr();//curses를 초기화
-    start_color();//이거해야 컬러기능사용가능
-    cbreak();//라인버퍼비활성화,입력을 즉시 프로그램으로전달>>엔터없이 즉시입력됨
-    noecho();//키입력에대한 출력을 비활성화>>입력된 키가 화면에 표시x
-    raw();//특수키를 읽지않음.
-    keypad(stdscr, TRUE);
-    getmaxyx(stdscr, conRows, conCols);//현재터미널의 행열을 저장함.
-    
-
-    int ch;
-    int letter;
-    int stop = 0;
-    int firstRun = 1;
-
-    setFirstUI();
-    ch = getch();
-    letter = value(ch);
-
-    while (1) {
-        if (firstRun) {
-            if (letter == 1 || ch == 13) {//13은 엔터, 9는 탭
-                clear();
+        case KEY_UP:
+            if (y != 0) {
+                y--;
             }
-            setWave();
-            setUI();
-            firstRun = 0;
-        }
-        
-        if (head == NULL && letter == 1) {
-            curNode = getN();
-            insertWant(curNode);
-            inputStr(curNode, ch);
-            totalnum += 1;
-            setUI();
-        }
-        else if (letter == 1) {
-            inputStr(curNode, ch);
-        }
-        else if (letter == 0) {
-            // F2 누르면 종료
-            if (ch == KEY_F(2)) {
-                break;
-            }
-            // 화살표면 화살표 실행
-            if (ch == KEY_UP || ch == KEY_DOWN || ch == KEY_LEFT || ch == KEY_RIGHT) {
-                curMove(ch);
-            }
-            if(ch == KEY_HOME){
-                move(y, 0);
-            }
-            // 엔터
-            if (ch == 13) { // 엔터가 13으로 입력되네, 운영체제마다 엔터 입력값 찾아보자
+            break;
+        case KEY_DOWN:
+            if (y < total) {
                 y++;
-                move(y, 0);
-                curNode = getN();
-                insertWant(curNode);
+            }
+            break;
+    }
+    move(y, x);
+    refresh();
+}
+
+void presskey() {
+
+    int c = 0;
+    
+    if (c == 0){
+      c = getch();
+    }
+    if (c < 32 || c > 126){
+    switch (c) {
+        case CONTROL('q'):
+            clear();
+            endwin();
+            exit(0);
+            break;
+
+        case CONTROL('s'):
+            break;
+
+        case CONTROL('f'):
+            break;
+
+        case KEY_LEFT: // 왼쪽 화살표 키
+        case KEY_RIGHT: // 오른쪽 화살표 키
+        case KEY_UP: // 위쪽 화살표 키
+        case KEY_DOWN: // 아래쪽 화살표 키
+            Move(c);
+            break;
+        case KEY_END: // End 키
+            x = Edit.line[y].len;
+            move(y,x);
+            break;
+
+        case KEY_HOME: // Home 키
+            move(y,0);
+            break;
+
+        case KEY_NPAGE: // Page Down 키
+        case KEY_PPAGE: // Page Up 키
+        {
+            int temprows = rows;
+            while (temprows--) {
+                if (c == KEY_PPAGE)
+                    Move(KEY_UP);
+                else if (c == KEY_NPAGE)
+                    Move(KEY_DOWN);
             }
         }
-        ch = getch();
-        letter = value(ch);
-    }
+            break;
+        // 이부분 해결해야 될듯
+        case '\n':
+            Newline();
+            break;
 
-    freeNode();
-    endwin();
-    return 0;
+        case KEY_DL: // Delete Key
+            Move(KEY_RIGHT);
+            DeleteChar();
+            break;
+
+        case KEY_BACKSPACE:
+            DeleteChar();
+            break;
+        default:
+            c = 0;
+            break;
+    }
+    else{
+      char ch = (char)c;
+      Insertchar(ch);
+    }
+    }
+    mvprintw(y, 0, Edit.line[y].c);
+    refresh();
+}
+
+// void scroll(){
+//   if (x > cols){
+//     move_cols += 1;
+//   }
+// }
+
+int main(int argc, char *argv[]){
+  initscr();
+  raw();
+  start_color();
+  noecho();
+  clear();
+  cbreak();
+  keypad(stdscr, TRUE);
+  x = 0;
+  y = 0;
+  rows = 0;
+  cols = 0;
+  move_rows = 0;
+  move_cols = 0;
+  total = 0;
+  getmaxyx(stdscr, rows, cols); // rows cols
+
+  Edit.filename = NULL;
+
+  if (Edit.filename == NULL){
+    Edit.filename = "No Name";
+  }
+  else{
+    Edit.filename = argv[1];
+  }
+  all_refresh();
+  Visual_Text_editor__version();
+  move(0,0); // 0, 0
+  refresh(); // refresh();
+  presskey();
+  Visual_Text_editor__version();
+  refresh();
+
+  while(true){
+    status_bar();
+    move(y,x);
+    refresh();
+    presskey();
+  }
+
+  endwin();
+  return 0;
+
 }

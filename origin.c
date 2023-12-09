@@ -374,8 +374,10 @@ int get_code(void)
 
 void presskey() {
 
-    int c = get_code();
-
+    int c = getch();
+    if (c == 224){
+      c = 256 + getch();  
+    }
     switch (c) {
         case CONTROL('q'):
             clear();

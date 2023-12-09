@@ -362,15 +362,15 @@ void Move(int key) {
     refresh();
 }
 
-int get_code(void)
-{
-	int ch = getch();
 
-	if (ch == 0 || ch == 224)
-		ch = 256 + getch();
+enum P_key {
 
-	return ch;
-}
+    del = 1000,
+    home,
+    end,
+    b_s = 127
+    
+};
 
 void presskey() {
 
@@ -425,12 +425,8 @@ void presskey() {
             Newline();
             break;
 
-        case 127: // Delete Key
-            Move(KEY_RIGHT);
-            DeleteChar();
-            break;
 
-        case KEY_BACKSPACE:
+        case 127:
             DeleteChar();
             break;
         default:

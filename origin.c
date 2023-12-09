@@ -490,9 +490,9 @@ int main(int argc, char *argv[]){
   refresh();
 
   while(true){
+    clean_and_printing();
     status_bar();
     move(y,x);
-    clean_and_printing();
     refresh();
     presskey();
    

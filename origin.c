@@ -341,10 +341,10 @@ void Move(int key) {
             break;
         case KEY_DOWN:
             if(y == rows-2){
+              if( total == y + y_out) break; 
               y_out += 1;
               flag = 1;
               y = rows - 3;
-              if( total == y + y_out) break; 
             }else{
               if (y < total) {
                 y += 1;

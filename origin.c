@@ -398,12 +398,12 @@ void presskey() {
             Move(c);
             break;
             
-        case 335: // End 키
+        case 57615: // End 키
             x = cols - 1;
             move(y,x);
             break;
 
-        case 327: // Home 키
+        case 57608: // Home 키
             x = 0;
             move(y,x);
             break;

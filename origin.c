@@ -327,7 +327,7 @@ void Move(int key) {
             if (x != 0) {
                 x -= 1;
             } else if (y > 0) {
-                y += 1;
+                y -= 1;
                 x = Edit.line[y].len;
             }
             break;

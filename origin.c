@@ -13,12 +13,14 @@
   #define INIT_LINE_SIZE 125
 
 int x = 0;
-int y = 0;
-int rows = 0;
+int y = 0; //1 최대 54 
+int y_out = 0; // +1
+int rows = 0; //54
 int cols = 0;
 int move_rows = 0;
 int move_cols = 0;
 int total = 0;
+int flag = 0;
 
 typedef struct Row {
 
@@ -51,11 +53,12 @@ void Del_current_line_char();
 void Del_current_line();
 void DeleteChar();
 void contained_new_line(Row *line, int pos_y, int pos_x);
-void Newline();
-void status_bar();
+void Newline();  //y_out + 1; line[y+y_out]
+void status_bar(); 
 void state();
 void end_message( const char *format, ...);
 void all_refresh();
+void clean_and_printing();
 
 
 Row *get_line(Row *line, int pos) {
@@ -254,11 +257,9 @@ void DeleteChar(){    // 수정 필요 백스페이스키 안먹는거 같음 !!
   }
 
   if(x > 0){
-    mvprintw(y, 0, "%*s", Edit.line[y].len, "");
     Del_current_line_char();
   }
   else{
-    mvprintw(y, 0, "%*s", Edit.line[y].len, "");
     Del_current_line();
 
   }
@@ -340,9 +341,9 @@ void Move(int key) {
     switch (key) {
         case KEY_LEFT:
             if (x != 0) {
-                x--;
+                x += 1;
             } else if (y > 0) {
-                y--;
+                y -= 1;
             }
             break;
         case KEY_RIGHT:
@@ -350,13 +351,19 @@ void Move(int key) {
             break;
         case KEY_UP:
             if (y != 0) {
-                y--;
+                y -= 1;
             }
             break;
         case KEY_DOWN:
-            if (y < total) {
-                y++;
+            if(y == rows-2){
+              y_out += 1;
+              flag = 1;
+            }else{
+              if (y < total) {
+                y += 1;
+              }
             }
+            
             break;
     }
     move(y, x);
@@ -420,15 +427,27 @@ void presskey() {
         case KEY_BACKSPACE:
             DeleteChar();
             break;
-    }
+      }
     }
     else{
       char ch = (char)c;
       Insertchar(ch);
-      mvprintw(y, 0, Edit.line[y].c);
     }
     
     refresh();
+}
+
+void clean_and_printing(){
+   for(int i=0; i< rows; ++i){
+    mvprintw(i, 0, "%*s", cols, "");
+    if(Edit.line[i + y_out].c == NULL){
+      continue;
+    }
+    else
+    {
+      mvprintf(i, 0, "%s", Edit.line[i + y_out].c);
+    }
+  }
 }
 
 // void scroll(){
@@ -473,8 +492,10 @@ int main(int argc, char *argv[]){
   while(true){
     status_bar();
     move(y,x);
+    clean_and_printing();
     refresh();
     presskey();
+   
   }
 
   endwin();

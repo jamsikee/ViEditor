@@ -342,6 +342,7 @@ void Move(int key) {
             if(y == rows-2){
               y_out += 1;
               flag = 1;
+              y = rows - 2;
             }else{
               if (y < total) {
                 y += 1;
@@ -495,7 +496,6 @@ int main(int argc, char *argv[]){
     move(y,x);
     refresh();
     presskey();
-   
   }
 
   endwin();

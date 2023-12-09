@@ -365,9 +365,12 @@ void Move(int key) {
 
 void presskey() {
 
-    int c = getch();
-    char ch = (char)c;
-  
+    int c = 0;
+    
+    if (c == 0){
+      c = getch();
+    }
+    if (c < 32 || c > 126){
     switch (c) {
         case CONTROL('q'):
             clear();
@@ -395,7 +398,7 @@ void presskey() {
         case KEY_HOME: // Home 키
             move(y,0);
             break;
-            
+
         case KEY_NPAGE: // Page Down 키
         case KEY_PPAGE: // Page Up 키
         {
@@ -422,8 +425,10 @@ void presskey() {
             DeleteChar();
             break;
         default:
+            char ch = (char)c;
             Insertchar(ch);
             break;
+    }
     }
     mvprintw(y, 0, Edit.line[y].c);
     refresh();

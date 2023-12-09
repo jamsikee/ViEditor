@@ -394,6 +394,7 @@ void presskey() {
         case KEY_DOWN: // 아래쪽 화살표 키
             Move(c);
             break;
+
         case KEY_END: // End 키
             x = Edit.line[y].len;
             move(y,x);
@@ -428,6 +429,7 @@ void presskey() {
         case KEY_BACKSPACE:
             DeleteChar();
             break;
+            
         default:
             char ch = (char)c;
             Insertchar(ch);

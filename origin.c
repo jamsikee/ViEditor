@@ -363,18 +363,11 @@ void Move(int key) {
     refresh();
 }
 
-int value(int ch) {
-    if (ch >= 32 && ch <= 126 || ch == 9) {
-        return 1; 
-    }
-    else
-        return 0; 
-}
-
 void presskey() {
-
-    int c = getch();
-    int special_key = value(c);
+    int c = 0;
+    c = getch();
+    
+  if(c < 32 || c > 126){
     switch (c) {
         case CONTROL('q'):
             clear();
@@ -431,12 +424,17 @@ void presskey() {
             break;
 
         default:
-            char ch = (char)c;
-            Insertchar(ch);
-            break;
+            c = 0;
+            continue;
     }
+  }
+  else{
+    char ch = (char)c;
+    Insertchar(ch);
+  }
     mvprintw(y, 0, Edit.line[y].c);
     refresh();
+    c = 0;
 }
 
 // void scroll(){

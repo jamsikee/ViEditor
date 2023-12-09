@@ -435,7 +435,7 @@ void presskey() {
             Insertchar(ch);
             break;
     }
-    // mvprintw(y, 0, Edit.line[y].c);
+    mvprintw(y, 0, Edit.line[y].c);
     refresh();
 }
 

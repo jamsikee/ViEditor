@@ -362,15 +362,6 @@ void Move(int key) {
     refresh();
 }
 
-enum P_key {
-
-    del,
-    home,
-    end,
-    b_s = 127
-    
-};
-
 #define home;
 void presskey() {
 
@@ -402,6 +393,7 @@ void presskey() {
             break;
 
         case KEY_HOME: // Home 키
+            printw("%d", c);
             x = 0;
             move(y,x);
             break;
@@ -419,12 +411,11 @@ void presskey() {
         }
             break;
         // 이부분 해결해야 될듯
-        case KEY_ENTER:
         case '\n':
             Newline();
             break;
 
-        case 127:
+        case 127: // Delete Key
             Move(KEY_RIGHT);
             DeleteChar();
             break;
@@ -437,7 +428,7 @@ void presskey() {
             Insertchar(ch);
             break;
     }
-    mvprintw(y, 0, Edit.line[y].c);
+    // mvprintw(y, 0, Edit.line[y].c);
     refresh();
 }
 
@@ -462,7 +453,7 @@ int main(int argc, char *argv[]){
   move_rows = 0;
   move_cols = 0;
   total = 0;
-  getmaxyx(stdscr, rows, cols);
+  getmaxyx(stdscr, rows, cols); // rows cols
 
   Edit.filename = NULL;
 
@@ -474,8 +465,8 @@ int main(int argc, char *argv[]){
   }
   all_refresh();
   Visual_Text_editor__version();
-  move(0,0);
-  refresh();
+  move(0,0); // 0, 0
+  refresh(); // refresh();
   presskey();
   Visual_Text_editor__version();
   refresh();

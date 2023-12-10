@@ -303,10 +303,8 @@ void status_bar() {
     int right_len = strlen(total_len) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
 
     // 오른쪽에 텍스트 출력
-    if(y_1 > total){
-      y_1 = total;
-    }
-    mvprintw(rows - 2, cols - right_len-1, "no ft | %d/%d", y_1, total);
+
+    mvprintw(rows - 2, cols - right_len-1, "no ft | %d/%d", y + y_out, total);
 
     attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
 }

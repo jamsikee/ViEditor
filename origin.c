@@ -419,7 +419,7 @@ void presskey() {
 
         case 8:
             DeleteChar();
-            clean_and_printing(y);
+            clean_and_printing(0);
             break;
       }
     }

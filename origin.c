@@ -60,6 +60,7 @@ void state();
 void end_message( const char *format, ...);
 void all_refresh();
 void clean_and_printing(int pos);
+void scrolling();
 
 
 Row *get_line(Row *line, int pos) {
@@ -460,7 +461,7 @@ void clean_and_printing(int pos) {
     }
 }
 
-void scroll() {
+void scrolling() {
     if (y < y_out) {
         y_out = y;
     }
@@ -476,7 +477,7 @@ void scroll() {
 }
 
 
-// void scroll(){
+// void scrolling(){
 //   if (x > cols){
 //     move_cols += 1;
 //   }
@@ -534,7 +535,7 @@ int main(int argc, char *argv[]){
 
   while(true){
     curs_set(0);
-    scroll();
+    scrolling();
     status_bar();
     end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     move(y,x);

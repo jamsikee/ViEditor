@@ -190,7 +190,7 @@ void RowInsertchar(Row *line, char word, int pos){
 
 }
 
-void empty_new_line(int pos){
+void empty_new_line(int pos){ 
 
   InsertRow(pos, "", 0);
   // If the line is empty or outside the screen add a empty line.
@@ -205,6 +205,7 @@ void Insertchar(char word){
   }
   RowInsertchar(&Edit.line[y + y_out], word, x);
   x += 1;
+  clean_and_printing(0);
   // Insert char at cursor x
 }
 

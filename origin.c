@@ -273,13 +273,10 @@ void Visual_Text_editor__version(){
   int mid = (cols - len)/2;
   if (total == 0){
     mvprintw(rows/3, mid, "Visual Text editor -- version 0.0.1");
-    refresh();
   }
   else {
     mvprintw(rows/3, mid, "                                   ");
-    refresh();
   }
-  refresh();
 }
 
 void status_bar() {
@@ -294,7 +291,6 @@ void status_bar() {
     move(rows-2, 0);
     for (int i = 0; i < cols; i++){
       printw( " ");
-      refresh();
     }
     
     // 왼쪽에 텍스트 출력

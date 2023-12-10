@@ -292,7 +292,7 @@ void status_bar() {
     init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
     attron(COLOR_PAIR(2) | A_REVERSE); // Enable the defined reverse color pair
     
-     move(rows-2, 0);
+    move(rows-2, 0);
     for (int i = 0; i < cols; i++){
       printw( " ");
       refresh();
@@ -303,7 +303,7 @@ void status_bar() {
 
     // 오른쪽에 텍스트 출력
 
-    mvprintw(rows - 2, cols - right_len, "no ft | %d/%d", y + y_out + 1, total);
+    mvprintw(rows - 2, cols - right_len, "no ft | %d/%d", y + y_out + 1, total/10);
 
     attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
 }

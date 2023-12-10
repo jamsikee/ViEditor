@@ -37,6 +37,14 @@ struct Visual_Text_Editor{
 
 };
 
+typedef struct {
+
+    char *temp;
+    size_t size;
+    int length;
+    // Store_File_Information
+} File_Inf;
+
 // total function
 struct Visual_Text_Editor Edit;
 void get_windows_size();
@@ -358,6 +366,35 @@ void Move(int key) {
     curs_set(1);
     refresh();
 }
+
+void open_file(char *store_file) {
+    free(Edit.store_file);
+    Edit.store_file = malloc(strlen(store_file) + 1);
+    strcpy(Edit.store_file, store_file);
+
+    FILE *file = fopen(store_file, "r");
+    if (!file) {
+        fprintf(stderr, "Cannot open file: %s\n", store_file);
+        exit(EXIT_FAILURE);
+    }
+
+    File_Inf Inf;
+    Inf.temp = NULL;
+    Inf.size = 0;
+    Inf.length = 0;
+
+    while ((Inf.length = getline(&(Inf.temp), &(Inf.size), file)) != -1) {
+        int read = Inf.length;
+        while (Inf.length > 0 && (Inf.temp[Inf.length - 1] == '\r' || Inf.temp[Inf.length - 1] == '\n')) {
+            Inf.length--;
+        }
+        InsertRow(Edit.total, Inf.temp, read);
+    }
+
+    free(Inf.temp);
+    fclose(file);
+}
+
 // 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐
 void presskey() {
 
@@ -482,14 +519,13 @@ int main(int argc, char *argv[]){
   total = 0;
   getmaxyx(stdscr, rows, cols); // rows cols
 
-  Edit.filename = NULL;
-
-  if (Edit.filename == NULL){
-    Edit.filename = "No Name";
-  }
-  else{
+if (argc >= 2) {
     Edit.filename = argv[1];
-  }
+    open_file(argv[1]);
+} else {
+    Edit.filename = "No Name";
+}
+
   all_refresh();
   Visual_Text_editor__version();
   move(0,0); // 0, 0

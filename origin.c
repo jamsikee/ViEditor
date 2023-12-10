@@ -340,8 +340,7 @@ void Move(int key) {
             if( y == rows - 3){
               if( total == y + y_out) {
                 y = rows - 3;
-                y_out = total - y;
-                move(y-1, x);
+                move(y, x);
               } else{
               y_out += 1;
               y = rows - 3;

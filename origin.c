@@ -389,7 +389,7 @@ void open_file(char *store_file) {
         while (Inf.length > 0 && (Inf.temp[Inf.length - 1] == '\r' || Inf.temp[Inf.length - 1] == '\n')) {
             Inf.length--;
         }
-        InsertRow(Edit.total, Inf.temp, read);
+        InsertRow(total, Inf.temp, read);
     }
 
     free(Inf.temp);

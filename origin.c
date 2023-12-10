@@ -349,7 +349,9 @@ void Move(int key) {
             }else{
               if (y + y_out< total) {
                 y += 1;
-              } 
+              } else{
+                y_out -= 1;
+              }
               move(y, x);
             }
             break;

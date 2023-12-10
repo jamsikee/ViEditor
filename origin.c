@@ -295,6 +295,7 @@ void status_bar() {
      move(rows-2, 0);
     for (int i = 0; i < cols; i++){
       printw( " ");
+      refresh();
     }
 
     // 왼쪽에 텍스트 출력

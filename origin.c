@@ -294,7 +294,7 @@ void status_bar() {
     int left_len = strlen(total_len) + strlen(Edit.filename) + 13;
     int right_len = strlen(total_len) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
 
-    for (int i = left_len; i < cols - (left_len + right_len); i++){
+    for (int i = left_len; i < cols - (left_len + right_len); ++i){
       move(rows-2, i);
       printw(" ");
     }

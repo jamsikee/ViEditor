@@ -300,7 +300,6 @@ void status_bar() {
       mvprintw(rows-2, i, " ");
       refresh();
     }
-    refresh();
 
     mvprintw(rows - 2, cols - right_len-1, "no ft | %d/%d", y + y_out + 1, total);
 

@@ -341,17 +341,17 @@ void Move(int key) {
               if( total == y + y_out) {
                 y = rows - 3;
                 y_out -= 1;
-                break;
               } else{
               y_out += 1;
               flag = 1;
               y = rows - 3;
               }
-
               move(y, x);
             }else{
               if (y + y_out< total) {
                 y += 1;
+              } else{
+                y -= 1;
               }
               move(y, x);
             }

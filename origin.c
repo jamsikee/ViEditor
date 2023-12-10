@@ -326,7 +326,7 @@ void Move(int key) {
             }
             break;
         case KEY_RIGHT:
-          if(Edit.line[y] == NULL){
+          if(line[y] == NULL){
             break;
           } else{
             if ( x < Edit.line[y].len){

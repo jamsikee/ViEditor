@@ -353,7 +353,7 @@ void Move(int key) {
     }
     move(y, x);
     refresh();
-    curs_set(0);
+    curs_set(1);
 }
 
 void presskey() {

@@ -426,12 +426,12 @@ void presskey() {
 void clean_and_printing(){
    for(int i=0; i < rows-2; ++i){
     mvprintw(i, 0, "%*s", cols, "");
-    mvprintw(i, 0, "~");
     if(Edit.line[i + y_out].c == NULL){
       continue;
     }
     else
     {
+      mvprintw(i, 0, "~");
       mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
     }
   }

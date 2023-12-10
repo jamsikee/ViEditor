@@ -283,7 +283,7 @@ void DeleteChar(){    // 수정 필요 백스페이스키 안먹는거 같음 !!
   else{
     Del_current_line();
   }
-  clean_and_printing(y - 1);
+  clean_and_printing(y);
 
 }
 

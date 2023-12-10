@@ -326,7 +326,7 @@ void Move(int key) {
             }
             break;
         case KEY_RIGHT:
-            x += 1;
+            
             break;
         case KEY_UP:
             if (y != 0) {

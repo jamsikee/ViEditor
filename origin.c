@@ -230,7 +230,7 @@ void Newline(){
   }
 
   if(y == rows - 3){
-    y -= rows - 3;
+    y = rows - 3;
     y_out += 1;
   } else{
     y += 1;

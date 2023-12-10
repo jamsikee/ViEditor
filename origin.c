@@ -499,8 +499,8 @@ int main(int argc, char *argv[]){
     status_bar();
     move(y,x);
     refresh();
-    curs_set(1);
     presskey();
+    curs_set(1);
   }
 
   endwin();

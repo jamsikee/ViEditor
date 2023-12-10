@@ -344,6 +344,7 @@ void Move(int key) {
                 scroll_y = rows - 3;
                 break;
               } 
+              y = y + y_out;
               y_out += 1;
               flag = 1;
               scroll_y = rows - 3;

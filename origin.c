@@ -296,7 +296,7 @@ void status_bar() {
 
     // 오른쪽에 텍스트 출력
    
-    for (int i = left_len - 1; i < cols - right_len; i++){
+    for (int i = left_len - 2; i < cols - right_len; i++){
       mvprintw(rows-2, i, " ");
       refresh();
     }

@@ -494,10 +494,12 @@ int main(int argc, char *argv[]){
   refresh();
 
   while(true){
+    curs_set(0);
     clean_and_printing();
     status_bar();
     move(y,x);
     refresh();
+    curs_set(1);
     presskey();
   }
 

@@ -317,7 +317,7 @@ void end_message(const char *format, ...) {
 }
 
 void Move(int key) {
-    
+    curs_set(0);
     switch (key) {
         case KEY_LEFT:
             if (x != 0) {
@@ -349,11 +349,11 @@ void Move(int key) {
                 y += 1;
               }
             }
-            
             break;
     }
     move(y, x);
     refresh();
+    curs_set(0);
 }
 
 void presskey() {

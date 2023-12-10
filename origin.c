@@ -198,12 +198,13 @@ void empty_new_line(int pos){
 }
 
 void Insertchar(char word){
-
-  if(y + y_out == total) {
-    y = rows - 3;
-    y_out += 1;
-    empty_new_line(total); 
-    // if cursor y = total then add line;
+  if( y == rows - 3){
+    if(y + y_out == total) {
+      y = rows - 3;
+      y_out += 1;
+      empty_new_line(total); 
+      // if cursor y = total then add line;
+    }
   }
   RowInsertchar(&Edit.line[y + y_out], word, x);
   x += 1;
@@ -236,7 +237,6 @@ void Newline() {
     }
 
     y += 1;
-
     x = 0;
 }
 

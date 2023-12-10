@@ -326,7 +326,12 @@ void Move(int key) {
             }
             break;
         case KEY_RIGHT:
-            
+            if ( x < Edit.line[y].len){
+              x + = 1;
+            } else if(x == Edit.line[y].len){
+              y += 1;
+              x = 0;
+            }
             break;
         case KEY_UP:
             if (y != 0) {
@@ -334,12 +339,8 @@ void Move(int key) {
             }
             break;
         case KEY_DOWN:
-            if (y < rows - 3){
+            if ( y < total){
               y += 1;
-            }
-            else{
-              y = rows - 3;
-              y_out += 1;
             }
             break;
     }
@@ -347,7 +348,7 @@ void Move(int key) {
     curs_set(1);
     refresh();
 }
-// 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐
+
 void presskey() {
 
     int c = 0;

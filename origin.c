@@ -219,7 +219,8 @@ void Newline(){
   else{
     contained_new_line(line, y, x);
   }
-
+  y += 1;
+  x = 0;
 }
 
 void Del_current_line_char() {
@@ -406,7 +407,6 @@ void presskey() {
         // 이부분 해결해야 될듯
         case '\n':
             Newline();
-            Move(KEY_DOWN);
             break;
 
         case KEY_BACKSPACE:

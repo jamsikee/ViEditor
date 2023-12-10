@@ -305,7 +305,7 @@ void status_bar() {
 
     attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
 }
-d
+
 void end_message(const char *format, ...) {
     va_list args;
     va_start(args, format);

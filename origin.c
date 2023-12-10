@@ -68,7 +68,7 @@ void state();
 void end_message( const char *format, ...);
 void all_refresh();
 void clean_and_printing(int pos);
-
+void scroll_clean_and_printing(int pos);
 
 Row *get_line(Row *line, int pos) {
 
@@ -287,7 +287,7 @@ void DeleteChar(){    // 수정 필요 백스페이스키 안먹는거 같음 !!
   }
   else{
     Del_current_line();
-
+    clean_and_printing(y);
   }
   
 
@@ -490,7 +490,7 @@ void clean_and_printing(int pos){
     mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
     }
   }
-}
+
 
 void scroll_clean_and_printing(int pos){
    for( int i = pos; i < rows-2; ++i){

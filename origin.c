@@ -306,7 +306,6 @@ void status_bar() {
     attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
 }
 
-
 void end_message(const char *format, ...) {
     va_list args;
     va_start(args, format);
@@ -338,17 +337,15 @@ void Move(int key) {
             move(y, x);
             break;
         case KEY_DOWN:
-            int scroll_y = 0;
             if(y == rows-2 || y == rows - 3){
               if( total == y + y_out) {
-                scroll_y = rows - 3;
+                y = rows - 3;
                 break;
               } 
-              y = y + y_out;
               y_out += 1;
               flag = 1;
-              scroll_y = rows - 3;
-              move(scroll_y, x);
+              y = rows - 3;
+              move(y, x);
             }else{
               if (y < total) {
                 y += 1;

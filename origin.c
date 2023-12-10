@@ -324,31 +324,28 @@ void Move(int key) {
                 y -= 1;
                 x = Edit.line[y].len;
             }
-            move(y, x);
             break;
         case KEY_RIGHT:
             x += 1;
-            move(y, x);
             break;
         case KEY_UP:
             if (y != 0) {
                 y -= 1;
             }
-            move(y, x);
             break;
         case KEY_DOWN:
             if( y == rows - 3){
               y_out += 1;
               y = rows - 3;
               }
-            }else{
+              else{
               if (y < total) {
                 y += 1;
               }
-              move(y, x);
             }
             break;
     }
+    move(y, x);
     curs_set(1);
     refresh();
 }

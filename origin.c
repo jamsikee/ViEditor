@@ -334,7 +334,7 @@ void Move(int key) {
             }
             break;
         case KEY_DOWN:
-            if( y == rows - 3){
+            if( y == rows - 2){
               if( total == y + y_out) {
                 y = rows - 3;
                 y_out -= 1;

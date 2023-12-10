@@ -251,8 +251,8 @@ void Del_current_line() {
 
   Row *line = get_line(Edit.line, y + y_out);
   // get line Edit.line[y]
-  x = Edit.line[y -1].len;
-  RowInsertString(&Edit.line[y -1], line->c, line->len);
+  x = Edit.line[y -1 +y_out].len;
+  RowInsertString(&Edit.line[y -1 + y_out], line->c, line->len);
   DeleteRow(y + y_out);
   y -= 1;
   // x cursor is prev line's len and y cursor -1 and insert string at line's len

@@ -228,13 +228,14 @@ void Newline() {
     } else {
         contained_new_line(line, y + y_out, x);
     }
-
-    if (y + y_out == total) {
+    if( y == rows - 3){
+      if (y + y_out == total) {
         y = rows - 3;
         y_out += 1;
-    } else {
-        y += 1;
+     }
     }
+
+    y += 1;
 
     x = 0;
 }

@@ -347,7 +347,6 @@ void Move(int key) {
               y_out += 1;
               flag = 1;
               scroll_y = rows - 3;
-              y += 1;
               move(scroll_y, x);
             }else{
               if (y < total) {

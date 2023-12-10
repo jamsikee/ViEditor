@@ -347,11 +347,9 @@ void Move(int key) {
               y = rows - 3;
               move(y, x);
             }else{
-              if (y < total) {
+              if (y + y_out< total) {
                 y += 1;
-              } else if(y + y_out + 1== total){
-                y -= 1;
-              }
+              } 
               move(y, x);
             }
             break;

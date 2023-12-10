@@ -58,7 +58,7 @@ void status_bar();
 void state();
 void end_message( const char *format, ...);
 void all_refresh();
-void clean_and_printing();
+void clean_and_printing(int pos);
 
 
 Row *get_line(Row *line, int pos) {
@@ -343,7 +343,6 @@ void Move(int key) {
               y_out += 1;
               flag = 1;
               y = rows - 3;
-              move(y-1, x);
             }else{
               if (y < total) {
                 y += 1;
@@ -408,23 +407,26 @@ void presskey() {
         // 이부분 해결해야 될듯
         case '\n':
             Newline();
+            clean_and_printing(y);
             break;
 
         case KEY_BACKSPACE:
             DeleteChar();
+            clean_and_printing(0);
             break;
       }
     }
     else{
       char ch = (char)c;
       Insertchar(ch);
+      clean_and_printing(0);
     }
     
     refresh();
 }
 
-void clean_and_printing(){
-   for(int i=0; i < rows-2; ++i){
+void clean_and_printing(int pos){
+   for( int i = pos; i < rows-2; ++i){
     mvprintw(i, 0, "%*s", cols, "");
     if(Edit.line[i + y_out].c == NULL){
       mvprintw(i, 0, "~");
@@ -493,7 +495,6 @@ int main(int argc, char *argv[]){
 
   while(true){
     curs_set(0);
-    clean_and_printing();
     status_bar();
     end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     move(y,x);

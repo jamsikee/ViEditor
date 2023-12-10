@@ -341,18 +341,19 @@ void Move(int key) {
             int scroll_y = 0;
             if(y == rows-2 || y == rows - 3){
               if( total == y + y_out) {
-                y = rows - 3;
+                scroll_y = rows - 3;
                 break;
               } 
               y_out += 1;
               flag = 1;
-              y = rows - 3;
+              scroll_y = rows - 3;
+              move(scroll_y, x);
             }else{
               if (y < total) {
                 y += 1;
               }
+              move(y, x);
             }
-            move(y, x);
             break;
     }
     curs_set(1);

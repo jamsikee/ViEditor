@@ -230,7 +230,7 @@ void Newline(){
   }
 
   if(y == rows - 3){
-    y -= 1;
+    y -= rows - 3;
     y_out += 1;
   } else{
     y += 1;
@@ -254,7 +254,13 @@ void Del_current_line() {
   x = Edit.line[y -1 +y_out].len;
   RowInsertString(&Edit.line[y -1 + y_out], line->c, line->len);
   DeleteRow(y + y_out);
-  y -= 1;
+
+  if( y == 0){
+    y = 0;
+    y_out -= 1;
+  } else{
+    y -= 1;
+  }
   // x cursor is prev line's len and y cursor -1 and insert string at line's len
 
 }

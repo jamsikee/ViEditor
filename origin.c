@@ -288,14 +288,15 @@ void status_bar() {
     
     init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
     attron(COLOR_PAIR(2) | A_REVERSE); // Enable the defined reverse color pair
-    
+
     // 왼쪽에 텍스트 출력
     mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
     int left_len = strlen(total_len) + strlen(Edit.filename) + 13;
     int right_len = strlen(total_len) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
 
-    for (int i = 0; i < cols- (left_len + right_len); i++){
-      mvprintw(rows -2, left_len + i, " ");
+    for (int i = left_len; i < cols - (left_len + right_len); i++){
+      move(rows-2, i);
+      printw(" ");
     }
     // 오른쪽에 텍스트 출력
 

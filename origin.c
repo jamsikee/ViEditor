@@ -131,7 +131,7 @@ void DeleteRow(int pos){
   }
   // If y < 0 or y > total then return
 
-  FreeRow(&Edit.line[pos]); // Line[pos]'s memory free
+  FreeRow(&Edit.line[pos - 1]); // Line[pos]'s memory free
   memmove(&Edit.line[pos], &Edit.line[pos+1], sizeof(Row) * (total - pos - 1));
   // Line[pos+1]'s memory move to free memory(line[pos]) 
   total-=1;

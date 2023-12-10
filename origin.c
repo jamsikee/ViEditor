@@ -427,11 +427,11 @@ void clean_and_printing(){
    for(int i=0; i < rows-2; ++i){
     mvprintw(i, 0, "%*s", cols, "");
     if(Edit.line[i + y_out].c == NULL){
+      mvprintw(i, 0, "~");
       continue;
     }
     else
     {
-      mvprintw(i, 0, "~");
       mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
     }
   }

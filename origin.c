@@ -333,6 +333,7 @@ void Move(int key) {
             if ( x < Edit.line[y].len){
               x += 1;
             } else if(x == Edit.line[y].len){
+              if(y == total) break;
               y += 1;
               x = 0;
             }

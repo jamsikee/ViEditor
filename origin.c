@@ -261,7 +261,6 @@ void Del_current_line() {
   } else{
     y -= 1;
   }
-  y -= 1;
   // x cursor is prev line's len and y cursor -1 and insert string at line's len
 
 }
@@ -270,7 +269,7 @@ void DeleteChar(){    // 수정 필요 백스페이스키 안먹는거 같음 !!
 
   Row *line = get_line(Edit.line, y);
 
-  if( y == total){
+  if( y + y_out == total){
     return;
   }
   if( x == 0 && y == 0){

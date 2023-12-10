@@ -298,6 +298,7 @@ void status_bar() {
    
     for (int i = left_len; i < cols - (left_len + right_len); i++){
       mvprintw(rows-2, i, " ");
+      refresh();
     }
     refresh();
 

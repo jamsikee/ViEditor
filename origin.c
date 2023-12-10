@@ -301,7 +301,7 @@ void status_bar() {
 
     // 오른쪽에 텍스트 출력
 
-    mvprintw(rows - 2, cols - right_len, "no ft | %d / %d", y + 1, total);
+    mvprintw(rows - 2, cols - right_len, "no ft | %d / %d", y + y_out + 1, total);
 
     attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
 }
@@ -326,33 +326,22 @@ void Move(int key) {
             }
             break;
         case KEY_RIGHT:
-          if(Edit.line[y].c == NULL){
-            break;
-          }
-          else{
-            if ( x < Edit.line[y].len){
-              x += 1;
-            } else if(x == Edit.line[y].len){
-              if(y == total) break;
-              y += 1;
-              x = 0;
-            }
-          }
+            x += 1;
             break;
         case KEY_UP:
             if (y != 0) {
                 y -= 1;
             }
-            if(x > Edit.line[y].len){
-              x = Edit.line[y].len;
-            }
             break;
         case KEY_DOWN:
-            if ( y < total){
-              y += 1;
-            }
-            if(x > Edit.line[y].len){
-              x = Edit.line[y].len;
+            if( y == rows - 3 || total == y + y_out){
+              y_out += 1;
+              flag = 1;
+              y = rows - 3;
+            }else{
+              if (y + y_out< total) {
+                y += 1;
+              }
             }
             break;
     }
@@ -360,7 +349,7 @@ void Move(int key) {
     curs_set(1);
     refresh();
 }
-
+// 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐
 void presskey() {
 
     int c = 0;
@@ -414,10 +403,10 @@ void presskey() {
         // 이부분 해결해야 될듯
         case '\n':
             Newline();
-            clean_and_printing(0);
+            clean_and_printing(y - 1);
             break;
 
-        case 8:
+        case KEY_BACKSPACE:
             DeleteChar();
             clean_and_printing(0);
             break;
@@ -435,7 +424,7 @@ void presskey() {
 void clean_and_printing(int pos){
    for( int i = pos; i < rows-2; ++i){
     mvprintw(i, 0, "%*s", cols, "");
-    if(Edit.line[i].c == NULL){
+    if(Edit.line[i + y_out].c == NULL){
       mvprintw(i, 0, "~");
       continue;
     }

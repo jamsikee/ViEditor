@@ -350,7 +350,7 @@ void Move(int key) {
             }
             break;
     }
-    move(y, x);
+    move(y + y_out, x);
     refresh();
     curs_set(1);
 }

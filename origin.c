@@ -225,11 +225,11 @@ void Newline(){
   // get line Edit.line[y]
   if(x == 0){
     empty_new_line(y + y_out);
-    clean_and_printing(y);
+
   }
   else{
     contained_new_line(line, y+y_out, x);
-    clean_and_printing(y);
+
   }
 
   if(y == rows - 3){
@@ -240,6 +240,7 @@ void Newline(){
   }
   x = 0;
   
+  scroll_clean_and_printing(y);
 }
 
 void Del_current_line_char() {
@@ -282,11 +283,13 @@ void DeleteChar(){    // 수정 필요 백스페이스키 안먹는거 같음 !!
 
   if(x > 0){
     Del_current_line_char();
+    scroll_clean_and_printing(y);
   }
   else{
     Del_current_line();
+
   }
-  clean_and_printing(y);
+  
 
 }
 
@@ -482,15 +485,9 @@ void presskey() {
 }
 
 void clean_and_printing(int pos){
-   for( int i = pos; i < rows-2; ++i){
+   for( int i = pos; i < rows - 2; ++i){
     mvprintw(i, 0, "%*s", cols, "");
-    if(Edit.line[i].c == NULL){
-      mvprintw(i, 0, "~");
-      continue;
-    }
-    else
-    {
-      mvprintw(i, 0, "%s", Edit.line[i].c);
+    mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
     }
   }
 }

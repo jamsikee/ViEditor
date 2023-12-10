@@ -435,13 +435,13 @@ void presskey() {
 void clean_and_printing(int pos){
    for( int i = pos; i < rows-2; ++i){
     mvprintw(i, 0, "%*s", cols, "");
-    if(Edit.line[i + y_out].c == NULL){
+    if(Edit.line[i].c == NULL){
       mvprintw(i, 0, "~");
       continue;
     }
     else
     {
-      mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
+      mvprintw(i, 0, "%s", Edit.line[i].c);
     }
   }
 }

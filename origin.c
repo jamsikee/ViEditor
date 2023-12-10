@@ -381,6 +381,7 @@ void presskey() {
         case KEY_UP: // 위쪽 화살표 키
         case KEY_DOWN: // 아래쪽 화살표 키
             Move(c);
+            clean_and_printing(0);
             break;
         case KEY_END: // End 키
             x = Edit.line[y].len;

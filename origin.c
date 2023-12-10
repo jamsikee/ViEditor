@@ -338,6 +338,7 @@ void Move(int key) {
               y += 1;
             }
             else{
+              y = rows - 3;
               y_out += 1;
             }
             break;

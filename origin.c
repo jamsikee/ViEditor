@@ -199,11 +199,13 @@ void empty_new_line(int pos){
 
 void Insertchar(char word){
 
-  if(y == total) {
+  if(y + y_out == total) {
+    y = rows - 3;
+    y_out += 1;
     empty_new_line(total); 
     // if cursor y = total then add line;
   }
-  RowInsertchar(&Edit.line[y], word, x);
+  RowInsertchar(&Edit.line[y + y_out], word, x);
   x += 1;
   // Insert char at cursor x
 }
@@ -218,19 +220,25 @@ void contained_new_line(Row *line, int pos_y, int pos_x) {
 
 }
 
-void Newline(){
+void Newline() {
+    Row *line = get_line(Edit.line, y + y_out);
 
-  Row *line = get_line(Edit.line, y);
-  // get line Edit.line[y]
-  if(x == 0){
-    empty_new_line(y);
-  }
-  else{
-    contained_new_line(line, y, x);
-  }
-  y += 1;
-  x = 0;
+    if (x == 0) {
+        empty_new_line(y + y_out);
+    } else {
+        contained_new_line(line, y + y_out, x);
+    }
+
+    if (y + y_out == total) {
+        y = rows - 3;
+        y_out += 1;
+    } else {
+        y += 1;
+    }
+
+    x = 0;
 }
+
 
 void Del_current_line_char() {
 
@@ -295,7 +303,7 @@ void status_bar() {
     snprintf(st_y, sizeof(st_y), "%d", y);
     
     int left_len = strlen(total_len) + strlen(Edit.filename) + 13;
-    int right_len = strlen(total_len) + strlen(st_y) + 15; // 9은 "no ft | "의 길이
+    int right_len = strlen(total_len) + strlen(st_y) + 11; // 9은 "no ft | "의 길이
 
     init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
     attron(COLOR_PAIR(2) | A_REVERSE); // Enable the defined reverse color pair

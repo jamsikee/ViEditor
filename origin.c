@@ -414,7 +414,7 @@ void presskey() {
         // 이부분 해결해야 될듯
         case '\n':
             Newline();
-            clean_and_printing(y - 1);
+            clean_and_printing(0);
             break;
 
         case 8:

@@ -228,7 +228,13 @@ void Newline(){
   else{
     contained_new_line(line, y+y_out, x);
   }
-  y += 1;
+
+  if(y == rows - 3){
+    y = row -3;
+    y_out += 1;
+  } else{
+    y += 1;
+  }
   x = 0;
 }
 

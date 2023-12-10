@@ -349,6 +349,8 @@ void Move(int key) {
             }else{
               if (y < total) {
                 y += 1;
+              } else if(y == total){
+                y -= 1;
               }
               move(y, x);
             }

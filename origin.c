@@ -194,7 +194,7 @@ void Insertchar(char word){
     empty_new_line(total); 
     // if cursor y = total then add line;
   }
-  RowInsertchar(&Edit.line[y+y_out], word, x);
+  RowInsertchar(&Edit.line[y], word, x);
   x += 1;
   // Insert char at cursor x
 }
@@ -306,6 +306,7 @@ void status_bar() {
     attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
 }
 
+
 void end_message(const char *format, ...) {
     va_list args;
     va_start(args, format);
@@ -324,28 +325,36 @@ void Move(int key) {
                 y -= 1;
                 x = Edit.line[y].len;
             }
+            move(y, x);
             break;
         case KEY_RIGHT:
             x += 1;
+            move(y, x);
             break;
         case KEY_UP:
             if (y != 0) {
                 y -= 1;
             }
+            move(y, x);
             break;
         case KEY_DOWN:
-            if( y == rows - 3 || total == y + y_out){
+            int scroll_y = 0;
+            if(y == rows-2){
+              if( total == y + y_out) {
+                y = rows - 3;
+                break;
+              } 
               y_out += 1;
               flag = 1;
               y = rows - 3;
             }else{
-              if (y + y_out< total) {
-                y += 1;
+              if (y < total) {
+                y = y + y_out;
               }
             }
+            move(y, x);
             break;
     }
-    move(y, x);
     curs_set(1);
     refresh();
 }
@@ -406,7 +415,7 @@ void presskey() {
             clean_and_printing(y - 1);
             break;
 
-        case 8:
+        case KEY_BACKSPACE:
             DeleteChar();
             clean_and_printing(0);
             break;

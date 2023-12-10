@@ -287,7 +287,7 @@ void status_bar() {
     snprintf(st_y, sizeof(st_y), "%d", y);
     
     int left_len = strlen(total_len) + strlen(Edit.filename) + 13;
-    int right_len = strlen(total_len) + strlen(st_y) + 9; // 9은 "no ft | "의 길이
+    int right_len = strlen(total_len) + strlen(st_y) + 11; // 9은 "no ft | "의 길이
 
     init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
     attron(COLOR_PAIR(2) | A_REVERSE); // Enable the defined reverse color pair
@@ -303,7 +303,7 @@ void status_bar() {
 
     // 오른쪽에 텍스트 출력
 
-    mvprintw(rows - 2, cols - right_len, "no ft | %d/%d", y + y_out + 1, total);
+    mvprintw(rows - 2, cols - right_len, "no ft | %d / %d", y + y_out + 1, total);
 
     attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
 }

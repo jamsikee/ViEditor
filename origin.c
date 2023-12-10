@@ -350,6 +350,9 @@ void Move(int key) {
             if ( y < total){
               y += 1;
             }
+            if(x > Edit.line[y].len){
+              x = Edit.line[y].len;
+            }
             break;
     }
     move(y, x);

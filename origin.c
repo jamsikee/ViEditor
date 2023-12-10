@@ -205,7 +205,7 @@ void Insertchar(char word){
   }
   RowInsertchar(&Edit.line[y + y_out], word, x);
   x += 1;
-  clean_and_printing(0);
+  scroll_clean_and_printing(0);
   // Insert char at cursor x
 }
 

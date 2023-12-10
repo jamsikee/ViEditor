@@ -304,7 +304,7 @@ void status_bar() {
 
     // 오른쪽에 텍스트 출력
 
-    mvprintw(rows - 2, cols - right_len-1, "no ft | %d/%d", y + y_out, total);
+    mvprintw(rows - 2, cols - right_len-1, "no ft | %d/%d", y + y_out + 1, total);
 
     attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
 }

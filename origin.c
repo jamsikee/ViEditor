@@ -325,16 +325,20 @@ void Move(int key) {
                 y -= 1;
                 x = Edit.line[y].len;
             }
+            move(y, x);
             break;
         case KEY_RIGHT:
             x += 1;
+            move(y, x);
             break;
         case KEY_UP:
             if (y != 0) {
                 y -= 1;
             }
+            move(y, x);
             break;
         case KEY_DOWN:
+            int scroll_y = 0;
             if(y == rows-2){
               if( total == y + y_out) {
                 y = rows - 3;
@@ -345,16 +349,16 @@ void Move(int key) {
               y = rows - 3;
             }else{
               if (y < total) {
-                y += 1;
+                y = y + y_out;
               }
             }
+            move(y, x);
             break;
     }
-    move(y, x);
     curs_set(1);
     refresh();
 }
-
+// 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐
 void presskey() {
 
     int c = 0;

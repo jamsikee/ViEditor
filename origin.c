@@ -34,6 +34,7 @@ struct Visual_Text_Editor{
 
   Row *line;
   char *filename;
+  char *store_file;
 
 };
 

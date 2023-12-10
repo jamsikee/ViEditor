@@ -342,6 +342,9 @@ void Move(int key) {
             if (y != 0) {
                 y -= 1;
             }
+            if(x > Edit.line[y].len){
+              x = Edit.line[y].len;
+            }
             break;
         case KEY_DOWN:
             if ( y < total){

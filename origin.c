@@ -169,7 +169,7 @@ void RowDeletechar(Row *line, int pos){
   // memory move c[pos+1] -> c[pos]
 
 }
-
+// RowInserchar need
 
 void RowInsertchar(Row *line, char word, int pos){
 

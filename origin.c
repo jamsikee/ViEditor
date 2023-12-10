@@ -15,7 +15,6 @@
 int x = 0;
 int y = 0; //1 최대 54 
 int y_out = 0; // +1
-int x_out = 0; // +1
 int rows = 0; //54
 int cols = 0;
 int move_rows = 0;
@@ -60,7 +59,6 @@ void state();
 void end_message( const char *format, ...);
 void all_refresh();
 void clean_and_printing(int pos);
-void scrolling();
 
 
 Row *get_line(Row *line, int pos) {
@@ -434,50 +432,21 @@ void presskey() {
     refresh();
 }
 
-void clean_and_printing(int pos) {
-    for (int i = pos; i < rows - 2; ++i) {
-        if (i + y_out >= total) {
-            mvprintw(i, 0, "~");
-            continue;
-        }
-
-        Row *current_line = &Edit.line[i + y_out];
-        int start_col = x_out;
-        int end_col = x_out + cols;
-
-        if (x_out > current_line->len) {
-            mvprintw(i, 0, "~");
-            continue;
-        }
-
-        if (current_line->len <= cols) {
-            mvprintw(i, 0, "%s", &current_line->c[x_out]);
-        } else {
-            if (end_col > current_line->len) {
-                end_col = current_line->len;
-            }
-            mvprintw(i, 0, "%.*s", end_col - start_col, &current_line->c[start_col]);
-        }
+void clean_and_printing(int pos){
+   for( int i = pos; i < rows-2; ++i){
+    mvprintw(i, 0, "%*s", cols, "");
+    if(Edit.line[i + y_out].c == NULL){
+      mvprintw(i, 0, "~");
+      continue;
     }
+    else
+    {
+      mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
+    }
+  }
 }
 
-void scrolling() {
-    if (y < y_out) {
-        y_out = y;
-    }
-    if (y > y_out + rows - 3) {
-        y_out = y - rows + 3;
-    }
-    if (x < x_out) {
-        x_out = x;
-    }
-    if (x >= x_out + cols) {
-        x_out = x - cols + 1;
-    }
-}
-
-
-// void scrolling(){
+// void scroll(){
 //   if (x > cols){
 //     move_cols += 1;
 //   }
@@ -513,8 +482,6 @@ int main(int argc, char *argv[]){
   move_rows = 0;
   move_cols = 0;
   total = 0;
-  x_out = 1;
-  y_out = 1;
   getmaxyx(stdscr, rows, cols); // rows cols
 
   Edit.filename = NULL;
@@ -535,7 +502,6 @@ int main(int argc, char *argv[]){
 
   while(true){
     curs_set(0);
-    scrolling();
     status_bar();
     end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     move(y,x);

@@ -415,7 +415,7 @@ void presskey() {
             clean_and_printing(y - 1);
             break;
 
-        case KEY_BACKSPACE:
+        case 8:
             DeleteChar();
             clean_and_printing(0);
             break;

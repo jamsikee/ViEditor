@@ -350,9 +350,9 @@ void Move(int key) {
             }
             break;
     }
-    move(y + y_out, x);
-    refresh();
+    move(y, x);
     curs_set(1);
+    refresh();
 }
 
 void presskey() {

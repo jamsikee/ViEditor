@@ -236,6 +236,7 @@ void Newline(){
     y += 1;
   }
   x = 0;
+  clean_and_printing(y);
 }
 
 void Del_current_line_char() {
@@ -462,19 +463,16 @@ void presskey() {
         // 이부분 해결해야 될듯
         case '\n':
             Newline();
-            clean_and_printing(y - 1);
             break;
 
         case 8:
             DeleteChar();
-            clean_and_printing(0);
             break;
       }
     }
     else{
       char ch = (char)c;
       Insertchar(ch);
-      clean_and_printing(0);
     }
     
     refresh();

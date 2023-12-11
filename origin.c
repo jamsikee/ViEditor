@@ -576,7 +576,7 @@ void scroll_clean_and_printing(int pos)
 
 void delete_printing(int pos)
 {
-  for (int i = 0; i < rows - 2; ++i)
+  for (int i = pos; i < rows - 2; ++i)
   {
     mvprintw(i, 0, "%*s", cols, "");
     mvprintw(i, 0, "~");

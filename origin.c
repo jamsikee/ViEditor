@@ -857,10 +857,10 @@ int main(int argc, char *argv[])
       
         get_filename(&status_FILE);
         save_file(status_FILE.name);
-        free(status_FILE.name);
     }
   }
 
   endwin();
+  free(status_FILE.name);
   return 0;
 }

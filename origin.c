@@ -264,7 +264,7 @@ void Newline()
     scroll_clean_and_printing(0);
   }
   else{
-    scroll_clean_and_printing(y);
+    scroll_clean_and_printing(y - 1);
   }
   }
   else

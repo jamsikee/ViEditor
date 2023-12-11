@@ -22,6 +22,7 @@ int move_cols = 0;
 int total = 0;
 int flag = 0;
 
+// total suruct
 typedef struct Row
 {
 
@@ -48,8 +49,9 @@ typedef struct
   // Store_File_Information
 } File_Inf;
 
-// total function
 struct Visual_Text_Editor Edit;
+// total function
+
 void get_windows_size();
 Row *get_line(Row *line, int pos);
 void InsertRow(int edit_y, char *line, int line_len);
@@ -69,8 +71,8 @@ void status_bar();
 void state();
 void end_message(const char *format, ...);
 void all_refresh();
-void delete_printing(int pos);
 void scroll_clean_and_printing(int pos);
+void open_file(char *store_file);
 
 Row *get_line(Row *line, int pos)
 {
@@ -224,13 +226,9 @@ void Insertchar(char word)
   }
   RowInsertchar(&Edit.line[y + y_out], word, x);
   x += 1;
-  if(y_out == 0){
-    mvprintw(y, 0, "%s", Edit.line[y].c);
-  }
-  else{
-    scroll_clean_and_printing(y);
-  }
   // Insert char at cursor x
+  scroll_clean_and_printing(y);
+  
 }
 
 void contained_new_line(Row *line, int pos_y, int pos_x)
@@ -329,12 +327,7 @@ void DeleteChar()
   {
     Del_current_line();
   }
-  if(total - 1 == y+ y_out){
-    delete_printing(y);
-  }
-  else{
-    scroll_clean_and_printing(y);
-  }
+  scroll_clean_and_printing(y);
 }
 
 void Visual_Text_editor__version()
@@ -512,9 +505,7 @@ void presskey()
     case KEY_UP:    // 위쪽 화살표 키
     case KEY_DOWN:  // 아래쪽 화살표 키
       Move(c);
-      if(y_out > 0){
-        scroll_clean_and_printing(0);
-      }
+      scroll_clean_and_printing(0);
       break;
     case KEY_END: // End 키
       x = Edit.line[y + y_out].len;
@@ -560,7 +551,7 @@ void presskey()
 
 void scroll_clean_and_printing(int pos)
 {
-  for (int i = 0; i < rows - 2; ++i)
+  for (int i = pos; i < rows - 2; ++i)
   {
     mvprintw(i, 0, "%*s", cols, "");
   }
@@ -577,25 +568,6 @@ void scroll_clean_and_printing(int pos)
   }
 }
 
-void delete_printing(int pos)
-{
-  for (int i = pos; i < rows - 2; ++i)
-  {
-    mvprintw(i, 0, "%*s", cols, "");
-    mvprintw(i, 0, "~");
-  }
-
-  for (int i = 0; i <= y; ++i){
-    if (Edit.line[i].c == NULL)
-    {
-      break;
-    }
-    else
-    {
-      mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
-    }
-  }
-}
 
 // void scroll(){
 //   if (x > cols){

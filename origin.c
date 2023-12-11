@@ -773,12 +773,12 @@ int main(int argc, char *argv[])
   {
     Edit.filename = argv[1];
     open_file(argv[1]);
+    presskey();
   }
   else
   {
     Edit.filename = "No Name";
   }
-  refresh();
   all_refresh();
   Visual_Text_editor__version();
   move(0, 0); // 0, 0

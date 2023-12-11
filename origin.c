@@ -59,6 +59,11 @@ typedef struct {
     size_t content_size;
 } File;
 
+typedef struct{
+  char *name;
+  int filename_len;
+} F_name;
+
 struct Visual_Text_Editor Edit;
 // total function
 
@@ -84,7 +89,9 @@ void all_refresh();
 void scroll_clean_and_printing(int pos);
 void open_file(char *store_file);
 void delete_clean_and_printing(int pos);
-void get_filename(char *filename);
+void Insert_FILE_Name(F_name *FILE, int pos, char c);
+void BACKSPACE_Name(F_name *FILE, int pos);
+void get_filename(F_name *FILE);
 
 Row *get_line(Row *line, int pos)
 {
@@ -578,6 +585,44 @@ void save_file(char *filename) {
     fclose(file); // 파일 닫기
 }
 
+void Insert_FILE_Name(F_name *FILE, int pos, char c){
+  if (pos < 0 || pos > name->filename_len){
+    return;
+  }
+  FILE->name = realloc(FILE->name, FILE->filename_len+2);
+  memmove(&FILE->name[pos + 1], &FILE->name[pos], FILE->filename_len-pos+1);
+  FILE->name[pos] = c;
+  FILE->filename_len +=1;
+}
+
+void BACKSPACE_Name(F_name *FILE, int pos){
+  if (pos < 0 || pos >= name->filename_len){
+    return;
+  }
+  
+  memmove(&FILE->name[pos], &FILE->name[pos + 1], FILE->filename_len - pos);
+  FILE->filename_len -= 1;
+}
+
+
+void get_filename(F_name *FILE) {
+    int ch, pos = 0;
+    mvprintw(rows-1, 0, "%*s", cols, "");
+    mvprintw(rows - 1, 0, "ENTER FILE NAME : ");
+    while((ch = getch()) != '\n'){
+      if(ch == KEY_BACKSPACE){
+        if(pos > 0){
+          pos -= 1;
+          BACKSPACE_Name(FILE, pos);
+        }else if(pos < MAX_FILENAME - 1){
+          Insert_FILE_Name(FILE, pos, ch);
+          pos += 1;
+        }
+      }
+      mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", FILE->name);
+    }
+    FILE->name[FILE->filename_len] = '\0';
+}
 
 // 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐
 void presskey()
@@ -757,50 +802,6 @@ void all_refresh()
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
   move(y, x);
   refresh();
-}
-
-
-typedef struct{
-  char *name;
-  int filename_len;
-} F_name;
-
-void Insert_FILE_Name(F_name *FILE, int pos, char c){
-  if (pos < 0 || pos > name->filename_len){
-    return;
-  }
-  FILE->name = realloc(FILE->name, FILE->filename_len+2);
-  memmove(&FILE->name[pos + 1], &FILE->name[pos], FILE->filename_len-pos+1);
-  FILE->name[pos] = c;
-  FILE->filename_len +=1;
-}
-void BACKSPACE_Name(F_name *FILE, int pos){
-  if (pos < 0 || pos >= name->filename_len){
-    return;
-  }
-  
-  memmove(&FILE->name[pos], &FILE->name[pos + 1], FILE->filename_len - pos);
-  FILE->filename_len -= 1;
-}
-
-
-void get_filename(F_name *FILE) {
-    int ch, pos = 0;
-    mvprintw(rows-1, 0, "%*s", cols, "");
-    mvprintw(rows - 1, 0, "ENTER FILE NAME : ");
-    while((ch = getch()) != '\n'){
-      if(ch == KEY_BACKSPACE){
-        if(pos > 0){
-          pos -= 1;
-          BACKSPACE_Name(FILE, pos);
-        }else if(pos < MAX_FILENAME - 1){
-          Insert_FILE_Name(FILE, pos, ch);
-          pos += 1;
-        }
-      }
-      mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", FILE->name);
-    }
-    FILE->name[FILE->filename_len] = '\0';
 }
 
 int main(int argc, char *argv[])

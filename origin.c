@@ -269,7 +269,7 @@ void Newline()
     delete_printing(y);
   }
   else{
-    scroll_clean_and_printing(y);
+    scroll_clean_and_printing(0);
   }
 }
 
@@ -330,7 +330,7 @@ void DeleteChar()
     delete_printing(y);
   }
   else{
-    scroll_clean_and_printing(y);
+    scroll_clean_and_printing(0);
   }
 }
 

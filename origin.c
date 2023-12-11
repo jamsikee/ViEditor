@@ -93,7 +93,7 @@ void open_file(char *store_file);
 void delete_clean_and_printing(int pos);
 void Insert_FILE_Name(F_name *FILE, int pos, char c);
 void BACKSPACE_Name(F_name *FILE, int pos);
-void get_filename(char *filename);
+
 
 Row *get_line(Row *line, int pos)
 {
@@ -587,45 +587,32 @@ void save_file(char *filename) {
     fclose(file); // 파일 닫기
 }
 
-void Insert_FILE_Name(F_name *FILE, int pos, char c){
-  if (pos < 0 || pos > FILE->filename_len){
-    return;
-  }
-  FILE->name = realloc(FILE->name, FILE->filename_len+2);
-  memmove(&FILE->name[pos + 1], &FILE->name[pos], FILE->filename_len-pos+1);
-  FILE->name[pos] = c;
-  FILE->filename_len +=1;
-}
+void get_filename(char *filename_buffer, int max_length) {
+    mvprintw(rows - 1, 0, "Enter filename (Enter to finish): ");
+    echo(); // Enable echoing of user input
+    move(rows - 1, strlen("Enter filename (Enter to finish): "));
+    refresh();
 
-void BACKSPACE_Name(F_name *FILE, int pos){
-  if (pos < 0 || pos >= FILE->filename_len){
-    return;
-  }
-  
-  memmove(&FILE->name[pos], &FILE->name[pos + 1], FILE->filename_len - pos);
-  FILE->filename_len -= 1;
-}
-
-
-void get_filename(char *filename) {
-    int ch, pos = 0;
-    mvprintw(rows-1, 0, "%*s", cols, "");
-    mvprintw(rows - 1, 0, "ENTER FILE NAME : ");
-    while((ch = getch()) != '\n'){
-      if(ch == KEY_BACKSPACE){
-        if(pos > 0){
-          pos -= 1;
-          filename[pos] = '\0';
+    int ch;
+    int index = 0;
+    while ((ch = getch()) != '\n') {
+        if (ch == KEY_BACKSPACE || ch == 127) {
+            if (index > 0) {
+                index--;
+                filename_buffer[index] = '\0';
+                move(rows - 1, strlen("Enter filename (Ctrl-G to finish): ") + index);
+                addch(' '); // Clear the character on the screen
+                move(rows - 1, strlen("Enter filename (Ctrl-G to finish): ") + index);
+                refresh();
+            }
+        } else if (isprint(ch) && index < max_length - 1) {
+            filename_buffer[index++] = ch;
+            filename_buffer[index] = '\0';
+            addch(ch);
+            refresh();
         }
-      } else {
-        if(pos < MAX_FILENAME - 1){
-          filename[pos++] = ch;
-          filename[pos] = '\0';
-        }
-      }
-      mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", filename);
-      refresh();
     }
+    noecho(); // Disable echoing
 }
 
 // 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐

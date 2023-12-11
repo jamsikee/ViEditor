@@ -221,8 +221,8 @@ void Insertchar(char word)
   }
   RowInsertchar(&Edit.line[y + y_out], word, x);
   x += 1;
-    if(total - 1 == y+ y_out){
-    delete_printing(y);
+  if(y_out == 0){
+    mvprintw(y, 0, Edit.line[y].c);
   }
   else{
     scroll_clean_and_printing(y);

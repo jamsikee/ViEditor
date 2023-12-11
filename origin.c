@@ -586,7 +586,7 @@ void save_file(char *filename) {
 }
 
 void Insert_FILE_Name(F_name *FILE, int pos, char c){
-  if (pos < 0 || pos > name->filename_len){
+  if (pos < 0 || pos > FILE->filename_len){
     return;
   }
   FILE->name = realloc(FILE->name, FILE->filename_len+2);
@@ -596,7 +596,7 @@ void Insert_FILE_Name(F_name *FILE, int pos, char c){
 }
 
 void BACKSPACE_Name(F_name *FILE, int pos){
-  if (pos < 0 || pos >= name->filename_len){
+  if (pos < 0 || pos >= FILE->filename_len){
     return;
   }
   

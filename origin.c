@@ -745,7 +745,10 @@ int main(int argc, char *argv[])
     Edit.filename = argv[1];
     open_file(argv[1]);
   }
-
+  else
+  {
+    Edit.filename = "No Name";
+  }
 
   all_refresh();
   Visual_Text_editor__version();

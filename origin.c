@@ -221,7 +221,12 @@ void Insertchar(char word)
   }
   RowInsertchar(&Edit.line[y + y_out], word, x);
   x += 1;
-  scroll_clean_and_printing(0);
+    if(total - 1 == y+ y_out){
+    delete_printing(y);
+  }
+  else{
+    scroll_clean_and_printing(y);
+  }
   // Insert char at cursor x
 }
 

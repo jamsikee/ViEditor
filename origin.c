@@ -624,7 +624,7 @@ void scroll_clean_and_printing(int pos)
   {
     if (Edit.line[i + y_out].c == NULL)
     {
-      mvprintw(i, 0, "%*s", cols, "");
+      mvprintw(i, 0, "%*s", cols, "~");
       continue;
     }
     else

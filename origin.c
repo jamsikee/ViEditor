@@ -321,7 +321,9 @@ void Del_current_line()
     x = Edit.line[y - 1 + y_out].len;
     y_out -= 1;
   } else{
+    x = Edit.line[y - 1 + y_out].len;
     y -= 1;
+    
   }
   // x cursor is prev line's len and y cursor -1 and insert string at line's len
 }

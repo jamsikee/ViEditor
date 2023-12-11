@@ -773,7 +773,8 @@ int main(int argc, char *argv[])
   {
     Edit.filename = argv[1];
     open_file(argv[1]);
-    all_refresh();
+    end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+    status_bar();
     presskey();
   }
   else

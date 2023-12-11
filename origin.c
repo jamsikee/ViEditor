@@ -584,7 +584,7 @@ void presskey()
     case KEY_NPAGE: // Page Down 키
     case KEY_PPAGE: // Page Up 키
     {
-      int temprows = rows;
+      int temprows = rows*2-4;
       while (temprows--)
       {
         if (c == KEY_PPAGE)

@@ -773,8 +773,7 @@ int main(int argc, char *argv[])
   {
     Edit.filename = argv[1];
     open_file(argv[1]);
-
-    all_refresh();
+    Move(KEY_RIGHT);
   }
   else
   {

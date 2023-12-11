@@ -763,7 +763,7 @@ void all_refresh()
 typedef struct{
   char *name;
   int filename_len;
-} F_name
+} F_name;
 
 void Insert_FILE_Name(F_name *FILE, int pos, char c){
   if (pos < 0 || pos > name->filename_len){

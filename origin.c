@@ -317,7 +317,7 @@ void DeleteChar()
   {
     Del_current_line();
   }
-  if(total - 1 = y+ y_out){
+  if(total - 1 == y+ y_out){
     delete_printing(y);
   }
   else{

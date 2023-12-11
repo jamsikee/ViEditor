@@ -144,10 +144,11 @@ void DeleteRow(int pos)
     return;
   }
   // If y < 0 or y > total then return
+
+  FreeRow(&Edit.line[pos]);
   Edit.line[pos].c = NULL;
   Edit.line[pos].len = 0;
   Edit.line[pos].line_capacity = 0;
-  FreeRow(&Edit.line[pos]);
   // Line[pos]'s memory free
   memmove(&Edit.line[pos], &Edit.line[pos + 1], sizeof(Row) * (total - pos - 1));
   // Line[pos+1]'s memory move to free memory(line[pos])
@@ -650,9 +651,9 @@ void delete_clean_and_printing(int pos)
 
   for (int i = 0; i < rows - 2; ++i)
   {
-    if (Edit.line[i + y_out - 1].c != NULL)
+    if (Edit.line[i + y_out ].c != NULL)
     { 
-      mvprintw(i, 0, "%s", Edit.line[i + y_out - 1].c);
+      mvprintw(i, 0, "%s", Edit.line[i + y_out ].c);
     }
     else
     {

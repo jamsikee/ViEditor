@@ -129,23 +129,18 @@ void FreeRow(Row *line)
   free(line->c);
 }
 
-void DeleteRow(int pos)
-{
+void DeleteRow(int pos) {
+    if (pos < 0 || pos >= total) {
+        return;
+    }
 
-  if (pos < 0)
-  {
-    return;
-  }
-  if (pos >= total)
-  {
-    return;
-  }
-  // If y < 0 or y > total then return
+    FreeRow(&Edit.line[pos]); // Line[pos]'s memory free
 
-  FreeRow(&Edit.line[pos]); // Line[pos]'s memory free
-  memmove(&Edit.line[pos], &Edit.line[pos + 1], sizeof(Row) * (total - pos - 1));
-  // Line[pos+1]'s memory move to free memory(line[pos])
-  total -= 1;
+    for (int i = pos; i < total - 1; ++i) {
+        Edit.line[i] = Edit.line[i + 1];
+    }
+
+    total -= 1;
 }
 
 void RowInsertString(Row *line, char *str, size_t del_line_len)

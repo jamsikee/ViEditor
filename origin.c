@@ -633,7 +633,7 @@ void presskey()
       break;
     }
   }
-  else
+  }else
   {
     char ch = (char)c;
     Insertchar(ch);

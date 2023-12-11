@@ -606,10 +606,17 @@ void presskey()
     // 이부분 해결해야 될듯
     case '\n':
       Newline();
+      flag = 1;
       break;
-
+    case '\t':
+      Inserchar(" ");
+      Inserchar(" ");
+      Inserchar(" ");
+      Inserchar(" ");
+      break;
     case 8:
       DeleteChar();
+      flag = 1;
       break;
     }
   }
@@ -617,6 +624,7 @@ void presskey()
   {
     char ch = (char)c;
     Insertchar(ch);
+    flag = 1;
   }
 
   refresh();

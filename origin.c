@@ -775,17 +775,17 @@ int main(int argc, char *argv[])
     end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     status_bar();
     move(y, x);
-    getch();
+    scroll_clean_and_printing(0);
     refresh();
   }
   else
   {
     Edit.filename = "No Name";
   }
-  
+  all_refresh();
   Visual_Text_editor__version();
   move(0, 0); // 0, 0
-  refresh();  // refresh();
+   // refresh();
   Visual_Text_editor__version();
   refresh();
 

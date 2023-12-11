@@ -141,8 +141,11 @@ void DeleteRow(int pos)
     return;
   }
   // If y < 0 or y > total then return
-
-  FreeRow(&Edit.line[pos]); // Line[pos]'s memory free
+  Edit.line[pos].c = NULL;
+  Edit.line[pos].len = 0;
+  Edit.line[pos].line_capacity = 0;
+  FreeRow(&Edit.line[pos]);
+  // Line[pos]'s memory free
   memmove(&Edit.line[pos], &Edit.line[pos + 1], sizeof(Row) * (total - pos - 1));
   // Line[pos+1]'s memory move to free memory(line[pos])
   total -= 1;
@@ -222,7 +225,7 @@ void Insertchar(char word)
   RowInsertchar(&Edit.line[y + y_out], word, x);
   x += 1;
   if(y_out == 0){
-    mvprintw(y, 0, Edit.line[y].c);
+    mvprintw(y, 0, "%s", Edit.line[y].c);
   }
   else{
     scroll_clean_and_printing(y);

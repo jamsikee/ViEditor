@@ -543,7 +543,7 @@ void scroll_clean_and_printing(int pos)
     mvprintw(i, 0, "%*s", cols, "");
   }
 
-  for (int i = 0; i < y; ++i){
+  for (int i = 0; i <= y; ++i){
     if (Edit.line[i + y_out].len == 0)
     {
       mvprintw(i, 0, "%*s", cols, "");
@@ -554,7 +554,7 @@ void scroll_clean_and_printing(int pos)
       mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
     }
   }
-  
+
 }
 
 // void scroll(){

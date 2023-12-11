@@ -441,6 +441,7 @@ void Move(int key)
         if (y == rows - 3 && y + y_out < total){
           y_out += 1;
           y = rows - 3;
+          x = 0;
         } else{
           y += 1;
           x = 0;

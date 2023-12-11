@@ -321,6 +321,7 @@ void Del_current_line()
   {
     y = 0;
     y_out -= 1;
+    x = Edit.line[y + y_out].len;
   }
   else
   {

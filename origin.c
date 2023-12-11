@@ -536,21 +536,21 @@ void presskey()
   refresh();
 }
 
-void scroll_clean_and_printing(int pos)
-{
-  for (int i = pos; i < rows - 2; ++i)
-  {
-    mvprintw(i, 0, "%*s", cols, "");
-    if (Edit.line[i + y_out].c == NULL)
-    {
-      break;
+void print_edit_line(int i) {
+    if (Edit.line[i].c == NULL) {
+        mvprintw(i, 0, "~");
+    } else {
+        mvprintw(i, 0, "%s", Edit.line[i].c);
     }
-    else
-    {
-      mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
-    }
-  }
 }
+
+void scroll_clean_and_printing(int pos) {
+    for (int i = pos; i < rows - 2; ++i) {
+        mvprintw(i, 0, "%*s", cols, "");
+        print_edit_line(i + y_out);
+    }
+}
+
 
 // void scroll(){
 //   if (x > cols){

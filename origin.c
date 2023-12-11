@@ -544,7 +544,7 @@ void open_file(char *store_file)
     int read = Inf.length;
     while (Inf.length > 0 && (Inf.temp[Inf.length - 1] == '\r' || Inf.temp[Inf.length - 1] == '\n'))
     {
-      Inf.length--;
+      Inf.length-= 2;
     }
     InsertRow(total, Inf.temp, read);
   }

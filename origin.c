@@ -541,7 +541,7 @@ void scroll_clean_and_printing(int pos)
   for (int i = pos; i < rows - 2; ++i)
   {
     mvprintw(i, 0, "%*s", cols, "");
-    if (Edit.line[i + y_out].c == NULL)
+    if (Edit.line[i + y_out].len == 0)
     {
       mvprintw(i, 0, "%*s", cols, "");
       break;

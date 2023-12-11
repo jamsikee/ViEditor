@@ -567,7 +567,7 @@ void presskey()
       if (flag == 1)
       { 
         mvprintw(rows - 1, 0, "%*s", cols, "");
-        end_message("Warning!!!  Please Ctrl + Q One more");
+        end_message("Warning!!! If you want to quit then Please Ctrl + Q One more");
         q_press += 1;
         if (q_press == 2)
         {

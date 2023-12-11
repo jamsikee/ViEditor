@@ -569,10 +569,10 @@ void open_file(char *store_file)
 
 }
 
-void save_file(char *filename) {
-    FILE *file = fopen(filename, "w"); // "w" 모드로 파일을 쓰기 모드로 열기
+void save_file(F_name *FILE) {
+    FILE *file = fopen(FILE->name, "w"); // "w" 모드로 파일을 쓰기 모드로 열기
     if (!file) {
-        fprintf(stderr, "Cannot open file for writing: %s\n", filename);
+        fprintf(stderr, "Cannot open file for writing: %s\n", FILE->name);
         return;
     }
 

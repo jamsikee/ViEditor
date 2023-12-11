@@ -618,9 +618,18 @@ void presskey()
         else if (c == KEY_NPAGE)
           Move(KEY_DOWN);
       }
-
+      
       scroll_clean_and_printing(0);
+       (c == KEY_PPAGE){
+          Move(KEY_UP);
+          move(y, 0);
+      }
+        else if (c == KEY_NPAGE){
+          Move(KEY_DOWN);
+          move(y, Edit.line[y + y_out].len);
+        }
     }
+
     // can do
     break;
     // 이부분 해결해야 될듯

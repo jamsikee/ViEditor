@@ -69,7 +69,7 @@ void status_bar();
 void state();
 void end_message(const char *format, ...);
 void all_refresh();
-void clean_and_printing(int pos);
+void delete_printing(int pos);
 void scroll_clean_and_printing(int pos);
 
 Row *get_line(Row *line, int pos)

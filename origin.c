@@ -345,7 +345,7 @@ void DeleteChar()
     y -= 1;
   }
     Del_current_line();
-    scroll_clean_and_printing(y-1);
+    scroll_clean_and_printing(y);
   }
 }
 

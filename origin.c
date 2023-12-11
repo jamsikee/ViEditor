@@ -269,7 +269,7 @@ void Newline()
     delete_printing(y);
   }
   else{
-    scroll_clean_and_printing(0);
+    scroll_clean_and_printing(y);
   }
 }
 
@@ -330,7 +330,7 @@ void DeleteChar()
     delete_printing(y);
   }
   else{
-    scroll_clean_and_printing(0);
+    scroll_clean_and_printing(y);
   }
 }
 
@@ -538,12 +538,11 @@ void presskey()
     case '\n':
       Newline();
       Move(KEY_UP);
-      Move(KEY_DOWN);
       break;
 
     case 8:
       DeleteChar();
-      Move(KEY_UP);
+      Move(KEY_DOWN);
       Move(KEY_DOWN);
       break;
     }

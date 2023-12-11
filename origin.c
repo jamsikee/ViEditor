@@ -414,7 +414,7 @@ void Move(int key)
     else if (y > 0)
     {
       y -= 1;
-      x = Edit.line[y].len;
+      x = Edit.line[y + y_out].len;
     }
     else if (x == 0 && y == 0){
       if(y_out > 0){

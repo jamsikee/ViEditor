@@ -663,14 +663,15 @@ void presskey()
       break;
 
     case CONTROL('s'):
-    {   if(flag == 1){
+    {   
+      if(flag == 1){
+        mode_change = 1;
         status_FILE.name = malloc(MAX_FILENAME);
         status_FILE.filename_len = 0;
         get_filename(&status_FILE);
         save_file(status_FILE.name);
         free(status_FILE.name);
     }
-    move(y, x);
     }
       break;
 

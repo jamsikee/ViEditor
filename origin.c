@@ -620,17 +620,8 @@ void presskey()
       }
       
       scroll_clean_and_printing(0);
-      if (c == KEY_PPAGE){
-          move(y, 0);
-      }
-        else if (c == KEY_NPAGE){
-          move(y, Edit.line[y + y_out ].len);
-        }
-    }
-
     // can do
     break;
-    // 이부분 해결해야 될듯
     case '\n':
       Newline();
       flag = 1;

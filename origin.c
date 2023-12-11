@@ -543,6 +543,7 @@ void scroll_clean_and_printing(int pos)
     mvprintw(i, 0, "%*s", cols, "");
     if (Edit.line[i + y_out].c == NULL)
     {
+      mvprintw(i, 0, "%*s", cols, "");
       break;
     }
     else

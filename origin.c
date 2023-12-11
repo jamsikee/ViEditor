@@ -666,11 +666,6 @@ void presskey()
     {   
       if(flag == 1){
         mode_change = 1;
-        status_FILE.name = malloc(MAX_FILENAME);
-        status_FILE.filename_len = 0;
-        get_filename(&status_FILE);
-        save_file(status_FILE.name);
-        free(status_FILE.name);
     }
     }
       break;
@@ -827,7 +822,8 @@ int main(int argc, char *argv[])
   flag = 0;
   q_press = 0;
   getmaxyx(stdscr, rows, cols); // rows cols
-
+  status_FILE.name = malloc(MAX_FILENAME);
+  status_FILE.filename_len = 0;
   if (argc >= 2)
   {
     Edit.filename = argv[1];
@@ -855,7 +851,14 @@ int main(int argc, char *argv[])
     move(y, x);
     refresh();
     curs_set(1);
+    if(mode_change == 0){
     presskey();
+    } else{
+      
+        get_filename(&status_FILE);
+        save_file(status_FILE.name);
+        free(status_FILE.name);
+    }
   }
 
   endwin();

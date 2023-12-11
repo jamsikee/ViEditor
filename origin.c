@@ -626,7 +626,7 @@ void presskey()
       }
         else if (c == KEY_NPAGE){
           Move(KEY_DOWN);
-          move(y, Edit.line[y + y_out].len);
+          move(y, Edit.line[y + y_out + 1].len);
         }
     }
 

@@ -93,7 +93,7 @@ void open_file(char *store_file);
 void delete_clean_and_printing(int pos);
 void Insert_FILE_Name(F_name *FILE, int pos, char c);
 void BACKSPACE_Name(F_name *FILE, int pos);
-void get_filename(F_name *FILE);
+void get_filename(char *filename);
 
 Row *get_line(Row *line, int pos)
 {
@@ -569,10 +569,10 @@ void open_file(char *store_file)
 
 }
 
-void save_file(F_name *FILE) {
-    FILE *file = fopen(FILE->name, "w"); // "w" 모드로 파일을 쓰기 모드로 열기
+void save_file(char *filename) {
+    FILE *file = fopen(filename, "w"); // "w" 모드로 파일을 쓰기 모드로 열기
     if (!file) {
-        fprintf(stderr, "Cannot open file for writing: %s\n", FILE->name);
+        fprintf(stderr, "Cannot open file for writing: %s\n", filename);
         return;
     }
 
@@ -607,7 +607,7 @@ void BACKSPACE_Name(F_name *FILE, int pos){
 }
 
 
-void get_filename(F_name *FILE) {
+void get_filename(char *filename) {
     int ch, pos = 0;
     mvprintw(rows-1, 0, "%*s", cols, "");
     mvprintw(rows - 1, 0, "ENTER FILE NAME : ");
@@ -615,15 +615,17 @@ void get_filename(F_name *FILE) {
       if(ch == KEY_BACKSPACE){
         if(pos > 0){
           pos -= 1;
-          BACKSPACE_Name(FILE, pos);
-        }else if(pos < MAX_FILENAME - 1){
-          Insert_FILE_Name(FILE, pos++, ch);
+          filename[pos] = '\0';
+        }
+      } else {
+        if(pos < MAX_FILENAME - 1){
+          filename[pos++] = ch;
+          filename[pos] = '\0';
         }
       }
-      mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", FILE->name);
+      mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", filename);
       refresh();
     }
-    FILE->name[FILE->filename_len] = '\0';
 }
 
 // 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐
@@ -664,9 +666,10 @@ void presskey()
     case CONTROL('s'):
     {   
       if(flag == 1){
-        get_filename(&status_FILE);
+        char filename[MAX_FILENAME + 1];
+        get_filename(filename);
+        save_file(filename);
     }
-    save_file(status_FILE.name);
     flag = 0;
     }
       break;

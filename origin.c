@@ -467,7 +467,9 @@ void Move(int key)
     if (y != 0)
     {
       y -= 1;
-    } else if ( y == 0 && y_out > 0){
+    }
+    else if (y == 0 && y_out > 0)
+    {
       y_out -= 1;
     }
     if (x > Edit.line[y + y_out].len)
@@ -494,7 +496,8 @@ void Move(int key)
         y += 1;
       }
     }
-    if (x > Edit.line[y+y_out].len){
+    if (x > Edit.line[y + y_out].len)
+    {
       x = Edit.line[y + y_out].len;
     }
     move(y, x);
@@ -584,7 +587,7 @@ void presskey()
     case KEY_NPAGE: // Page Down 키
     case KEY_PPAGE: // Page Up 키
     {
-      int temprows = rows*2-3;
+      int temprows = rows * 2;
       while (temprows--)
       {
         if (c == KEY_PPAGE)
@@ -594,6 +597,7 @@ void presskey()
       }
       scroll_clean_and_printing(0);
     }
+    // can do
     break;
     // 이부분 해결해야 될듯
     case '\n':

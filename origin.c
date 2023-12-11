@@ -582,8 +582,8 @@ void delete_printing(int pos)
     mvprintw(i, 0, "~");
   }
 
-  for (int i = 0; i <= total + y - (y_out- rows -2); ++i){
-    if (Edit.line[i] == NULL)
+  for (int i = 0; i <= y; ++i){
+    if (Edit.line[i].c == NULL)
     {
       break;
     }

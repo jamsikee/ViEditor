@@ -620,7 +620,7 @@ void presskey()
       }
       
       scroll_clean_and_printing(0);
-       (c == KEY_PPAGE){
+      if (c == KEY_PPAGE){
           Move(KEY_UP);
           move(y, 0);
       }

@@ -629,7 +629,7 @@ void presskey()
       flag = 1;
       break;
 
-    case 127:
+    case KEY_BACKSPACE:
       DeleteChar();
       flag = 1;
       break;

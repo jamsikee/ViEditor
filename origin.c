@@ -503,7 +503,6 @@ void Move(int key)
     break;
   }
   curs_set(1);
-  refresh();
 }
 
 void open_file(char *store_file)

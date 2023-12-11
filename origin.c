@@ -310,15 +310,7 @@ void Del_current_line()
   RowInsertString(&Edit.line[y - 1 + y_out], line->c, line->len);
   DeleteRow(y + y_out);
 
-  if (y_out > 0 && x == 0 && y == 0)
-  {
-    y = 0;
-    y_out -= 1;
-  }
-  else
-  {
-    y -= 1;
-  }
+  y -= 1;
   // x cursor is prev line's len and y cursor -1 and insert string at line's len
 }
 
@@ -343,6 +335,15 @@ void DeleteChar()
   }
   else
   { 
+    if (y_out > 0 && x == 0 && y == 0)
+  {
+    y = 0;
+    y_out -= 1;
+  }
+  else
+  {
+    y -= 1;
+  }
     Del_current_line();
     scroll_clean_and_printing(y-1);
   }

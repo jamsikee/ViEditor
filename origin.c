@@ -621,12 +621,10 @@ void presskey()
       
       scroll_clean_and_printing(0);
       if (c == KEY_PPAGE){
-          Move(KEY_UP);
           move(y, 0);
       }
         else if (c == KEY_NPAGE){
-          Move(KEY_DOWN);
-          move(y, Edit.line[y + y_out + 1].len);
+          move(y, Edit.line[y + y_out ].len);
         }
     }
 

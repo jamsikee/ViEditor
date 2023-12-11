@@ -776,6 +776,7 @@ int main(int argc, char *argv[])
     end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     status_bar();
     getch();
+    refresh();
   }
   else
   {

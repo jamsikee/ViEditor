@@ -335,6 +335,7 @@ void DeleteChar()
   }
   else
   { 
+    Del_current_line();
     if (y_out > 0 && x == 0 && y == 0)
   {
     y = 0;
@@ -344,7 +345,6 @@ void DeleteChar()
   {
     y -= 1;
   }
-    Del_current_line();
     scroll_clean_and_printing(y + 1);
   }
 }

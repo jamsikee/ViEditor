@@ -617,8 +617,7 @@ void get_filename(F_name *FILE) {
           pos -= 1;
           BACKSPACE_Name(FILE, pos);
         }else if(pos < MAX_FILENAME - 1){
-          Insert_FILE_Name(FILE, pos, ch);
-          pos += 1;
+          Insert_FILE_Name(FILE, pos++, ch);
         }
       }
       mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", FILE->name);

@@ -243,6 +243,7 @@ void Newline()
   if (x == 0)
   {
     empty_new_line(y + y_out);
+    scroll_clean_and_printing(y);
   }
   else
   {

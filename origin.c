@@ -83,8 +83,6 @@ void all_refresh();
 void scroll_clean_and_printing(int pos);
 void open_file(char *store_file);
 void delete_clean_and_printing(int pos);
-void Insert_FILE_Name(F_name *FILE, int pos, char c);
-void BACKSPACE_Name(F_name *FILE, int pos);
 void get_filename(char *filename);
 
 Row *get_line(Row *line, int pos)
@@ -738,33 +736,6 @@ void scroll_clean_and_printing(int pos)
   }
 }
 
-void delete_clean_and_printing(int pos)
-{
-  for (int i = pos; i < rows - 2; ++i)
-  {
-    mvprintw(i, 0, "%*s", cols, "");
-  }
-
-  for (int i = 0; i < rows - 2; ++i)
-  {
-    if (Edit.line[i + y_out].c != NULL)
-    {
-      mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
-    }
-    else
-    {
-      mvprintw(i, 0, "%*s", cols, "");
-      mvprintw(i, 0, "~");
-      continue;
-    }
-  }
-}
-
-// void scroll(){
-//   if (x > cols){
-//     move_cols += 1;
-//   }
-// }
 void state()
 {
   clear();

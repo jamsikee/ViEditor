@@ -622,6 +622,7 @@ void get_filename(F_name *FILE) {
         }
       }
       mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", FILE->name);
+      refresh();
     }
     FILE->name[FILE->filename_len] = '\0';
 }

@@ -665,7 +665,7 @@ void presskey()
     {   if(flag == 1){
         status_FILE.name = malloc(MAX_FILENAME);
         status_FILE.filename_len = 0;
-        get_filename(F_name);
+        get_filename(&F_name);
         save_file(status_FILE.name);
         free(status_FILE.name);
     }

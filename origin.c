@@ -565,7 +565,8 @@ void presskey()
     {
     case CONTROL('q'):
       if (flag == 1)
-      {
+      { 
+        end_message("                                                 ");
         end_message("Warning!!!  Please Ctrl + Q One more");
         q_press += 1;
         if (q_press == 2)

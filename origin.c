@@ -665,8 +665,10 @@ void presskey()
     case CONTROL('s'):
     {   
       if(flag == 1){
-        mode_change = 1;
+        get_filename(&status_FILE);
     }
+    save_file(status_FILE.name);
+    flag = 0;
     }
       break;
 
@@ -851,13 +853,7 @@ int main(int argc, char *argv[])
     move(y, x);
     refresh();
     curs_set(1);
-    if(mode_change == 0){
     presskey();
-    } else{
-      
-        get_filename(&status_FILE);
-        save_file(status_FILE.name);
-    }
   }
 
   endwin();

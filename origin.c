@@ -509,7 +509,9 @@ void presskey()
     case KEY_UP:    // 위쪽 화살표 키
     case KEY_DOWN:  // 아래쪽 화살표 키
       Move(c);
-      scroll_clean_and_printing(0);
+      if(y_out > 0){
+        scroll_clean_and_printing(0);
+      }
       break;
     case KEY_END: // End 키
       x = Edit.line[y + y_out].len;
@@ -558,7 +560,6 @@ void scroll_clean_and_printing(int pos)
   for (int i = 0; i < rows - 2; ++i)
   {
     mvprintw(i, 0, "%*s", cols, "");
-    mvprintw(i, 0, "~");
   }
 
   for (int i = 0; i <= rows - 2; ++i){

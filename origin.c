@@ -778,8 +778,7 @@ int main(int argc, char *argv[])
   {
     Edit.filename = "No Name";
   }
-  move(y, x);
-  refresh();
+  
   all_refresh();
   Visual_Text_editor__version();
   move(0, 0); // 0, 0

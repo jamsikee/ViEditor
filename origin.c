@@ -6,7 +6,6 @@
 #include <ncurses.h>
 #include <stdbool.h>
 #include <stdarg.h>
-#include <unistd.h>
 
 #define CONTROL(k) ((k) & 0x1f) // control + k
 #define INIT_ROW_SIZE 1000
@@ -58,13 +57,6 @@ typedef struct {
     char *content;
     size_t content_size;
 } File;
-
-typedef struct{
-  char *name;
-  int filename_len;
-} F_name;
-
-F_name status_FILE;
 
 struct Visual_Text_Editor Edit;
 // total function
@@ -651,9 +643,12 @@ void presskey()
         char filename[MAX_FILENAME + 1];
         get_filename(filename);
         save_file(filename);
+        Edit.filename = filename;
+        end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     }
     flag = 0;
     }
+
       break;
 
     case CONTROL('f'):
@@ -808,8 +803,7 @@ int main(int argc, char *argv[])
   flag = 0;
   q_press = 0;
   getmaxyx(stdscr, rows, cols); // rows cols
-  status_FILE.name = malloc(MAX_FILENAME);
-  status_FILE.filename_len = 0;
+
   if (argc >= 2)
   {
     Edit.filename = argv[1];
@@ -841,6 +835,5 @@ int main(int argc, char *argv[])
   }
 
   endwin();
-  free(status_FILE.name);
   return 0;
 }

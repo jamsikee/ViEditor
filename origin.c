@@ -375,8 +375,8 @@ void Visual_Text_editor__version()
 
 void status_bar()
 {
-  char total_len[30];
-  char st_y[30];
+  char total_len[20];
+  char st_y[20];
   int y_1 = y + 1;
   snprintf(total_len, sizeof(total_len), "%d", total);
   snprintf(st_y, sizeof(st_y), "%d", y + y_out + 1);
@@ -395,7 +395,7 @@ void status_bar()
     mvprintw(rows - 2, i, " ");
     refresh();
   }
-    mvprintw(rows - 2, 0, "[No Name] - %d lines", total);
+  mvprintw(rows - 2, 0, "[No Name] - %d lines",total);
   }else{
     for (int i = left_len - 2; i < cols - right_len; i++)
   {
@@ -404,6 +404,8 @@ void status_bar()
   }
   mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
   }
+  // 왼쪽에 텍스트 출력
+
 
   // 오른쪽에 텍스트 출력
 

@@ -612,7 +612,13 @@ void presskey()
       break;
 
     case CONTROL('s'):
-    save_file(Edit.filename);
+    {
+        char filename[100]; // Define a buffer for the filename
+        get_filename(filename, sizeof(filename)); // Get the filename from the user
+        // Save the file using the obtained filename
+        save_file(filename);
+        break;
+    }
       break;
 
     case CONTROL('f'):
@@ -746,6 +752,15 @@ void all_refresh()
   end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
   move(y, x);
   refresh();
+}
+
+void get_filename(char *filename_buffer, int max_length) {
+    mvprintw(rows - 1, 0, "Enter filename : ");
+    echo(); // Enable echoing of user input
+    move(rows - 1, strlen("Enter filename : "));
+    refresh();
+    getnstr(filename_buffer, max_length); // Capture user input for the filename
+    noecho(); // Disable echoing
 }
 
 int main(int argc, char *argv[])

@@ -641,7 +641,7 @@ void presskey()
         char filename[MAX_FILENAME + 1];
         get_filename(filename);
         save_file(filename);
-        char tempname = filename;
+        char tempname[50] = filename;
         Edit.filename = tempname;
         end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     }

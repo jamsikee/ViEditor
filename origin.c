@@ -317,8 +317,9 @@ void Del_current_line()
   RowInsertString(&Edit.line[y - 1 + y_out], line->c, line->len);
   DeleteRow(y + y_out);
 
-  if(y == 0){
+  if(y == 0 && y > y_out){
     y = 0;
+    y_out -= 1;
   } else{
     y -= 1;
   }
@@ -346,11 +347,6 @@ void DeleteChar()
   }
   else{
     Del_current_line();
-    if ( x == 0 && y == 0 && y_out > 0 ){
-      y_out -= 1;
-      y = 0;
-      x = Edit.line[y + y_out].len;
-    } 
     scroll_clean_and_printing(y);
   }
 }

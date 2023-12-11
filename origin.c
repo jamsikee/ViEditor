@@ -311,11 +311,16 @@ void DeleteChar()
   if (x > 0)
   {
     Del_current_line_char();
-    scroll_clean_and_printing(y);
+
   }
   else
   {
     Del_current_line();
+  }
+  if(total = y+ y_out){
+    delete_printing(y);
+  }
+  else{
     scroll_clean_and_printing(y);
   }
 }
@@ -555,7 +560,26 @@ void scroll_clean_and_printing(int pos)
       mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
     }
   }
+}
 
+void delete_printing(int pos)
+{
+  for (int i = pos; i < rows - 2; ++i)
+  {
+    mvprintw(i, 0, "%*s", cols, "");
+    mvprintw(i, 0, "~");
+  }
+
+  for (int i = 0; i <= y; ++i){
+    if (Edit.line[i + y_out].c == NULL)
+    {
+      break;
+    }
+    else
+    {
+      mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
+    }
+  }
 }
 
 // void scroll(){

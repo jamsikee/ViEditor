@@ -773,7 +773,6 @@ int main(int argc, char *argv[])
   {
     Edit.filename = argv[1];
     open_file(argv[1]);
-    presskey();
   }
   else
   {
@@ -783,7 +782,6 @@ int main(int argc, char *argv[])
   Visual_Text_editor__version();
   move(0, 0); // 0, 0
   refresh();  // refresh();
-  presskey();
   Visual_Text_editor__version();
   refresh();
 

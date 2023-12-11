@@ -418,8 +418,8 @@ void Move(int key)
     }
     else if (x == 0 && y == 0){
       if(y_out > 0){
-        x = Edit.line[y + y_out].len;
         y = 0;
+        x = Edit.line[y + y_out].len;
         y_out -= 1;
       }
     }

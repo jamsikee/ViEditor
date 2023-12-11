@@ -228,7 +228,6 @@ void Insertchar(char word)
   x += 1;
   // Insert char at cursor x
   scroll_clean_and_printing(y);
-  
 }
 
 void contained_new_line(Row *line, int pos_y, int pos_x)
@@ -250,44 +249,47 @@ void Newline()
   {
     empty_new_line(y + y_out);
     if (y == rows - 3)
-  {
-    y = rows - 3;
-    y_out += 1;
-  }
-  else
-  {
-    y += 1;
-  }
-  x = 0;
+    {
+      y = rows - 3;
+      y_out += 1;
+    }
+    else
+    {
+      y += 1;
+    }
+    x = 0;
 
-  if(y == rows - 3){
-    scroll_clean_and_printing(0);
-  }
-  else{
-    scroll_clean_and_printing(y - 1);
-  }
+    if (y == rows - 3)
+    {
+      scroll_clean_and_printing(0);
+    }
+    else
+    {
+      scroll_clean_and_printing(y - 1);
+    }
   }
   else
   {
     contained_new_line(line, y + y_out, x);
     if (y == rows - 3)
-  {
-    y = rows - 3;
-    y_out += 1;
+    {
+      y = rows - 3;
+      y_out += 1;
+    }
+    else
+    {
+      y += 1;
+    }
+    x = 0;
+    if (y == rows - 3)
+    {
+      scroll_clean_and_printing(0);
+    }
+    else
+    {
+      scroll_clean_and_printing(y - 1);
+    }
   }
-  else
-  {
-    y += 1;
-  }
-  x = 0;
-  if(y == rows - 3){
-    scroll_clean_and_printing(0);
-  }
-  else{
-    scroll_clean_and_printing(y - 1);
-  }
-  }
-
 }
 
 void Del_current_line_char()
@@ -337,7 +339,6 @@ void DeleteChar()
   if (x > 0)
   {
     Del_current_line_char();
-
   }
   else
   {
@@ -416,8 +417,10 @@ void Move(int key)
       y -= 1;
       x = Edit.line[y + y_out].len;
     }
-    else if (x == 0 && y == 0){
-      if(y_out > 0){
+    else if (x == 0 && y == 0)
+    {
+      if (y_out > 0)
+      {
         y = 0;
         y_out -= 1;
         x = Edit.line[y + y_out].len;
@@ -438,19 +441,25 @@ void Move(int key)
       }
       else if (x == Edit.line[y + y_out].len)
       {
-        if (y == rows - 3 && y + y_out < total){
+        if (y == rows - 3 && y + y_out < total)
+        {
           y_out += 1;
           y = rows - 3;
           x = 0;
-        } else{
-          if(y != rows - 3){
-          y += 1;
-          x = 0;
-        }else{
-          y = rows - 3;
+        }
+        else
+        {
+          if (y != rows - 3)
+          {
+            y += 1;
+            x = 0;
+          }
+          else
+          {
+            y = rows - 3;
+          }
         }
       }
-    }
     }
     move(y, x);
     break;
@@ -458,6 +467,12 @@ void Move(int key)
     if (y != 0)
     {
       y -= 1;
+    } else if ( y == 0 && y_out > 0){
+      y_out -= 1;
+    }
+    if (x > Edit.line[y + y_out].len)
+    {
+      x = Edit.line[y + y_out].len;
     }
     move(y, x);
     break;
@@ -604,20 +619,19 @@ void scroll_clean_and_printing(int pos)
     mvprintw(i, 0, "%*s", cols, "");
   }
 
-  for (int i = 0; i <= rows - 2; ++i){
+  for (int i = 0; i <= rows - 2; ++i)
+  {
     if (Edit.line[i + y_out].c == NULL)
     {
       mvprintw(i, 0, "%*s", cols, "");
       continue;
     }
     else
-    { 
+    {
       mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
-      
     }
   }
 }
-
 
 // void scroll(){
 //   if (x > cols){

@@ -416,10 +416,25 @@ void Move(int key)
       y -= 1;
       x = Edit.line[y].len;
     }
+    else if (x == 0 && y == 0){
+
+    }
     move(y, x);
     break;
   case KEY_RIGHT:
-    x += 1;
+    if (Edit.line[y].c == NULL) {
+    break;
+}
+else {
+    if (x < Edit.line[y].len) {
+        x += 1;
+    }
+    else if (x == Edit.line[y].len) {
+        if (y == total) break;
+        y += 1;
+        x = 0;
+    }
+}
     move(y, x);
     break;
   case KEY_UP:
@@ -580,6 +595,7 @@ void scroll_clean_and_printing(int pos)
     else
     {
       mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
+      if(Edit.line[i + y_out].len == 0) break;
     }
   }
 }

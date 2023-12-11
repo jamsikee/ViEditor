@@ -604,6 +604,7 @@ void get_filename(char *filename) {
           filename[pos] = '\0';
         }
       }
+      mvprintw(rows-1, 0, "%*s", cols, "");
       mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", filename);
       refresh();
     }

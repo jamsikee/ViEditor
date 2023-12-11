@@ -338,7 +338,7 @@ void DeleteChar()
   {
     return;
   }
-  if (x == 0 && y == 0)
+  if (x == 0 && y + y_out == 0)
   {
     return;
   }

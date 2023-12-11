@@ -451,6 +451,7 @@ void Move(int key)
         }
       }
     }
+    }
     move(y, x);
     break;
   case KEY_UP:

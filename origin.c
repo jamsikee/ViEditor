@@ -11,6 +11,7 @@
 #define CONTROL(k) ((k) & 0x1f) // control + k
 #define INIT_ROW_SIZE 1000
 #define INIT_LINE_SIZE 125
+#define MAX_FILENAME 50
 
 int x = 0;
 int y = 0;     // 1 최대 54
@@ -22,6 +23,7 @@ int move_cols = 0;
 int total = 0;
 int flag = 0;
 int q_press = 0;
+int mode_change = 0;
 
 // total suruct
 typedef struct Row
@@ -57,6 +59,13 @@ typedef struct {
     size_t content_size;
 } File;
 
+typedef struct{
+  char *name;
+  int filename_len;
+} F_name;
+
+F_name status_FILE;
+
 struct Visual_Text_Editor Edit;
 // total function
 
@@ -82,7 +91,9 @@ void all_refresh();
 void scroll_clean_and_printing(int pos);
 void open_file(char *store_file);
 void delete_clean_and_printing(int pos);
-void get_filename(char *filename_buffer, int max_length);
+void Insert_FILE_Name(F_name *FILE, int pos, char c);
+void BACKSPACE_Name(F_name *FILE, int pos);
+void get_filename(char *filename);
 
 Row *get_line(Row *line, int pos)
 {
@@ -576,6 +587,26 @@ void save_file(char *filename) {
     fclose(file); // 파일 닫기
 }
 
+void get_filename(char *filename) {
+    int ch, pos = 0;
+    mvprintw(rows-1, 0, "%*s", cols, "");
+    mvprintw(rows - 1, 0, "ENTER FILE NAME : ");
+    while((ch = getch()) != '\n'){
+      if(ch == KEY_BACKSPACE){
+        if(pos > 0){
+          pos -= 1;
+          filename[pos] = '\0';
+        }
+      } else {
+        if(pos < MAX_FILENAME - 1){
+          filename[pos++] = ch;
+          filename[pos] = '\0';
+        }
+      }
+      mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", filename);
+      refresh();
+    }
+}
 
 // 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐
 void presskey()
@@ -613,16 +644,13 @@ void presskey()
       break;
 
     case CONTROL('s'):
-    {   if(flag == 1){
-        char filename[100]; // Define a buffer for the filename
-        get_filename(filename, sizeof(filename)); // Get the filename from the user
-        // Save the file using the obtained filename
+    {   
+      if(flag == 1){
+        char filename[MAX_FILENAME + 1];
+        get_filename(filename);
         save_file(filename);
-        clear(); // Clear the screen after saving
-        endwin(); // Close the ncurses window
-        exit(0); // Exit the program
-        break;
     }
+    flag = 0;
     }
       break;
 
@@ -759,34 +787,6 @@ void all_refresh()
   refresh();
 }
 
-void get_filename(char *filename_buffer, int max_length) {
-    mvprintw(rows - 1, 0, "Enter filename (Enter to finish): ");
-    echo(); // Enable echoing of user input
-    move(rows - 1, strlen("Enter filename (Enter to finish): "));
-    refresh();
-
-    int ch;
-    int index = 0;
-    while ((ch = getch()) != '\n') {
-        if (ch == KEY_BACKSPACE || ch == 127) {
-            if (index > 0) {
-                index--;
-                filename_buffer[index] = '\0';
-                move(rows - 1, strlen("Enter filename (Ctrl-G to finish): ") + index);
-                addch(' '); // Clear the character on the screen
-                move(rows - 1, strlen("Enter filename (Ctrl-G to finish): ") + index);
-                refresh();
-            }
-        } else if (isprint(ch) && index < max_length - 1) {
-            filename_buffer[index++] = ch;
-            filename_buffer[index] = '\0';
-            addch(ch);
-            refresh();
-        }
-    }
-    noecho(); // Disable echoing
-}
-
 int main(int argc, char *argv[])
 {
   initscr();
@@ -806,7 +806,8 @@ int main(int argc, char *argv[])
   flag = 0;
   q_press = 0;
   getmaxyx(stdscr, rows, cols); // rows cols
-
+  status_FILE.name = malloc(MAX_FILENAME);
+  status_FILE.filename_len = 0;
   if (argc >= 2)
   {
     Edit.filename = argv[1];
@@ -838,5 +839,6 @@ int main(int argc, char *argv[])
   }
 
   endwin();
+  free(status_FILE.name);
   return 0;
 }

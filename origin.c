@@ -260,7 +260,12 @@ void Newline()
   }
   x = 0;
 
-  scroll_clean_and_printing(y);
+  if(total - 1 == y+ y_out){
+    delete_printing(y);
+  }
+  else{
+    scroll_clean_and_printing(y);
+  }
 }
 
 void Del_current_line_char()

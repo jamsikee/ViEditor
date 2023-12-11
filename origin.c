@@ -583,7 +583,7 @@ void delete_printing(int pos)
   }
 
   for (int i = 0; i <= total + y - (y_out- rows -2); ++i){
-    if (Edit.line[i + y_out].c == NULL)
+    if (Edit.line == NULL)
     {
       break;
     }

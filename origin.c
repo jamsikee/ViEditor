@@ -318,10 +318,10 @@ void Del_current_line()
 
   if(y == 0 && y_out > 0){
     y = 0;
-    x = Edit.line[y - 1 + y_out].len;
+    x = Edit.line[y  + y_out].len;
     y_out -= 1;
   } else{
-    x = Edit.line[y - 1 + y_out].len;
+    x = Edit.line[y  + y_out].len;
     y -= 1;
     
   }

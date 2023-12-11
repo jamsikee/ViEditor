@@ -640,9 +640,9 @@ void presskey()
       if(flag == 1){
         char filename[MAX_FILENAME + 1];
         get_filename(filename);
+        Edit.filename = filename;
         save_file(filename);
-        char tempname[50] = filename;
-        Edit.filename = tempname;
+        
         end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     }
     flag = 0;

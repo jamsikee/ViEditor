@@ -387,12 +387,6 @@ void status_bar()
 
   init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
   attron(COLOR_PAIR(2) | A_REVERSE);      // Enable the defined reverse color pair
-
-  for (int i = left_len - 2; i < cols - right_len; i++)
-  {
-    mvprintw(rows - 2, i, " ");
-    refresh();
-  }
   
   if(Edit.filename == NULL){
     for (int i = left_len_no - 2; i < cols - right_len; i++)
@@ -400,7 +394,7 @@ void status_bar()
     mvprintw(rows - 2, i, " ");
     refresh();
   }
-      mvprintw(rows - 2, 0, "[No Name] - %d lines", total);
+    mvprintw(rows - 2, 0, "[No Name] - %d lines", total);
   } else{
   // 왼쪽에 텍스트 출력
   for (int i = left_len - 2; i < cols - right_len; i++)
@@ -656,6 +650,7 @@ void presskey()
   }
 
   refresh();
+}
 }
 
 void file_save(){

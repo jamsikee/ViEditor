@@ -380,9 +380,8 @@ void status_bar()
   for (int i = left_len - 2; i < cols - right_len; i++)
   {
     mvprintw(rows - 2, i, " ");
-    refresh();
   }
-
+  refresh();
   // 왼쪽에 텍스트 출력
   mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
 

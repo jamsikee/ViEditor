@@ -249,13 +249,7 @@ void Newline()
   if (x == 0)
   {
     empty_new_line(y + y_out);
-  }
-  else
-  {
-    contained_new_line(line, y + y_out, x);
-  }
-
-  if (y == rows - 3)
+    if (y == rows - 3)
   {
     y = rows - 3;
     y_out += 1;
@@ -272,6 +266,28 @@ void Newline()
   else{
     scroll_clean_and_printing(y);
   }
+  }
+  else
+  {
+    contained_new_line(line, y + y_out, x);
+    if (y == rows - 3)
+  {
+    y = rows - 3;
+    y_out += 1;
+  }
+  else
+  {
+    y += 1;
+  }
+  x = 0;
+  if(y == rows - 3){
+    scroll_clean_and_printing(0);
+  }
+  else{
+    scroll_clean_and_printing(y - 1);
+  }
+  }
+
 }
 
 void Del_current_line_char()

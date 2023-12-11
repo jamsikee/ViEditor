@@ -342,7 +342,8 @@ void DeleteChar()
   }
   else
   { 
-    if(y_out > 0 && x == 0){
+    if(y_out > 0 && x == 0 && y == 0){
+      y = 0;
       y_out -= 1;
     }
     Del_current_line();

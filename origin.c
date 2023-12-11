@@ -313,15 +313,14 @@ void Del_current_line()
 
   Row *line = get_line(Edit.line, y + y_out);
   // get line Edit.line[y]
+  x = Edit.line[y -1 + y_out].len;
   RowInsertString(&Edit.line[y - 1 + y_out], line->c, line->len);
   DeleteRow(y + y_out);
 
   if(y == 0 && y_out > 0){
     y = 0;
-    x = Edit.line[y -1 + y_out].len;
     y_out -= 1;
   } else{
-    x = Edit.line[y  -1+ y_out].len;
     y -= 1;
     
   }

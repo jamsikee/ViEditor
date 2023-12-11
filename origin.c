@@ -134,6 +134,7 @@ void InsertRow(int edit_y, char *line, int line_len)
   total += 1;
 }
 
+
 void FreeRow(Row *line)
 { // Efficient method for free memory
 
@@ -541,12 +542,12 @@ void open_file(char *store_file)
 
   while ((Inf.length = getline(&(Inf.temp), &(Inf.size), file)) != -1)
   {
-    int read = Inf.length;
     while (Inf.length > 0 && (Inf.temp[Inf.length - 1] == '\r' || Inf.temp[Inf.length - 1] == '\n'))
     {
-      Inf.length-= 2;
+      Inf.length-= 1;
     }
-    InsertRow(total, Inf.temp, read);
+    int read = Inf.length;
+    InsertRow(total, Inf.temp, read );
   }
 
   free(Inf.temp);

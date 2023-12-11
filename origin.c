@@ -419,7 +419,7 @@ void Move(int key)
     break;
   case KEY_DOWN:
     int scroll_y = 0;
-    if (y == rows - 2)
+    if (y == rows - 3)
     {
       if (total == y + y_out)
       {

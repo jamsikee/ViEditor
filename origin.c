@@ -129,18 +129,23 @@ void FreeRow(Row *line)
   free(line->c);
 }
 
-void DeleteRow(int pos) {
-    if (pos < 0 || pos >= total) {
-        return;
-    }
+void DeleteRow(int pos)
+{
 
-    FreeRow(&Edit.line[pos]); // Line[pos]'s memory free
+  if (pos < 0)
+  {
+    return;
+  }
+  if (pos >= total)
+  {
+    return;
+  }
+  // If y < 0 or y > total then return
 
-    for (int i = pos; i < total - 1; ++i) {
-        Edit.line[i] = Edit.line[i + 1];
-    }
-
-    total -= 1;
+  FreeRow(&Edit.line[pos]); // Line[pos]'s memory free
+  memmove(&Edit.line[pos], &Edit.line[pos + 1], sizeof(Row) * (total - pos - 1));
+  // Line[pos+1]'s memory move to free memory(line[pos])
+  total -= 1;
 }
 
 void RowInsertString(Row *line, char *str, size_t del_line_len)
@@ -531,21 +536,21 @@ void presskey()
   refresh();
 }
 
-void print_edit_line(int i) {
-    if (Edit.line[i].c == NULL) {
-        mvprintw(i, 0, "~");
-    } else {
-        mvprintw(i, 0, "%s", Edit.line[i].c);
+void scroll_clean_and_printing(int pos)
+{
+  for (int i = pos; i < rows - 2; ++i)
+  {
+    mvprintw(i, 0, "%*s", cols, "");
+    if (Edit.line[i + y_out].c == NULL)
+    {
+      break;
     }
-}
-
-void scroll_clean_and_printing(int pos) {
-    for (int i = pos; i < rows - 2; ++i) {
-        mvprintw(i, 0, "%*s", cols, "");
-        print_edit_line(i + y_out);
+    else
+    {
+      mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
     }
+  }
 }
-
 
 // void scroll(){
 //   if (x > cols){

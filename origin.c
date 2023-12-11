@@ -317,18 +317,9 @@ void Del_current_line()
   RowInsertString(&Edit.line[y - 1 + y_out], line->c, line->len);
   DeleteRow(y + y_out);
 
-  if (y_out > 0 && x == 0 && y == 0)
-  {
+  if(y == 0){
     y = 0;
-    y_out -= 1;
-    if( Edit.line[y + y_out].c == NULL){
-      x = 0;
-    }else{
-      x = Edit.line[y + y_out].len;
-    }
-  }
-  else
-  {
+  } else{
     y -= 1;
   }
   // x cursor is prev line's len and y cursor -1 and insert string at line's len
@@ -353,9 +344,13 @@ void DeleteChar()
     Del_current_line_char();
     scroll_clean_and_printing(y);
   }
-  else
-  { 
+  else{
     Del_current_line();
+    if ( x == 0 && y == 0 && y_out > 0 ){
+      y_out -= 1;
+      y = 0;
+      x = Edit.line[y + y_out].len;
+    } 
     scroll_clean_and_printing(y);
   }
 }

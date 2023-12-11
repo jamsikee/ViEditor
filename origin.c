@@ -443,8 +443,11 @@ void Move(int key)
           y = rows - 3;
           x = 0;
         } else{
+          if(y != rows - 3){
           y += 1;
           x = 0;
+        }else{
+          y = rows - 3;
         }
       }
     }

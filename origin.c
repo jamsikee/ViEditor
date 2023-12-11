@@ -537,13 +537,10 @@ void presskey()
     // 이부분 해결해야 될듯
     case '\n':
       Newline();
-      Move(KEY_UP);
       break;
 
     case 8:
       DeleteChar();
-      Move(KEY_DOWN);
-      Move(KEY_DOWN);
       break;
     }
   }
@@ -558,7 +555,7 @@ void presskey()
 
 void scroll_clean_and_printing(int pos)
 {
-  for (int i = pos; i < rows - 2; ++i)
+  for (int i = 0; i < rows - 2; ++i)
   {
     mvprintw(i, 0, "%*s", cols, "");
     mvprintw(i, 0, "~");

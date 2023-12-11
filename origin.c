@@ -438,7 +438,7 @@ void Move(int key)
       }
       else if (x == Edit.line[y + y_out].len)
       {
-        if (y == rows - 3 && y + y_out == total){
+        if (y == rows - 3 && y + y_out < total){
           y_out += 1;
           y = rows - 3;
         } else{

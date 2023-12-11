@@ -566,6 +566,7 @@ void open_file(char *store_file)
   fclose(file);
   y = 0;
   y_out = total - rows - 2;
+  if(y_out < 0) y_out = 0;
 
 }
 

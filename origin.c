@@ -477,7 +477,6 @@ void Move(int key)
     move(y, x);
     break;
   case KEY_DOWN:
-    int scroll_y = 0;
     if (y == rows - 3)
     {
       if (total == y + y_out)
@@ -486,7 +485,6 @@ void Move(int key)
         break;
       }
       y_out += 1;
-      flag = 1;
       y = rows - 3;
     }
     else
@@ -495,6 +493,9 @@ void Move(int key)
       {
         y += 1;
       }
+    }
+    if (x > Edit.line[y+y_out].len){
+      x = Edit.line[y + y_out].len;
     }
     move(y, x);
     break;

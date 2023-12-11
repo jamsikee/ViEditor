@@ -73,6 +73,7 @@ void end_message(const char *format, ...);
 void all_refresh();
 void scroll_clean_and_printing(int pos);
 void open_file(char *store_file);
+void delete_clean_and_printing(int pos);
 
 Row *get_line(Row *line, int pos)
 {
@@ -148,9 +149,7 @@ void DeleteRow(int pos)
   Edit.line[pos].line_capacity = 0;
   FreeRow(&Edit.line[pos]);
   // Line[pos]'s memory free
-   for (int i = pos; i < total - 1; ++i) {
-        Edit.line[i] = Edit.line[i + 1]; // 다음 요소를 현재 위치로 이동
-    }
+  memmove(&Edit.line[pos], &Edit.line[pos + 1], sizeof(Row) * (total - pos - 1));
   // Line[pos+1]'s memory move to free memory(line[pos])
   total -= 1;
 }
@@ -346,7 +345,7 @@ void DeleteChar()
   else
   { 
     Del_current_line();
-    scroll_clean_and_printing(y + 1);
+    delete_clean_and_printing(y + 1);
   }
 }
 
@@ -634,6 +633,27 @@ void scroll_clean_and_printing(int pos)
       mvprintw(i, 0, "%*s", cols, "");
       mvprintw(i, 0, "~");
       continue;
+    }
+    else
+    {
+      mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
+    }
+  }
+}
+
+void delete_clean_and_printing(int pos)
+{
+  for (int i = pos; i < rows - 2; ++i)
+  {
+    mvprintw(i, 0, "%*s", cols, "");
+  }
+
+  for (int i = 0; i < rows - 2; ++i)
+  {
+    if (Edit.line[i + y_out].c == NULL)
+    {
+      mvprintw(i, 0, "%*s", cols, "");
+      break;
     }
     else
     {

@@ -392,9 +392,9 @@ void status_bar()
     mvprintw(rows - 2, i, " ");
     refresh();
   }
-  
   // 왼쪽에 텍스트 출력
   mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
+
   // 오른쪽에 텍스트 출력
 
   mvprintw(rows - 2, cols - right_len, "no ft | %d / %d", y + y_out + 1, total);
@@ -620,8 +620,17 @@ void presskey()
       }
       
       scroll_clean_and_printing(0);
+      if (c == KEY_PPAGE){
+          move(y, 0);
+      }
+        else if (c == KEY_NPAGE){
+          move(y, Edit.line[y + y_out ].len);
+        }
+    }
+
     // can do
     break;
+    // 이부분 해결해야 될듯
     case '\n':
       Newline();
       flag = 1;
@@ -633,7 +642,7 @@ void presskey()
       break;
     }
   }
-  }else
+  else
   {
     char ch = (char)c;
     Insertchar(ch);
@@ -736,7 +745,10 @@ int main(int argc, char *argv[])
     Edit.filename = argv[1];
     open_file(argv[1]);
   }
-
+  else
+  {
+    Edit.filename = "No Name";
+  }
 
   all_refresh();
   Visual_Text_editor__version();

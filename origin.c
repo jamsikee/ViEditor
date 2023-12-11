@@ -769,7 +769,11 @@ int main(int argc, char *argv[])
   q_press = 0;
   getmaxyx(stdscr, rows, cols); // rows cols
 
-  if (argc >= 2)
+
+
+  all_refresh();
+  Visual_Text_editor__version();
+    if (argc >= 2)
   {
     Edit.filename = argv[1];
     open_file(argv[1]);
@@ -778,9 +782,6 @@ int main(int argc, char *argv[])
   {
     Edit.filename = "No Name";
   }
-
-  all_refresh();
-  Visual_Text_editor__version();
   move(0, 0); // 0, 0
   refresh();  // refresh();
   presskey();

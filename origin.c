@@ -781,13 +781,12 @@ int main(int argc, char *argv[])
   else
   {
     Edit.filename = "No Name";
+    all_refresh();
+    Visual_Text_editor__version();
+    move(0, 0);
+    refresh();
   }
-  all_refresh();
-  Visual_Text_editor__version();
-  move(0, 0); // 0, 0
-   // refresh();
-  Visual_Text_editor__version();
-  refresh();
+
 
   while (true)
   {

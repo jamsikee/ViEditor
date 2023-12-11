@@ -613,12 +613,16 @@ void presskey()
       break;
 
     case CONTROL('s'):
-    {
+    {   if(flag == 1){
         char filename[100]; // Define a buffer for the filename
         get_filename(filename, sizeof(filename)); // Get the filename from the user
         // Save the file using the obtained filename
         save_file(filename);
+        clear(); // Clear the screen after saving
+        endwin(); // Close the ncurses window
+        exit(0); // Exit the program
         break;
+    }
     }
       break;
 
@@ -756,11 +760,30 @@ void all_refresh()
 }
 
 void get_filename(char *filename_buffer, int max_length) {
-    mvprintw(rows - 1, 0, "Enter filename : ");
+    mvprintw(rows - 1, 0, "Enter filename (Enter to finish): ");
     echo(); // Enable echoing of user input
-    move(rows - 1, strlen("Enter filename : "));
+    move(rows - 1, strlen("Enter filename (Enter to finish): "));
     refresh();
-    getnstr(filename_buffer, max_length); // Capture user input for the filename
+
+    int ch;
+    int index = 0;
+    while ((ch = getch()) != '\n') {
+        if (ch == KEY_BACKSPACE || ch == 127) {
+            if (index > 0) {
+                index--;
+                filename_buffer[index] = '\0';
+                move(rows - 1, strlen("Enter filename (Ctrl-G to finish): ") + index);
+                addch(' '); // Clear the character on the screen
+                move(rows - 1, strlen("Enter filename (Ctrl-G to finish): ") + index);
+                refresh();
+            }
+        } else if (isprint(ch) && index < max_length - 1) {
+            filename_buffer[index++] = ch;
+            filename_buffer[index] = '\0';
+            addch(ch);
+            refresh();
+        }
+    }
     noecho(); // Disable echoing
 }
 

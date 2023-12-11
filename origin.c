@@ -658,7 +658,7 @@ void delete_clean_and_printing(int pos)
     }
     else
     {
-      mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
+      mvprintw(i, 0, "%s", Edit.line[i + y_out - 1].c);
     }
   }
 }

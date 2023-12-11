@@ -593,6 +593,7 @@ void presskey()
         else if (c == KEY_NPAGE)
           Move(KEY_DOWN);
       }
+      
       scroll_clean_and_printing(0);
     }
     // can do
@@ -623,7 +624,7 @@ void scroll_clean_and_printing(int pos)
     mvprintw(i, 0, "%*s", cols, "");
   }
 
-  for (int i = 0; i <= rows - 2; ++i)
+  for (int i = 0; i < rows - 2; ++i)
   {
     if (Edit.line[i + y_out].c == NULL)
     {

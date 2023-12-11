@@ -375,25 +375,35 @@ void Visual_Text_editor__version()
 
 void status_bar()
 {
-  char total_len[20];
-  char st_y[20];
+  char total_len[30];
+  char st_y[30];
   int y_1 = y + 1;
   snprintf(total_len, sizeof(total_len), "%d", total);
   snprintf(st_y, sizeof(st_y), "%d", y + y_out + 1);
 
   int left_len = strlen(total_len) + strlen(Edit.filename) + 13;
+  int left_len_no = strlen(total_len) + 20;
   int right_len = strlen(total_len) + strlen(st_y) + 11; // 9은 "no ft | "의 길이
 
   init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
   attron(COLOR_PAIR(2) | A_REVERSE);      // Enable the defined reverse color pair
 
-  for (int i = left_len - 2; i < cols - right_len; i++)
+
+  if(Edit.filename == NULL){
+    for (int i = left_len_no - 2; i < cols - right_len; i++)
   {
     mvprintw(rows - 2, i, " ");
     refresh();
   }
-  // 왼쪽에 텍스트 출력
+    mvprintw(rows - 2, 0, "[No Name] - %d lines", total);
+  }else{
+    for (int i = left_len - 2; i < cols - right_len; i++)
+  {
+    mvprintw(rows - 2, i, " ");
+    refresh();
+  }
   mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
+  }
 
   // 오른쪽에 텍스트 출력
 
@@ -736,10 +746,7 @@ int main(int argc, char *argv[])
     Edit.filename = argv[1];
     open_file(argv[1]);
   }
-  else
-  {
-    Edit.filename = "No Name";
-  }
+
 
   all_refresh();
   Visual_Text_editor__version();

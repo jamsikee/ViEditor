@@ -465,6 +465,8 @@ void open_file(char *store_file)
 
   free(Inf.temp);
   fclose(file);
+  y = 0;
+  y_out = total - rows - 2;
 }
 
 // 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐

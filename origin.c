@@ -579,7 +579,9 @@ void save_file(char *filename) {
     for (int i = 0; i < total; ++i) {
         if (Edit.line[i].c != NULL) {
             fprintf(file, "%s\n", Edit.line[i].c); // 각 줄을 파일에 쓰기
-        } 
+        } else {
+            fprintf(file, "\n"); // 비어있는 줄인 경우 개행 문자만 파일에 쓰기
+        }
     }
 
     fclose(file); // 파일 닫기
@@ -813,7 +815,7 @@ int main(int argc, char *argv[])
     end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     status_bar();
     move(y, x);
-    scroll_clean_and_printing(0);
+    
     refresh();
   }
   else

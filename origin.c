@@ -775,7 +775,6 @@ int main(int argc, char *argv[])
     open_file(argv[1]);
     end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     status_bar();
-    presskey();
   }
   else
   {

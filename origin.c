@@ -266,7 +266,7 @@ void Newline()
   x = 0;
 
   if(total - 1 == y+ y_out){
-    delete_printing(y);
+    scroll_clean_and_printing(0);
   }
   else{
     scroll_clean_and_printing(y);

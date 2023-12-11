@@ -592,6 +592,7 @@ void presskey()
         else if (c == KEY_NPAGE)
           Move(KEY_DOWN);
       }
+      scroll_clean_and_printing(0);
     }
     break;
     // 이부분 해결해야 될듯

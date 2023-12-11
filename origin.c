@@ -50,6 +50,13 @@ typedef struct
   // Store_File_Information
 } File_Inf;
 
+
+typedef struct {
+    char *filename;
+    char *content;
+    size_t content_size;
+} File;
+
 struct Visual_Text_Editor Edit;
 // total function
 
@@ -548,6 +555,25 @@ void open_file(char *store_file)
   y_out = total - rows - 2;
 }
 
+void save_file(char *filename) {
+    FILE *file = fopen(filename, "w"); // "w" 모드로 파일을 쓰기 모드로 열기
+    if (!file) {
+        fprintf(stderr, "Cannot open file for writing: %s\n", filename);
+        return;
+    }
+
+    for (int i = 0; i < total; ++i) {
+        if (Edit.line[i].c != NULL) {
+            fprintf(file, "%s\n", Edit.line[i].c); // 각 줄을 파일에 쓰기
+        } else {
+            fprintf(file, "\n"); // 비어있는 줄인 경우 개행 문자만 파일에 쓰기
+        }
+    }
+
+    fclose(file); // 파일 닫기
+}
+
+
 // 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐
 void presskey()
 {
@@ -584,6 +610,7 @@ void presskey()
       break;
 
     case CONTROL('s'):
+    save_file(Edit.filename);
       break;
 
     case CONTROL('f'):

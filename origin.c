@@ -554,8 +554,7 @@ void open_file(char *store_file)
   fclose(file);
   y = 0;
   y_out = total - rows - 2;
-  scroll_clean_and_printing(0);
-  refresh();
+
 }
 
 void save_file(char *filename) {

@@ -393,12 +393,9 @@ void status_bar()
     refresh();
   }
   // 왼쪽에 텍스트 출력
-  mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
-  if(Edit.filename == "No Name"){
-    mvprintw(1, 2, "hgello");
-  }
-  // 오른쪽에 텍스트 출력
 
+  mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
+  // 오른쪽에 텍스트 출력
   mvprintw(rows - 2, cols - right_len, "no ft | %d / %d", y + y_out + 1, total);
 
   attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair

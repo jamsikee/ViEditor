@@ -650,7 +650,7 @@ void delete_clean_and_printing(int pos)
 
   for (int i = 0; i < rows - 2; ++i)
   {
-    if (Edit.line[i + y_out + 1].c == NULL)
+    if (Edit.line[i + y_out - 1].c == NULL)
     {
       mvprintw(i, 0, "%*s", cols, "");
       mvprintw(i, 0, "~");

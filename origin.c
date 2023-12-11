@@ -547,7 +547,7 @@ void scroll_clean_and_printing(int pos)
     if (Edit.line[i + y_out].len == 0)
     {
       mvprintw(i, 0, "~");
-      break;
+      continue;
     }
     else
     {

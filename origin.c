@@ -593,9 +593,10 @@ void scroll_clean_and_printing(int pos)
       break;
     }
     else
-    {
+    { 
+      mvprintw(i, 0, "%*s", cols, "");
       mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
-      if(Edit.line[i + y_out].len == 0) break;
+      
     }
   }
 }

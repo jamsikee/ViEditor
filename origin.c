@@ -760,11 +760,11 @@ void get_filename(char *filename) {
     echo();
     nocbreak();
     keypad(stdscr, FALSE);
-    mvprintf(rows -1, 0, "%*s", cols, "");
-    mvprintf(rows-1, 0, "FILE NAME: ");
+    mvprintw(rows -1, 0, "%*s", cols, "");
+    mvprintw(rows-1, 0, "FILE NAME: ");
 
     noecho();
-    cbreak;
+    cbreak();
     keypad(stdscr, TRUE);
 }
 

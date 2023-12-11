@@ -148,7 +148,9 @@ void DeleteRow(int pos)
   Edit.line[pos].line_capacity = 0;
   FreeRow(&Edit.line[pos]);
   // Line[pos]'s memory free
-  memmove(&Edit.line[pos], &Edit.line[pos + 1], sizeof(Row) * (total - pos - 1));
+   for (int i = pos; i < total - 1; ++i) {
+        Edit.line[i] = Edit.line[i + 1]; // 다음 요소를 현재 위치로 이동
+    }
   // Line[pos+1]'s memory move to free memory(line[pos])
   total -= 1;
 }

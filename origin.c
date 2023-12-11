@@ -64,6 +64,8 @@ typedef struct{
   int filename_len;
 } F_name;
 
+F_name status_FILE;
+
 struct Visual_Text_Editor Edit;
 // total function
 
@@ -661,13 +663,13 @@ void presskey()
 
     case CONTROL('s'):
     {   if(flag == 1){
-        F_name status_FILE;
         status_FILE.name = malloc(MAX_FILENAME);
         status_FILE.filename_len = 0;
         get_filename(F_name);
         save_file(status_FILE.name);
         free(status_FILE.name);
     }
+    move(y, x);
     }
       break;
 

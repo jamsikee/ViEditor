@@ -340,12 +340,13 @@ void DeleteChar()
   if (x > 0)
   {
     Del_current_line_char();
+    scroll_clean_and_printing(y);
   }
   else
   { 
     Del_current_line();
+    scroll_clean_and_printing(y-1);
   }
-  scroll_clean_and_printing(y);
 }
 
 void Visual_Text_editor__version()

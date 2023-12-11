@@ -82,7 +82,7 @@ void all_refresh();
 void scroll_clean_and_printing(int pos);
 void open_file(char *store_file);
 void delete_clean_and_printing(int pos);
-void get_filename(char *filename_buffer, int max_length);
+void get_filename(char *filename);
 
 Row *get_line(Row *line, int pos)
 {
@@ -614,7 +614,7 @@ void presskey()
 
     case CONTROL('s'):
     {   if(flag == 1){
-        char filename[100]; // Define a buffer for the filename
+        char filename[50]; // Define a buffer for the filename
         get_filename(filename); // Get the filename from the user
         // Save the file using the obtained filename
         save_file(filename);

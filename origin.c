@@ -11,6 +11,7 @@
 #define CONTROL(k) ((k) & 0x1f) // control + k
 #define INIT_ROW_SIZE 1000
 #define INIT_LINE_SIZE 125
+#define MAX_FILENAME 50
 
 int x = 0;
 int y = 0;     // 1 최대 54
@@ -22,6 +23,7 @@ int move_cols = 0;
 int total = 0;
 int flag = 0;
 int q_press = 0;
+int mode_change = 0;
 
 // total suruct
 typedef struct Row
@@ -756,16 +758,48 @@ void all_refresh()
   refresh();
 }
 
-void get_filename(char *filename) {
-    echo();
-    nocbreak();
-    keypad(stdscr, FALSE);
-    mvprintw(rows -1, 0, "%*s", cols, "");
-    mvprintw(rows-1, 0, "FILE NAME: ");
 
-    noecho();
-    cbreak();
-    keypad(stdscr, TRUE);
+typedef struct{
+  char *name;
+  int filename_len;
+} F_name
+
+void Insert_FILE_Name(F_name *FILE, int pos, char c){
+  if (pos < 0 || pos > name->filename_len){
+    return;
+  }
+  FILE->name = realloc(FILE->name, FILE->filename_len+2);
+  memmove(&FILE->name[pos + 1], &FILE->name[pos], FILE->filename_len-pos+1);
+  FILE->name[pos] = c;
+  FILE->filename_len +=1;
+}
+void BACKSPACE_Name(F_name *FILE, int pos){
+  if (pos < 0 || pos >= name->filename_len){
+    return;
+  }
+  
+  memmove(&FILE->name[pos], &FILE->name[pos + 1], FILE->filename_len - pos);
+  FILE->filename_len -= 1;
+}
+
+
+void get_filename(F_name *FILE) {
+    int ch, pos = 0;
+    mvprintw(rows-1, 0, "%*s", cols, "");
+    mvprintw(rows - 1, 0, "ENTER FILE NAME : ");
+    while((ch = getch()) != '\n'){
+      if(ch == KEY_BACKSPACE){
+        if(pos > 0){
+          pos -= 1;
+          BACKSPACE_Name(FILE, pos);
+        }else if(pos < MAX_FILENAME - 1){
+          Insert_FILE_Name(FILE, pos, ch);
+          pos += 1;
+        }
+      }
+      mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", FILE->name);
+    }
+    FILE->name[FILE->filename_len] = '\0';
 }
 
 int main(int argc, char *argv[])
@@ -777,6 +811,9 @@ int main(int argc, char *argv[])
   clear();
   cbreak();
   keypad(stdscr, TRUE);
+  F_name status_FILE;
+  status_FILE.name = malloc(MAX_FILENAME);
+  status_FILE.filename_len = 0;
   x = 0;
   y = 0;
   rows = 0;
@@ -815,9 +852,15 @@ int main(int argc, char *argv[])
     move(y, x);
     refresh();
     curs_set(1);
+    if(mode_change == 0){
     presskey();
+    }
+    else{
+      get_filename(&status_FILE);
+    }
   }
 
   endwin();
+  free(status_FILE.name);
   return 0;
 }

@@ -616,11 +616,12 @@ void presskey()
 
     case CONTROL('s'):
     {   if(flag == 1){
-        char filename[50]; // Define a buffer for the filename
-        get_filename(filename); // Get the filename from the user
-        // Save the file using the obtained filename
-        save_file(filename);
-        break;
+        F_name status_FILE;
+        status_FILE.name = malloc(MAX_FILENAME);
+        status_FILE.filename_len = 0;
+        get_filename(&F_name);
+        save_file(status_FILE.name);
+        free(status_FILE.name);
     }
     }
       break;
@@ -811,9 +812,6 @@ int main(int argc, char *argv[])
   clear();
   cbreak();
   keypad(stdscr, TRUE);
-  F_name status_FILE;
-  status_FILE.name = malloc(MAX_FILENAME);
-  status_FILE.filename_len = 0;
   x = 0;
   y = 0;
   rows = 0;
@@ -852,15 +850,9 @@ int main(int argc, char *argv[])
     move(y, x);
     refresh();
     curs_set(1);
-    if(mode_change == 0){
     presskey();
-    }
-    else{
-      get_filename(&status_FILE);
-    }
   }
 
   endwin();
-  free(status_FILE.name);
   return 0;
 }

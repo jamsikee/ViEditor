@@ -654,7 +654,7 @@ void presskey()
     {   
       if(flag == 1){
         char filename[MAX_FILENAME + 1];
-        get_filename(filename);
+        get_filename(filename, sizeof(filename));
         save_file(filename);
     }
     flag = 0;

@@ -82,6 +82,7 @@ void all_refresh();
 void scroll_clean_and_printing(int pos);
 void open_file(char *store_file);
 void delete_clean_and_printing(int pos);
+void get_filename(char *filename_buffer, int max_length);
 
 Row *get_line(Row *line, int pos)
 {

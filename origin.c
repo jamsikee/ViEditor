@@ -351,7 +351,7 @@ void DeleteChar()
   else
   { 
     Del_current_line();
-    delete_clean_and_printing(y);
+    scroll_clean_and_printing(y);
   }
 }
 

@@ -650,9 +650,9 @@ void delete_clean_and_printing(int pos)
 
   for (int i = 0; i < rows - 2; ++i)
   {
-    if (Edit.line[i + y_out].c != NULL)
+    if (Edit.line[i + y_out - 1].c != NULL)
     { 
-      mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
+      mvprintw(i, 0, "%s", Edit.line[i + y_out - 1].c);
     }
     else
     {

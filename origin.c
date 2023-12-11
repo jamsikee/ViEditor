@@ -21,6 +21,7 @@ int move_rows = 0;
 int move_cols = 0;
 int total = 0;
 int flag = 0;
+int q_press = 0;
 
 // total suruct
 typedef struct Row
@@ -150,12 +151,13 @@ void DeleteRow(int pos)
   Edit.line[pos].len = 0;
   Edit.line[pos].line_capacity = 0;
   // Line[pos]'s memory free
-  for (int i = pos; i < total; ++i) {
-        Edit.line[i] = Edit.line[i + 1];
-        Edit.line[i].c = Edit.line[i + 1].c;
-        Edit.line[i].len = Edit.line[i + 1].len;
-        Edit.line[i].line_capacity = Edit.line[i + 1].line_capacity;
-    }
+  for (int i = pos; i < total; ++i)
+  {
+    Edit.line[i] = Edit.line[i + 1];
+    Edit.line[i].c = Edit.line[i + 1].c;
+    Edit.line[i].len = Edit.line[i + 1].len;
+    Edit.line[i].line_capacity = Edit.line[i + 1].line_capacity;
+  }
   // Line[pos+1]'s memory move to free memory(line[pos])
   total -= 1;
 }
@@ -313,16 +315,18 @@ void Del_current_line()
 
   Row *line = get_line(Edit.line, y + y_out);
   // get line Edit.line[y]
-  x = Edit.line[y -1 + y_out].len;
+  x = Edit.line[y - 1 + y_out].len;
   RowInsertString(&Edit.line[y - 1 + y_out], line->c, line->len);
   DeleteRow(y + y_out);
 
-  if(y == 0 && y_out > 0){
+  if (y == 0 && y_out > 0)
+  {
     y = 0;
     y_out -= 1;
-  } else{
+  }
+  else
+  {
     y -= 1;
-    
   }
   // x cursor is prev line's len and y cursor -1 and insert string at line's len
 }
@@ -346,7 +350,8 @@ void DeleteChar()
     Del_current_line_char();
     scroll_clean_and_printing(y);
   }
-  else{
+  else
+  {
     Del_current_line();
     scroll_clean_and_printing(y);
   }
@@ -559,9 +564,23 @@ void presskey()
     switch (c)
     {
     case CONTROL('q'):
-      clear();
-      endwin();
-      exit(0);
+      if (flag == 1)
+      {
+        end_message("Warning!!!  Please Ctrl + Q One more");
+        q_press += 1;
+        if (q_press == 2)
+        {
+          clear();
+          endwin();
+          exit(0);
+        }
+      }
+      else
+      {
+        clear();
+        endwin();
+        exit(0);
+      }
       break;
 
     case CONTROL('s'):
@@ -590,7 +609,7 @@ void presskey()
     case KEY_NPAGE: // Page Down 키
     case KEY_PPAGE: // Page Up 키
     {
-      int temprows = rows * 2 -5;
+      int temprows = rows * 2 - 5;
       while (temprows--)
       {
         if (c == KEY_PPAGE)
@@ -598,7 +617,7 @@ void presskey()
         else if (c == KEY_NPAGE)
           Move(KEY_DOWN);
       }
-      
+
       scroll_clean_and_printing(0);
     }
     // can do
@@ -608,12 +627,7 @@ void presskey()
       Newline();
       flag = 1;
       break;
-    case '\t':
-      Inserchar(" ");
-      Inserchar(" ");
-      Inserchar(" ");
-      Inserchar(" ");
-      break;
+
     case 8:
       DeleteChar();
       flag = 1;
@@ -661,9 +675,9 @@ void delete_clean_and_printing(int pos)
 
   for (int i = 0; i < rows - 2; ++i)
   {
-    if (Edit.line[i + y_out ].c != NULL)
-    { 
-      mvprintw(i, 0, "%s", Edit.line[i + y_out ].c);
+    if (Edit.line[i + y_out].c != NULL)
+    {
+      mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
     }
     else
     {
@@ -714,6 +728,8 @@ int main(int argc, char *argv[])
   move_rows = 0;
   move_cols = 0;
   total = 0;
+  flag = 0;
+  q_press = 0;
   getmaxyx(stdscr, rows, cols); // rows cols
 
   if (argc >= 2)

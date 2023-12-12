@@ -662,7 +662,6 @@ void presskey()
     }
     flag = 0;
     }
-
       break;
 
     case CONTROL('f'):
@@ -816,7 +815,7 @@ int main(int argc, char *argv[])
     curs_set(0);
     status_bar();
     move(y, x);
-    end_message("Help: Ctrl-S = save | Ctrl-Q = quit");
+    end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     refresh();
     curs_set(1);
     presskey();

@@ -128,7 +128,7 @@ void InsertRow(int edit_y, char *line, int line_len)
   // Memory move line[y] -> line[y + 1]
   Edit.line[edit_y].len = line_len;
   Edit.line[edit_y].c = malloc(INIT_LINE_SIZE + 1);
-   Edit.line[edit_y].line_capacity = INIT_LINE_SIZE;
+  Edit.line[edit_y].line_capacity = INIT_LINE_SIZE;
 
     if (line_len > Edit.line[edit_y].line_capacity) {
         while (line_len > Edit.line[edit_y].line_capacity) {
@@ -788,7 +788,7 @@ int main(int argc, char *argv[])
   flag = 0;
   q_press = 0;
   getmaxyx(stdscr, rows, cols); // rows cols
-
+  
   if (argc >= 2)
   {
     Edit.filename = argv[1];
@@ -806,6 +806,8 @@ int main(int argc, char *argv[])
     Visual_Text_editor__version();
     move(0, 0);
     refresh();
+    Edit.line = malloc(sizeof(Row) +1);
+    Edit.line[0].c[0] = '\0';
   }
 
 

@@ -679,18 +679,15 @@ void presskey()
     case KEY_DOWN:  // 아래쪽 화살표 키
       Move(c);
       scroll_clean_and_printing(0);
-      end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
       break;
     case KEY_END: // End 키
       x = Edit.line[y + y_out].len;
       move(y, x);
-      end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
       break;
 
     case KEY_HOME: // Home 키
       x = 0;
       move(y, x);
-      end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
       break;
 
     case KEY_NPAGE: // Page Down 키
@@ -713,20 +710,17 @@ void presskey()
           move(y, Edit.line[y + y_out ].len);
         }
     }
-    end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     // can do
     break;
     // 이부분 해결해야 될듯
     case '\n':
       Newline();
       flag = 1;
-      end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
       break;
 
     case KEY_BACKSPACE:
       DeleteChar();
       flag = 1;
-      end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
       break;
     }
   }
@@ -735,7 +729,6 @@ void presskey()
     char ch = (char)c;
     Insertchar(ch);
     flag = 1;
-    end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
   }
 
   refresh();
@@ -761,6 +754,7 @@ void scroll_clean_and_printing(int pos)
       mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
     }
   }
+  end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
 }
 
 void state()

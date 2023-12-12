@@ -622,7 +622,8 @@ void presskey()
       if (flag == 1)
       { 
         q_press += 1;
-        mvprintw(rows - 1, 0, "%*s", cols, "");
+        move(rows-1, 0);
+        printw("%*s", cols, "");
         refresh();
         if (q_press == 2)
         {
@@ -808,15 +809,6 @@ int main(int argc, char *argv[])
     curs_set(0);
     status_bar();
     move(y, x);
-    if(q_press == 1){
-      mvprintw(rows - 1, 0, "%*s", cols, "");
-      refresh();
-      mvprintw(rows-1, 0, "Warning!!! If you want to quit Editor then press One more");
-    }else{
-      mvprintw(rows - 1, 0, "%*s", cols, "");
-      refresh();
-      mvprintw(rows-1, 0, "Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-    }
     refresh();
     curs_set(1);
     presskey();

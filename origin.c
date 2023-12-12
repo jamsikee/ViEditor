@@ -815,10 +815,12 @@ int main(int argc, char *argv[])
   {
     curs_set(0);
     status_bar();
+    end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     move(y, x);
     refresh();
     curs_set(1);
     presskey();
+    
   }
 
   endwin();

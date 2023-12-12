@@ -703,7 +703,8 @@ void presskey()
       break;
 
     case CONTROL('f'):
-      char query[MAX_SEARCHNAME + 1];
+      char Sub_Matching[MAX_SEARCHNAME + 1];
+      get_searchname(Sub_Matching);
       break;
 
     case KEY_LEFT:  // 왼쪽 화살표 키

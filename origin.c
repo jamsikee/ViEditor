@@ -91,14 +91,6 @@ Row *get_line(Row *line, int pos)
   // get line index
 }
 
-void welcome()
-{
-  const char *message = "Visual Text editor -- version 0.0.1";
-  int len = strlen(message);
-  int mid = (cols - len) / 2;
-  mvprintw(rows / 3, mid, "%s", message);
-}
-
 void InsertRow(int edit_y, char *line, int line_len)
 {
   if (edit_y < 0)

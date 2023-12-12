@@ -128,10 +128,20 @@ void InsertRow(int edit_y, char *line, int line_len)
   // Memory move line[y] -> line[y + 1]
   Edit.line[edit_y].len = line_len;
   Edit.line[edit_y].c = malloc(INIT_LINE_SIZE + 1);
-  while (line_len > Edit.line[edit_y].line_capacity) {
-        Edit.line[edit_y].line_capacity *= 2;
+   Edit.line[edit_y].line_capacity = INIT_LINE_SIZE;
+
+    if (line_len > Edit.line[edit_y].line_capacity) {
+        while (line_len > Edit.line[edit_y].line_capacity) {
+            Edit.line[edit_y].line_capacity *= 2;
+        }
         Edit.line[edit_y].c = realloc(Edit.line[edit_y].c, Edit.line[edit_y].line_capacity + 1);
-  }
+        if (Edit.line[edit_y].c == NULL) {
+            // 메모리 할당 실패 처리
+            return;
+        }
+    } else {
+        Edit.line[edit_y].c = malloc(Edit.line[edit_y].line_capacity + 1);
+    }
   // Line_capacity is (Edit.line[y].c)'s size
   memcpy(Edit.line[edit_y].c, line, line_len);
   Edit.line[edit_y].c[line_len] = '\0';

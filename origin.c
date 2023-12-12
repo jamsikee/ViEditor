@@ -9,12 +9,15 @@
 #ifdef _WIN32
     #include <curses.h>
     #define BACKSPACE 8
+    #define ENTER 13
 #elif __APPLE
     #include <ncurses.h>
     #define BACKSPACE 127
+    #define ENTER '\n'
 #else
     #include <ncurses.h>
     #define BACKSPACE KEY_BACKSPACE
+    #define ENTER '\n'
 #endif
 
 
@@ -22,10 +25,11 @@
 #define INIT_ROW_SIZE 1000
 #define INIT_LINE_SIZE 125
 #define MAX_FILENAME 50
+#define MAX_SEARCHNAME 20
 
 int x = 0;
 int y = 0;     // 1 최대 54
-int y_out = 0; // +1
+int cursor_out = 0; // +1
 int rows = 0;  // 54
 int cols = 0;
 int move_rows = 0;
@@ -86,7 +90,7 @@ void Del_current_line_char();
 void Del_current_line();
 void DeleteChar();
 void contained_new_line(Row *line, int pos_y, int pos_x);
-void Newline(); // y_out + 1; line[y+y_out]
+void Newline(); // cursor_out + 1; line[y+cursor_out]
 void status_bar();
 void state();
 void end_message(const char *format, ...);
@@ -95,6 +99,7 @@ void scroll_clean_and_printing(int pos);
 void open_file(char *store_file);
 void delete_clean_and_printing(int pos);
 void get_filename(char *filename);
+void get_searchname(char *search);
 
 Row *get_line(Row *line, int pos)
 {
@@ -262,12 +267,12 @@ void empty_new_line(int pos)
 void Insertchar(char word)
 {
 
-  if (y + y_out == total)
+  if (y + cursor_out == total)
   {
     empty_new_line(total);
     // if cursor y = total then add line;
   }
-  RowInsertchar(&Edit.line[y + y_out], word, x);
+  RowInsertchar(&Edit.line[y + cursor_out], word, x);
   x += 1;
   // Insert char at cursor x
   scroll_clean_and_printing(y);
@@ -286,15 +291,15 @@ void contained_new_line(Row *line, int pos_y, int pos_x)
 void Newline()
 {
 
-  Row *line = get_line(Edit.line, y + y_out);
+  Row *line = get_line(Edit.line, y + cursor_out);
   // get line Edit.line[y]
   if (x == 0)
   {
-    empty_new_line(y + y_out);
+    empty_new_line(y + cursor_out);
     if (y == rows - 3)
     {
       y = rows - 3;
-      y_out += 1;
+      cursor_out += 1;
     }
     else
     {
@@ -313,11 +318,11 @@ void Newline()
   }
   else
   {
-    contained_new_line(line, y + y_out, x);
+    contained_new_line(line, y + cursor_out, x);
     if (y == rows - 3)
     {
       y = rows - 3;
-      y_out += 1;
+      cursor_out += 1;
     }
     else
     {
@@ -338,7 +343,7 @@ void Newline()
 void Del_current_line_char()
 {
 
-  Row *line = get_line(Edit.line, y + y_out);
+  Row *line = get_line(Edit.line, y + cursor_out);
   // get line Edit.line[y]
   RowDeletechar(line, x - 1);
   x -= 1;
@@ -347,16 +352,16 @@ void Del_current_line_char()
 void Del_current_line()
 {
 
-  Row *line = get_line(Edit.line, y + y_out);
+  Row *line = get_line(Edit.line, y + cursor_out);
   // get line Edit.line[y]
-  x = Edit.line[y - 1 + y_out].len;
-  RowInsertString(&Edit.line[y - 1 + y_out], line->c, line->len);
-  DeleteRow(y + y_out);
+  x = Edit.line[y - 1 + cursor_out].len;
+  RowInsertString(&Edit.line[y - 1 + cursor_out], line->c, line->len);
+  DeleteRow(y + cursor_out);
 
-  if (y == 0 && y_out > 0)
+  if (y == 0 && cursor_out > 0)
   {
     y = 0;
-    y_out -= 1;
+    cursor_out -= 1;
   }
   else
   {
@@ -370,11 +375,11 @@ void DeleteChar()
 
   Row *line = get_line(Edit.line, y);
 
-  if (y + y_out == total)
+  if (y + cursor_out == total)
   {
     return;
   }
-  if (x == 0 && y == 0 && y_out == 0)
+  if (x == 0 && y == 0 && cursor_out == 0)
   {
     return;
   }
@@ -413,7 +418,7 @@ void status_bar()
   char st_y[20];
   int y_1 = y + 1;
   snprintf(total_len, sizeof(total_len), "%d", total);
-  snprintf(st_y, sizeof(st_y), "%d", y + y_out + 1);
+  snprintf(st_y, sizeof(st_y), "%d", y + cursor_out + 1);
 
   int left_len = strlen(total_len) + strlen(Edit.filename) + 13;
   int right_len = strlen(total_len) + strlen(st_y) + 11; // 9은 "no ft | "의 길이
@@ -430,7 +435,7 @@ void status_bar()
 
   mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
   // 오른쪽에 텍스트 출력
-  mvprintw(rows - 2, cols - right_len, "no ft | %d / %d", y + y_out + 1, total);
+  mvprintw(rows - 2, cols - right_len, "no ft | %d / %d", y + cursor_out + 1, total);
 
   attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
 }
@@ -458,15 +463,15 @@ void Move(int key)
     else if (y > 0)
     {
       y -= 1;
-      x = Edit.line[y + y_out].len;
+      x = Edit.line[y + cursor_out].len;
     }
     else if (x == 0 && y == 0)
     {
-      if (y_out > 0)
+      if (cursor_out > 0)
       {
         y = 0;
-        y_out -= 1;
-        x = Edit.line[y + y_out].len;
+        cursor_out -= 1;
+        x = Edit.line[y + cursor_out].len;
       }
     }
     move(y, x);
@@ -478,15 +483,15 @@ void Move(int key)
     }
     else
     {
-      if (x < Edit.line[y + y_out].len)
+      if (x < Edit.line[y + cursor_out].len)
       {
         x += 1;
       }
-      else if (x == Edit.line[y + y_out].len)
+      else if (x == Edit.line[y + cursor_out].len)
       {
-        if (y == rows - 3 && y + y_out < total)
+        if (y == rows - 3 && y + cursor_out < total)
         {
-          y_out += 1;
+          cursor_out += 1;
           y = rows - 3;
           x = 0;
         }
@@ -511,25 +516,25 @@ void Move(int key)
     {
       y -= 1;
     }
-    else if (y == 0 && y_out > 0)
+    else if (y == 0 && cursor_out > 0)
     {
-      y_out -= 1;
+      cursor_out -= 1;
     }
-    if (x > Edit.line[y + y_out].len)
+    if (x > Edit.line[y + cursor_out].len)
     {
-      x = Edit.line[y + y_out].len;
+      x = Edit.line[y + cursor_out].len;
     }
     move(y, x);
     break;
   case KEY_DOWN:
     if (y == rows - 3)
     {
-      if (total == y + y_out)
+      if (total == y + cursor_out)
       {
         y = rows - 3;
         break;
       }
-      y_out += 1;
+      cursor_out += 1;
       y = rows - 3;
     }
     else
@@ -539,9 +544,9 @@ void Move(int key)
         y += 1;
       }
     }
-    if (x > Edit.line[y + y_out].len)
+    if (x > Edit.line[y + cursor_out].len)
     {
-      x = Edit.line[y + y_out].len;
+      x = Edit.line[y + cursor_out].len;
     }
     move(y, x);
     break;
@@ -581,8 +586,8 @@ void open_file(char *store_file)
   free(Inf.temp);
   fclose(file);
   y = 0;
-  y_out = total - rows - 2;
-  if(y_out < 0) y_out = 0;
+  cursor_out = total - rows - 2;
+  if(cursor_out < 0) cursor_out = 0;
 
 }
 
@@ -622,6 +627,28 @@ void get_filename(char *filename) {
       }
       mvprintw(rows-1, 0, "%*s", cols, "");
       mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", filename);
+      refresh();
+    }
+}
+
+void get_searchname(char *search) {
+    int ch, pos = 0;
+    mvprintw(rows-1, 0, "%*s", cols, "");
+    mvprintw(rows - 1, 0, "ENTER Query : ");
+    while((ch = getch()) != '\n'){
+      if(ch == KEY_BACKSPACE){
+        if(pos > 0){
+          pos -= 1;
+          search[pos] = '\0';
+        }
+      } else {
+        if(pos < MAX_FILENAME - 1){
+          search[pos++] = ch;
+          search[pos] = '\0';
+        }
+      }
+      mvprintw(rows-1, 0, "%*s", cols, "");
+      mvprintw(rows - 1, 0, "ENTER Query : %s", search);
       refresh();
     }
 }
@@ -676,6 +703,7 @@ void presskey()
       break;
 
     case CONTROL('f'):
+      char query[MAX_SEARCHNAME + 1];
       break;
 
     case KEY_LEFT:  // 왼쪽 화살표 키
@@ -689,7 +717,7 @@ void presskey()
       break;
     case KEY_END: // End 키
     if(total == 0) return;
-      x = Edit.line[y + y_out].len;
+      x = Edit.line[y + cursor_out].len;
       move(y, x);
       break;
 
@@ -746,7 +774,7 @@ void scroll_clean_and_printing(int pos)
 
   for (int i = 0; i < rows - 2; ++i)
   {
-    if (Edit.line[i + y_out].c == NULL)
+    if (Edit.line[i + cursor_out].c == NULL)
     {
       mvprintw(i, 0, "%*s", cols, "");
       mvprintw(i, 0, "~");
@@ -754,7 +782,7 @@ void scroll_clean_and_printing(int pos)
     }
     else
     {
-      mvprintw(i, 0, "%s", Edit.line[i + y_out].c);
+      mvprintw(i, 0, "%s", Edit.line[i + cursor_out].c);
     }
   }
 }

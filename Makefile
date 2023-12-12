@@ -1,22 +1,13 @@
 CC = gcc
 TARGET = vite
 OBJS = origin.o
-
-OS := $(shell uname -s)
-
-ifeq ($(OS), Windows_NT)
-    LIBS = -lm -lpdcurses
-    INC = -I/path/to/pdcurses/header 
-    LFLAGS = -L/path/to/pdcurses/lib 
-else
-    LIBS = -lm -lncurses
-endif
+LIBS = -lm -lncurses
 
 $(TARGET) : $(OBJS)
-    $(CC) $(LFLAGS) -o $(TARGET) $(OBJS) $(LIBS)
+	$(CC) -o $(TARGET) $(OBJS) $(LIBS)
 
 $(OBJS) : origin.c
-    $(CC) $(INC) -c -o $(OBJS) origin.c
+	$(CC) -c -o $(OBJS) origin.c
 
 clean :
-    rm -f $(OBJS) $(TARGET)
+	rm -f $(OBJS) $(TARGET)

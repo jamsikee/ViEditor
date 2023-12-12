@@ -1,30 +1,9 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -g -I.
-LDFLAGS = -L. -lpdcurses
-
-TARGET = vite
-
-SOURCES = origin.c
-
-OBJECTS = $(SOURCES:.c=.o)
-
-OS := $(shell uname -s)
-
-ifeq ($(OS),Linux)
-    LDFLAGS = -lncurses
+ifeq ($(OS),Windows_NT)
+	CFLAGS = -I pdcurses -L ./ -lpdcurses
 else
-    LDFLAGS = -lpdcurses
+	CFLAGS = -lncurses
 endif
 
-all: $(TARGET)
-
-$(TARGET): $(OBJECTS)
-   $(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS) $(LDFLAGS)
-
-%.o: %.c
-   $(CC) $(CFLAGS) -c $<
-
-clean:
-   rm -f $(TARGET) $(OBJECTS)
-
-.PHONY: all clean
+origin.o : origin.c
+	$(CC) -c -o origin.c $(CFLAGS)

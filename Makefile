@@ -1,9 +1,13 @@
 CC = gcc
-ifeq ($(OS),Windows_NT)
-	CFLAGS = -I pdcurses -L ./ -lpdcurses
-else
-	CFLAGS = -lncurses
-endif
+TARGET = vite
+OBJS = origin.o
+LIBS = -lm -lncurses
 
-origin.o : origin.c
-	$(CC) -c -o origin.c $(CFLAGS)
+$(TARGET) : $(OBJS)
+	$(CC) -o $(TARGET) $(OBJS) $(LIBS)
+
+$(OBJS) : origin.c
+	$(CC) -c -o $(OBJS) origin.c
+
+clean :
+	rm -f $(OBJS) $(TARGET)

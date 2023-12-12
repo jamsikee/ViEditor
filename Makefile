@@ -1,13 +1,14 @@
 CC = gcc
-TARGET = vite
-OBJS = origin.o
-LIBS = -lm -lncurses
 
-$(TARGET) : $(OBJS)
-	$(CC) -o $(TARGET) $(OBJS) $(LIBS)
+OS := $(shell uname -s)
 
-$(OBJS) : origin.c
-	$(CC) -c -o $(OBJS) origin.c
+ifeq ($(OS),Windows_NT)
+    CFLAGS = -I pdcurses
+    LDFLAGS = -L ./ -lpdcurses
+else
+    CFLAGS =
+    LDFLAGS = -lncurses
+endif
 
-clean :
-	rm -f $(OBJS) $(TARGET)
+origin.o : origin.c
+    $(CC) $(CFLAGS) -c origin.c -o origin.o $(LDFLAGS)

@@ -718,7 +718,7 @@ void presskey()
       flag = 1;
       break;
 
-    case KEY_BACKSPACE:
+    case 127:
       DeleteChar();
       flag = 1;
       break;

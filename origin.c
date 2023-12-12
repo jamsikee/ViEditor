@@ -806,8 +806,6 @@ int main(int argc, char *argv[])
     Visual_Text_editor__version();
     move(0, 0);
     refresh();
-    Edit.line = malloc(sizeof(Row));
-    Edit.line[0].c[0] = '\0';
   }
 
 

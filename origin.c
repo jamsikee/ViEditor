@@ -3,9 +3,20 @@
 #include <string.h>
 #include <fcntl.h>
 #include <ctype.h>
-#include <ncurses.h>
 #include <stdbool.h>
 #include <stdarg.h>
+
+#ifdef _WIN32
+    #include <curses.h>
+    #define BACKSPACE 8
+#elif __APPLE
+    #include <ncurses.h>
+    #define BACKSPACE 127
+#else
+    #include <ncurses.h>
+    #define BACKSPACE KEY_BACKSPACE
+#endif
+
 
 #define CONTROL(k) ((k) & 0x1f) // control + k
 #define INIT_ROW_SIZE 1000

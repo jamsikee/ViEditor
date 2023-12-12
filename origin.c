@@ -667,8 +667,8 @@ void presskey()
         Edit.filename = malloc(strlen(filename) + 1);  // 메모리 할당
         strcpy(Edit.filename, filename);  
         save_file(filename);
-        
         end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+        q_press = 0;
     }
     flag = 0;
     }
@@ -703,7 +703,7 @@ void presskey()
     case KEY_PPAGE: // Page Up 키
     {
       if(total == 0) return;
-      int temprows = rows -2;
+      int temprows = rows -3;
       while (temprows--)
       {
         if (c == KEY_PPAGE)
@@ -713,15 +713,7 @@ void presskey()
       }
       
       scroll_clean_and_printing(0);
-      if (c == KEY_PPAGE){
-          move(y, 0);
-      }
-        else if (c == KEY_NPAGE){
-          move(y,Edit.line[y + y_out ].len);
-        }
     }
-
-    // can do
     break;
     // 이부분 해결해야 될듯
     case '\n':

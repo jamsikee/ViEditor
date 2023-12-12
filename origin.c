@@ -671,15 +671,19 @@ void presskey()
     case KEY_RIGHT: // 오른쪽 화살표 키
     case KEY_UP:    // 위쪽 화살표 키
     case KEY_DOWN:  // 아래쪽 화살표 키
+    
+      if(total == 0) return;
       Move(c);
       scroll_clean_and_printing(0);
       break;
     case KEY_END: // End 키
+    if(total == 0) return;
       x = Edit.line[y + y_out].len;
       move(y, x);
       break;
 
     case KEY_HOME: // Home 키
+    if(total == 0) return;
       x = 0;
       move(y, x);
       break;
@@ -687,6 +691,7 @@ void presskey()
     case KEY_NPAGE: // Page Down 키
     case KEY_PPAGE: // Page Up 키
     {
+      if(total == 0) return;
       int temprows = rows * 2 - 5;
       while (temprows--)
       {

@@ -815,6 +815,10 @@ int main(int argc, char *argv[])
   {
     curs_set(0);
     status_bar();
+    move(y, x);
+    refresh();
+    curs_set(1);
+    presskey();
     if(q_press == 1){
       mvprintw(rows - 1, 0, "%*s", cols, "");
       end_message("Warning!!! If you want to quit then Please Ctrl + Q One more");
@@ -822,10 +826,6 @@ int main(int argc, char *argv[])
       end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
       q_press = 0;
     }
-    move(y, x);
-    refresh();
-    curs_set(1);
-    presskey();
     
   }
 

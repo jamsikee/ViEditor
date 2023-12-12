@@ -622,7 +622,7 @@ void presskey()
       if (flag == 1)
       { 
           mvprintw(rows - 1, 0, "%*s", cols, "");
-          mvprintw(row-1, 0, "Warning!!! If you want to quit then press one more");
+          mvprintw(row-1, cols-50, "Warning!!! If you want to quit then press one more");
           refresh();
           q_press += 1;
         if (q_press == 2)

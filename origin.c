@@ -814,7 +814,7 @@ int main(int argc, char *argv[])
     curs_set(0);
     status_bar();
     if(q_press == 1){
-      end_message("Warning!!! If you want to quit then Please Ctrl + Q One more");
+      end_message("Warning!!! You have to save : Ctrl-S");
     } else{
       end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     }

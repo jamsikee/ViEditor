@@ -78,7 +78,6 @@ void contained_new_line(Row *line, int pos_y, int pos_x);
 void Newline(); // y_out + 1; line[y+y_out]
 void status_bar();
 void state();
-void end_message(const char *format, ...);
 void all_refresh();
 void scroll_clean_and_printing(int pos);
 void open_file(char *store_file);
@@ -424,16 +423,6 @@ void status_bar()
   attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
 }
 
-void end_message(const char *format, ...)
-{
-  va_list args;
-  va_start(args, format);
-  mvprintw(rows - 1, 0, "%*s", cols, "");
-  mvprintw(rows - 1, 0, format, args); // 가변 인자들을 printf 형태로 특정 위치에 출력
-  va_end(args);
-  refresh();
-}
-
 void Move(int key)
 {
   curs_set(0);
@@ -633,7 +622,6 @@ void presskey()
       if (flag == 1)
       { 
         mvprintw(rows - 1, 0, "%*s", cols, "");
-        refresh();
         mvprintw(rows-1, 0, "Warning!!! If you want to quit then Please Ctrl + Q One more");
         refresh();
         q_press += 1;
@@ -660,8 +648,8 @@ void presskey()
         Edit.filename = malloc(strlen(filename) + 1);  // 메모리 할당
         strcpy(Edit.filename, filename);  
         save_file(filename);
-        
-        end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+        mvprintw(rows - 1, 0, "%*s", cols, "");
+        mvprintw(rows-1, 0, "Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     }
     flag = 0;
     }
@@ -768,7 +756,8 @@ void all_refresh()
 {
   state();
   status_bar();
-  end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+  mvprintw(rows - 1, 0, "%*s", cols, "");
+  mvprintw(rows-1, 0, "Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
   move(y, x);
   refresh();
 }
@@ -797,7 +786,8 @@ int main(int argc, char *argv[])
   {
     Edit.filename = argv[1];
     open_file(argv[1]);
-    end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+    mvprintw(rows - 1, 0, "%*s", cols, "");
+    mvprintw(rows-1, 0, "Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     status_bar();
     move(y, x);
     scroll_clean_and_printing(0);

@@ -717,7 +717,7 @@ void presskey()
           move(y, 0);
       }
         else if (c == KEY_NPAGE){
-          move(y,0, Edit.line[y + y_out ].len);
+          move(y,Edit.line[y + y_out ].len);
         }
     }
 

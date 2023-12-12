@@ -815,7 +815,12 @@ int main(int argc, char *argv[])
   {
     curs_set(0);
     status_bar();
-    end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+    if(q_press == 1){
+      end_message("Warning!!! If you want to quit then Please Ctrl + Q One more");
+    } else{
+      end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+      q_press = 0;
+    }
     move(y, x);
     refresh();
     curs_set(1);

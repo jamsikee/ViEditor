@@ -819,13 +819,6 @@ int main(int argc, char *argv[])
     refresh();
     curs_set(1);
     presskey();
-    if(q_press == 1){
-      mvprintw(rows - 1, 0, "%*s", cols, "");
-      end_message("Warning!!! If you want to quit then Please Ctrl + Q One more");
-    } else{
-      end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-      q_press = 0;
-    }
     
   }
 

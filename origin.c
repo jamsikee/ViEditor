@@ -78,6 +78,7 @@ void contained_new_line(Row *line, int pos_y, int pos_x);
 void Newline(); // y_out + 1; line[y+y_out]
 void status_bar();
 void state();
+void end_message(const char *format, ...);
 void all_refresh();
 void scroll_clean_and_printing(int pos);
 void open_file(char *store_file);
@@ -89,6 +90,14 @@ Row *get_line(Row *line, int pos)
 
   return &line[pos];
   // get line index
+}
+
+void welcome()
+{
+  const char *message = "Visual Text editor -- version 0.0.1";
+  int len = strlen(message);
+  int mid = (cols - len) / 2;
+  mvprintw(rows / 3, mid, "%s", message);
 }
 
 void InsertRow(int edit_y, char *line, int line_len)
@@ -415,6 +424,15 @@ void status_bar()
   attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
 }
 
+void end_message(const char *format, ...)
+{
+  va_list args;
+  va_start(args, format);
+  mvprintw(rows - 1, 0, format, args); // 가변 인자들을 printf 형태로 특정 위치에 출력
+  va_end(args);
+  refresh();
+}
+
 void Move(int key)
 {
   curs_set(0);
@@ -613,10 +631,9 @@ void presskey()
     case CONTROL('q'):
       if (flag == 1)
       { 
-          mvprintw(rows - 1, 0, "%*s", cols, "");
-          mvprintw(rows-1, cols-50, "Warning!!! If you want to quit then press one more");
-          refresh();
-          q_press += 1;
+        mvprintw(rows - 1, 0, "%*s", cols, "");
+        end_message("Warning!!! If you want to quit then Please Ctrl + Q One more");
+        q_press += 1;
         if (q_press == 2)
         {
           clear();
@@ -640,12 +657,12 @@ void presskey()
         Edit.filename = malloc(strlen(filename) + 1);  // 메모리 할당
         strcpy(Edit.filename, filename);  
         save_file(filename);
-        mvprintw(rows - 1, 0, "%*s", cols, "");
-        mvprintw(rows-1, 0, "Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
-        refresh();
+        
+        end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     }
     flag = 0;
     }
+
       break;
 
     case CONTROL('f'):
@@ -749,8 +766,7 @@ void all_refresh()
 {
   state();
   status_bar();
-  mvprintw(rows - 1, 0, "%*s", cols, "");
-  mvprintw(rows-1, 0, "Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+  end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
   move(y, x);
   refresh();
 }
@@ -779,8 +795,7 @@ int main(int argc, char *argv[])
   {
     Edit.filename = argv[1];
     open_file(argv[1]);
-    mvprintw(rows - 1, 0, "%*s", cols, "");
-    mvprintw(rows-1, 0, "Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+    end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     status_bar();
     move(y, x);
     scroll_clean_and_printing(0);
@@ -800,6 +815,7 @@ int main(int argc, char *argv[])
   {
     curs_set(0);
     status_bar();
+    end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
     move(y, x);
     refresh();
     curs_set(1);

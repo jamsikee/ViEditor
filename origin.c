@@ -718,7 +718,7 @@ void presskey()
       flag = 1;
       break;
 
-    case 127:
+    case 8:
       DeleteChar();
       flag = 1;
       break;

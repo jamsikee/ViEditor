@@ -624,7 +624,6 @@ void presskey()
         q_press += 1;
         if(q_press == 1){
           mvprintw(rows - 1, 0, "%*s", cols, "");
-          refresh();
           mvprintw(row-1, 0, "Warning!!! If you want to quit then press one more");
           refresh();
         }

@@ -703,7 +703,7 @@ void presskey()
     case KEY_PPAGE: // Page Up 키
     {
       if(total == 0) return;
-      int temprows = rows * 2 - 5;
+      int temprows = rows -3;
       while (temprows--)
       {
         if (c == KEY_PPAGE)

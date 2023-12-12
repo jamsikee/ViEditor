@@ -703,7 +703,8 @@ void presskey()
     case KEY_PPAGE: // Page Up 키
     {
       if(total == 0) return;
-      int temprows = rows -3;
+      int temprows = rows *2-5;
+      int temp_y = y;
       while (temprows--)
       {
         if (c == KEY_PPAGE)
@@ -714,10 +715,10 @@ void presskey()
       
       scroll_clean_and_printing(0);
       if (c == KEY_PPAGE){
-          move(y, 0);
+          move(temp_y, 0);
       }
         else if (c == KEY_NPAGE){
-          move(y, Edit.line[y + y_out ].len);
+          move(temp_y, Edit.line[y + y_out ].len);
         }
     }
 

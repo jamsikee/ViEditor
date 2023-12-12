@@ -621,12 +621,10 @@ void presskey()
     case CONTROL('q'):
       if (flag == 1)
       { 
-        q_press += 1;
-        if(q_press == 1){
           mvprintw(rows - 1, 0, "%*s", cols, "");
           mvprintw(row-1, 0, "Warning!!! If you want to quit then press one more");
           refresh();
-        }
+          q_press += 1;
         if (q_press == 2)
         {
           clear();

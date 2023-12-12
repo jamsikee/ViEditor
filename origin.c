@@ -622,6 +622,8 @@ void presskey()
       if (flag == 1)
       { 
         q_press += 1;
+        mvprintw(rows - 1, 0, "%*s", cols, "");
+        refresh();
         if (q_press == 2)
         {
           clear();
@@ -647,6 +649,7 @@ void presskey()
         save_file(filename);
         mvprintw(rows - 1, 0, "%*s", cols, "");
         mvprintw(rows-1, 0, "Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+        refresh();
     }
     flag = 0;
     }

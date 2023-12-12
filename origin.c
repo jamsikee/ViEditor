@@ -714,10 +714,10 @@ void presskey()
       
       scroll_clean_and_printing(0);
       if (c == KEY_PPAGE){
-          move(temp_y, 0);
+          move(y, 0);
       }
         else if (c == KEY_NPAGE){
-          move(temp_y, Edit.line[y + y_out ].len);
+          move(y,0, Edit.line[y + y_out ].len);
         }
     }
 

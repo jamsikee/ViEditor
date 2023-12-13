@@ -836,14 +836,17 @@ void presskey()
           if (sub_len > 0)
           {
             sub_len -= 1;
-            sub[sub_len] = '\0';
+            sub[sub_len] = '\0'; // stirng[max] = NULL
+            mvprintw(rows - 1, 0, "%*s", cols, "");
+            mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", sub);
+            refresh();
             sub_matching(sub);
           }
         }
         else if (s_c == KEY_LEFT || s_c == KEY_RIGHT)
         {
           if (s_now != -1)
-          { // 검색 결과가 있을 때만 처리
+          { // no move at -1
             if (s_c == KEY_LEFT)
             {
               if (s_now > 0)
@@ -877,14 +880,14 @@ void presskey()
             {
               sub[sub_len] = (char)s_c;
               sub_len += 1;
-              sub[sub_len] = '\0'; // 올바른 종료 문자 설정
+              sub[sub_len] = '\0'; // string[max] = NULL
+              mvprintw(rows - 1, 0, "%*s", cols, "");
+              mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", sub);
+              refresh();
               sub_matching(sub);
             }
           }
         }
-        mvprintw(rows - 1, 0, "%*s", cols, "");
-        mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", sub);
-        refresh();
         if (s_now >= 0 && s_now < s_pos->s_total)
         {
           x = s_pos[s_now].s_x;

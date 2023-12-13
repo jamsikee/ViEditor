@@ -840,9 +840,9 @@ void presskey()
             }
           }
           else if(s_c == KEY_RIGHT){
-            if(s_now < s_pos->s_total){
+            if(s_now < s_pos->s_total - 1){  // s_now가 13이고 s_pos->s_total 14라면 
               s_now += 1;
-            }else if(s_now > s_pos->s_total){
+            }else {
               s_now = 0;
             }
           }

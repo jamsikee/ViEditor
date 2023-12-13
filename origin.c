@@ -630,7 +630,8 @@ int main(int argc, char* argv[]) {
     int firstRun = 1;//제일처음 ch를받아왔는지 확인하는 변수
    // int fileCh;
     // 파일 열기 및 읽기 부분
-    if (argc > 1) {
+    // 파일 열기 및 읽기 부분
+if (argc > 1) {
     FILE* file = fopen(argv[1], "r");
     if (file == NULL) {
         printw("Error: File could not be opened.");
@@ -665,70 +666,6 @@ int main(int argc, char* argv[]) {
     setUI();
 }
 
-                // if ((int)strlen(buffer) - 1 > conCols)
-                // { // 파일의 문자열이 콘솔의 길이보다 길면 새로 겟뉴노드해서연걸인데 일단 한줄만큼만더됨.
-                //     int txtCols = (int)strlen(buffer) - 1;
-                //     int i = 1;
-                //     current->str = strndup(buffer, conCols); // 처음에 버퍼처음부터 cols길이까지 복붙.
-                //     current->strsize = conCols;
-                //     while (txtCols > conCols)
-                //     {
-                //         current = getN();
-                //          insertAtTail(current);
-                //         current->str = strndup(buffer, conCols * i); // conCols가 몇번돌았는지.
-                //         if (txtCols < conCols)
-                //         {
-                //             current->strsize = txtCols;
-                //         }
-                //         else
-                //         {
-                //             current->strsize = conCols;
-                //         }
-                //         txtCols -= conCols;
-                //         i++;
-                //     }
-                //     current = getN();
-                //     insertAtTail(current);
-                //     current->str = strndup(buffer, (int)strlen(buffer) - txtCols);
-                //     // 콘솔크기만큼 문자열뒤로이동해서 복붙, 전체길이-남은해야하는길이
-                //     current->strsize = txtCols;
-                // }
-                // continue;
-            }
-            //파일 맨마지막만읽어와서 그냥 와일한번돌때마다 current를 null로해서 새로수행함 밑에는 고려하다가 실패함
-            else if (buffer[0] == '\n') {//그 행의 문자열이 널이면 
-                current = getN();
-                insertAtTail(current);
-                current->strsize = 0;
-                continue;
-            }
-            else if ((int)strlen(buffer) -1 > conCols) {//파일의 문자열이 콘솔의 길이보다 길면 새로 겟뉴노드해서연걸인데 음
-                current = getN();
-                insertAtTail(current);
-                current->strsize = (int)strlen(buffer) - 1;
-            }
-            if(current->str==NULL){
-                current->strsize=0;
-            }
-            //임시방편
-            
-            current->strsize=(int)strlen(buffer) - 1;
-            current->str = strdup(buffer);
-            
-            current = NULL;
-            }
-        
-        fclose(file);
-
-        // 초기화 및 출력
-        firstRun=0;
-        x = 0;
-        y = 0;
-        linenum=1;
-        curNode = head;
-        rePrintConsol();
-        setUI();
-    }
 
     if (argc < 2) {//argc<2 : 파일오픈x
         if (filename == NULL) {

@@ -843,7 +843,7 @@ void presskey()
           else if(s_c == KEY_RIGHT){
             if(s_now < s_pos->s_total - 1){
               s_now += 1;
-            }else if(s_now == s_pos->s_total){
+            }else if(s_now > s_pos->s_total){
               s_now = 0;
             }
           }

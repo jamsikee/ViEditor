@@ -829,6 +829,7 @@ void presskey()
           cursor_out = temp_y_cursor_out;
           move(y, x);
           scroll_clean_and_printing(0);
+          status_bar();
           refresh();
           break;
         }
@@ -885,6 +886,7 @@ void presskey()
               x = s_pos[s_now].s_x;
               y = s_pos[s_now].s_y;
               cursor_out = s_pos[s_now].s_out;
+              status_bar();
               scroll_clean_and_printing(0);
               move(y,x);
               refresh();

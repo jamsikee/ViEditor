@@ -669,37 +669,6 @@ void get_filename(char *filename)
   }
 }
 
-/*
-void get_searchname(char *Query)
-{
-  int ch, pos = 0;
-  mvprintw(rows - 1, 0, "%*s", cols, ""); // clear
-  mvprintw(rows - 1, 0, "Search   (ESC/Arrows/Enter)");
-  while ((ch = getch()) != '\n')
-  {
-    if (ch == BACKSPACE)
-    {
-      if (pos > 0)
-      {
-        pos -= 1;
-        Query[pos] = '\0';
-      }
-    }
-    else
-    {
-      if (pos < MAX_SEARCHNAME - 1) // Query's max size is 20
-      {
-        Query[pos++] = ch;
-        Query[pos] = '\0';
-      }
-    }
-    mvprintw(rows - 1, 0, "%*s", cols, "");
-    mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", Query);
-    refresh();
-  }
-}
-*/
-
 typedef struct
 {
   int s_y;

@@ -67,6 +67,7 @@ typedef struct
 
 typedef struct
 {
+  int s_y;
   int s_x;
   int s_out;
 } SearchPosition;
@@ -97,7 +98,7 @@ void open_file(char *store_file);
 void delete_clean_and_printing(int pos);
 void get_filename(char *filename);
 void get_searchname(char *search);
-SearchPosition *search_text(char *search_text);
+void search_text(char *search_text);
 
 Row *get_line(Row *line, int pos)
 {
@@ -695,7 +696,7 @@ void search_text(char *searchText) {
                 arraySize *= 2;
                 searchPositions = realloc(searchPositions, sizeof(SearchPosition) * arraySize);
             }
-            searchPositions[searchCount].y = i;
+            searchPositions[searchCount].s_y = i;
             searchPositions[searchCount].s_x = found - lineText;
             searchPositions[searchCount].s_out = (i >= rows - 3) ? i - (rows - 3) : 0;
             searchCount++;

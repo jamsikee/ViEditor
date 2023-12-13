@@ -829,6 +829,7 @@ void presskey()
           cursor_out = temp_y_cursor_out;
           move(y, x);
           scroll_clean_and_printing(0);
+          refresh();
           break;
         }
         else if(s_c == BACKSPACE){
@@ -840,6 +841,8 @@ void presskey()
               s_pos->s_total = 0;
               s_pos->s_x = 0;
               s_pos->s_y = 0;
+              mvprintw(rows - 1, 0, "%*s", cols, ""); // clear
+              mvprintw(rows - 1, 0, "Search   (ESC/Arrows/Enter)");
               move(0, 0);
               refresh();
               continue;
@@ -874,12 +877,7 @@ void presskey()
             }
           }
         } // if end
-        if(sub_len == 0){
-           mvprintw(rows - 1, 0, "%*s", cols, ""); // clear
-          mvprintw(rows - 1, 0, "Search   (ESC/Arrows/Enter)");
-          move(0, 0);
-          refresh();
-        } else{
+        if(sub_len > 0){
               mvprintw(rows - 1, 0, "%*s", cols, "");
               mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", sub);
               if(s_now >= 0 && s_now < s_pos->s_total){

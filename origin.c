@@ -853,13 +853,12 @@ int main(int argc, char *argv[])
     status_bar();
     if(q_press == 1){
       end_message("Warning!!! You have to save : Ctrl-S");
-    } else{
-      mvprintw(rows-1, 0, "%*s", cols, "");
     }
     move(y, x);
     refresh();
     curs_set(1);
     presskey();
+    mvprintw(rows-1, 0, "%*s", cols, "");
     
   }
 

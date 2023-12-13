@@ -835,7 +835,7 @@ void presskey()
             sub[sub_len] = '\0';
             sub_matching(sub);
           } else if(sub_len == 0){
-            sub = {0};
+            sub[MAX_SEARCHNAME + 1] = {0};
             continue;
           }
         }

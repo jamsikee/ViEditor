@@ -414,7 +414,6 @@ void Visual_Text_editor__version()
 
 void status_bar()
 {
-  char modified[10];
   char total_len[20];
   char st_y[20];
   int y_1 = y + 1;
@@ -426,16 +425,16 @@ void status_bar()
 
   init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
   attron(COLOR_PAIR(2) | A_REVERSE);      // Enable the defined reverse color pair
-
+if(flag == 1){
+  left_len += 11;
+}
   for (int i = left_len - 2; i < cols - right_len; i++)
   {
     mvprintw(rows - 2, i, " ");
     refresh();
   }
   if (flag == 1) {
-    left_len += 11;
-    modified = "(modified)";
-    mvprintw(rows - 2, 0, "[%s] - %d lines %s", Edit.filename, total, modified);
+    mvprintw(rows - 2, 0, "[%s] - %d lines (modified)", Edit.filename, total);
   }
   else {
     mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
@@ -445,7 +444,6 @@ void status_bar()
   mvprintw(rows - 2, cols - right_len, "no ft | %d / %d", y + cursor_out + 1, total);
 
   attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
-  modified = NULL;
 }
 
 void end_message(const char *format, ...)

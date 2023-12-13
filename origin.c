@@ -78,19 +78,19 @@ struct Visual_Text_Editor Edit;
 
 void get_windows_size();
 Row *get_line(Row *line, int pos);
-void InsertRow(int edit_y, char *line, int line_len);
-void FreeRow(Row *line);
-void DeleteRow(int pos);
-void RowInsertString(Row *line, char *str, size_t del_line_len);
-void RowDeletechar(Row *line, int pos);
-void RowInsertchar(Row *line, char word, int pos);
+void insert_row(int edit_y, char *line, int line_len);
+void free_row(Row *line);
+void del_row(int pos);
+void row_insert_remined(Row *line, char *str, size_t del_line_len);
+void row_del_char(Row *line, int pos);
+void row_insert_char(Row *line, char word, int pos);
 void empty_new_line(int pos);
-void Insertchar(char word);
-void Del_current_line_char();
-void Del_current_line();
-void DeleteChar();
+void insert_char(char word);
+void del_current_line_char();
+void del_current_line();
+void delete_char();
 void contained_new_line(Row *line, int pos_y, int pos_x);
-void Newline(); // cursor_out + 1; line[y+cursor_out]
+void new_line(); // cursor_out + 1; line[y+cursor_out]
 void status_bar();
 void state();
 void end_message(const char *format, ...);
@@ -116,7 +116,7 @@ void welcome()
   mvprintw(rows / 3, mid, "%s", message);
 }
 
-void InsertRow(int edit_y, char *line, int line_len)
+void insert_row(int edit_y, char *line, int line_len)
 {
   if (edit_y < 0)
   {
@@ -166,13 +166,13 @@ void InsertRow(int edit_y, char *line, int line_len)
 }
 
 
-void FreeRow(Row *line)
+void free_row(Row *line)
 { // Efficient method for free memory
 
   free(line->c);
 }
 
-void DeleteRow(int pos)
+void del_row(int pos)
 {
 
   if (pos < 0)
@@ -185,7 +185,7 @@ void DeleteRow(int pos)
   }
   // If y < 0 or y > total then return
 
-  FreeRow(&Edit.line[pos]);
+  free_row(&Edit.line[pos]);
   Edit.line[pos].c = NULL;
   Edit.line[pos].len = 0;
   Edit.line[pos].line_capacity = 0;
@@ -201,7 +201,7 @@ void DeleteRow(int pos)
   total -= 1;
 }
 
-void RowInsertString(Row *line, char *str, size_t del_line_len)
+void row_insert_remined(Row *line, char *str, size_t del_line_len)
 {
 
   // This function will use delete char at x = 0 then delete row
@@ -219,7 +219,7 @@ void RowInsertString(Row *line, char *str, size_t del_line_len)
   line->c[line->len] = '\0';
 }
 
-void RowDeletechar(Row *line, int pos)
+void row_del_char(Row *line, int pos)
 {
 
   if (pos < 0 || pos >= line->len)
@@ -236,7 +236,7 @@ void RowDeletechar(Row *line, int pos)
 }
 // RowInserchar need
 
-void RowInsertchar(Row *line, char word, int pos)
+void row_insert_char(Row *line, char word, int pos)
 {
 
   if (pos < 0 || pos > line->len)
@@ -250,7 +250,7 @@ void RowInsertchar(Row *line, char word, int pos)
     line->c = realloc(line->c, line->line_capacity);
   }
 
-  // it seems like RowInsertString capacity*2
+  // it seems like row_insert_remined capacity*2
   memmove(&line->c[pos + 1], &line->c[pos], line->len - pos + 1);
   // memory move line->len - pos + 1 size
   line->len += 1;
@@ -260,11 +260,11 @@ void RowInsertchar(Row *line, char word, int pos)
 void empty_new_line(int pos)
 {
 
-  InsertRow(pos, "", 0);
+  insert_row(pos, "", 0);
   // If the line is empty or outside the screen add a empty line.
 }
 
-void Insertchar(char word)
+void insert_char(char word)
 {
 
   if (y + cursor_out == total)
@@ -272,7 +272,7 @@ void Insertchar(char word)
     empty_new_line(total);
     // if cursor y = total then add line;
   }
-  RowInsertchar(&Edit.line[y + cursor_out], word, x);
+  row_insert_char(&Edit.line[y + cursor_out], word, x);
   x += 1;
   // Insert char at cursor x
   scroll_clean_and_printing(y);
@@ -281,14 +281,14 @@ void Insertchar(char word)
 void contained_new_line(Row *line, int pos_y, int pos_x)
 {
 
-  InsertRow(pos_y + 1, &line->c[pos_x], line->len - pos_x);
+  insert_row(pos_y + 1, &line->c[pos_x], line->len - pos_x);
   // Insert current line's string(pos_x to line->len) to new line
   line = &Edit.line[pos_y];
   line->len = pos_x;
   line->c[line->len] = '\0';
 }
 
-void Newline()
+void new_line()
 {
 
   Row *line = get_line(Edit.line, y + cursor_out);
@@ -340,23 +340,23 @@ void Newline()
   }
 }
 
-void Del_current_line_char()
+void del_current_line_char()
 {
 
   Row *line = get_line(Edit.line, y + cursor_out);
   // get line Edit.line[y]
-  RowDeletechar(line, x - 1);
+  row_del_char(line, x - 1);
   x -= 1;
 }
 
-void Del_current_line()
+void del_current_line()
 {
 
   Row *line = get_line(Edit.line, y + cursor_out);
   // get line Edit.line[y]
   x = Edit.line[y - 1 + cursor_out].len;
-  RowInsertString(&Edit.line[y - 1 + cursor_out], line->c, line->len);
-  DeleteRow(y + cursor_out);
+  row_insert_remined(&Edit.line[y - 1 + cursor_out], line->c, line->len);
+  del_row(y + cursor_out);
 
   if (y == 0 && cursor_out > 0)
   {
@@ -370,7 +370,7 @@ void Del_current_line()
   // x cursor is prev line's len and y cursor -1 and insert string at line's len
 }
 
-void DeleteChar()
+void delete_char()
 { // 수정 필요 백스페이스키 안먹는거 같음 !!
 
   Row *line = get_line(Edit.line, y);
@@ -386,12 +386,12 @@ void DeleteChar()
 
   if (x > 0)
   {
-    Del_current_line_char();
+    del_current_line_char();
     scroll_clean_and_printing(y);
   }
   else
   {
-    Del_current_line();
+    del_current_line();
     scroll_clean_and_printing(y);
   }
 }
@@ -586,7 +586,7 @@ void open_file(char *store_file)
       Inf.length-= 1;
     }
     int read = Inf.length;
-    InsertRow(total, Inf.temp, read );
+    insert_row(total, Inf.temp, read );
   }
 
   free(Inf.temp);
@@ -654,7 +654,7 @@ void get_searchname(char *search) {
         }
       }
       mvprintw(rows-1, 0, "%*s", cols, "");
-      mvprintw(rows - 1, 0, "ENTER Query : %s", search);
+      mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", search);
       refresh();
     }
 }
@@ -752,12 +752,12 @@ void presskey()
     break;
     // 이부분 해결해야 될듯
     case '\n':
-      Newline();
+      new_line();
       flag = 1;
       break;
 
     case KEY_BACKSPACE:
-      DeleteChar();
+      delete_char();
       flag = 1;
       break;
     }
@@ -765,7 +765,7 @@ void presskey()
   else
   {
     char ch = (char)c;
-    Insertchar(ch);
+    insert_char(ch);
     flag = 1;
   }
 

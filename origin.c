@@ -874,6 +874,12 @@ void presskey()
             }
           }
         } // if end
+        if(sub_len == 0){
+           mvprintw(rows - 1, 0, "%*s", cols, ""); // clear
+          mvprintw(rows - 1, 0, "Search   (ESC/Arrows/Enter)");
+          move(0, 0);
+          refresh();
+        } else{
               mvprintw(rows - 1, 0, "%*s", cols, "");
               mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", sub);
               if(s_now >= 0 && s_now < s_pos->s_total){
@@ -884,6 +890,7 @@ void presskey()
               move(y,x);
               refresh();
               }
+        }
       } // while end
     }
     break;

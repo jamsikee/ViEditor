@@ -91,7 +91,7 @@ void open_file(char *store_file);
 void delete_clean_and_printing(int pos);
 void get_filename(char *filename);
 void get_searchname(char *search);
-void sub_matching(char *Query)
+void sub_matching(char *Query);
 
 Row *get_line(Row *line, int pos)
 {
@@ -777,8 +777,8 @@ void presskey()
           clear();  // clear ncurses creen
           endwin(); // turn off encurses
           exit(0);  // exit
-        }
-      }
+        } // if (q_press == 2) end
+      } // if (flag == 1) end
       else
       {
         clear();
@@ -798,11 +798,11 @@ void presskey()
         save_file(filename);
         mvprintw(rows - 1, 0, "%*s", cols, "");
         q_press = 0; // if save then init q_press
-      }
+      } // if (flag == 1) end
       flag = 0; // no modified
     }
     break;
-    /*
+    
     case CONTROL('f'):
     {
       char sub[MAX_SEARCHNAME + 1] = {0}; // sub[] = NULL
@@ -839,11 +839,11 @@ void presskey()
             }
           }
         } // if end
-      } //
+      } // while end
       get_searchname(Sub);
     }
     break;
-    */
+    
     
 
     case KEY_LEFT:  // arrow_left

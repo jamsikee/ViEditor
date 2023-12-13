@@ -852,6 +852,7 @@ void presskey()
           }
         }
         else if(s_c == KEY_LEFT || s_c == KEY_RIGHT){
+          if(sub_len == 0) continue;
           if(s_c == KEY_LEFT){
             if(s_now > 0){
               s_now -= 1;

@@ -64,13 +64,6 @@ typedef struct
   // Store_File_Information
 } File_Inf;
 
-typedef struct
-{
-  char *filename;
-  char *content;
-  size_t content_size;
-} File;
-
 struct Visual_Text_Editor Edit;
 
 // total function
@@ -697,6 +690,8 @@ void get_searchname(char *search)
     refresh();
   }
 }
+
+
 
 // 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐
 void presskey()

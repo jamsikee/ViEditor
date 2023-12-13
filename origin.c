@@ -696,8 +696,8 @@ void search_text(char *searchText) {
                 searchPositions = realloc(searchPositions, sizeof(SearchPosition) * arraySize);
             }
             searchPositions[searchCount].y = i;
-            searchPositions[searchCount].x = found - lineText;
-            searchPositions[searchCount].y_out = (i >= rows - 3) ? i - (rows - 3) : 0;
+            searchPositions[searchCount].s_x = found - lineText;
+            searchPositions[searchCount].s_out = (i >= rows - 3) ? i - (rows - 3) : 0;
             searchCount++;
             found = strstr(found + 1, searchText);
         }
@@ -705,8 +705,8 @@ void search_text(char *searchText) {
 
     if (searchCount > 0) {
         currentPosition = 0;
-        y_out = searchPositions[0].y_out;
-        x = searchPositions[0].x;
+        cursor_out = searchPositions[0].s_out;
+        x = searchPositions[0].s_x;
         scroll_clean_and_printing(0); // 화면을 새로 고침
         move(0, x); // 커서를 첫 번째 검색 위치로 이동
     }
@@ -719,8 +719,8 @@ void move_to_search_position(int direction) {
     if (currentPosition < 0) currentPosition = 0;
     if (currentPosition >= searchCount) currentPosition = searchCount - 1;
 
-    y_out = searchPositions[currentPosition].y_out;
-    x = searchPositions[currentPosition].x;
+    cursor_out = searchPositions[currentPosition].s_out;
+    x = searchPositions[currentPosition].s_x;
     scroll_clean_and_printing(0); // 화면을 새로 고침
     move(0, x); // 새 검색 위치로 커서 이동
 }

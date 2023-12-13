@@ -609,7 +609,7 @@ void open_file(char *store_file)
   free(Inf.temp);
   fclose(file);
   y = 0;
-  cursor_out = total - (rows - 2); // screen rows + cursor_out = total
+  cursor_out = total - (rows - 3); // screen rows + cursor_out = total
   if (cursor_out < 0)
     cursor_out = 0;
 }

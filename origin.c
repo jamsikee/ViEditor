@@ -665,7 +665,7 @@ void get_filename(char *filename)
     }
 
     mvprintw(rows - 1, 0, "%*s", cols, "");
-    mvprintw(rows - 1, 0, "ENTER FILE NAME : %s hello", filename);
+    mvprintw(rows - 1, 0, "ENTER FILE NAME : %s ", filename);
     refresh();
   }
 }
@@ -887,6 +887,7 @@ void presskey()
             }
           }
         }
+        /*
         if (s_now >= 0 && s_now < s_pos->s_total)
         {
           x = s_pos[s_now].s_x;
@@ -895,6 +896,7 @@ void presskey()
           move(y, x);
           scroll_clean_and_printing(0);
         }
+        */
       }
       break;
     }

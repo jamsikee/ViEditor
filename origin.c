@@ -601,6 +601,7 @@ void open_file(char *store_file)
   {
     while (Inf.length > 0 && (Inf.temp[Inf.length - 1] == '\r' || Inf.temp[Inf.length - 1] == '\n'))
     { // if '\r' or '\n' then len - 1
+      Inf.temp[Inf.length] = '\0';
       Inf.length -= 1;
     }
     int read = Inf.length;
@@ -802,7 +803,7 @@ void presskey()
       flag = 0; // no modified
     }
     break;
-    
+    // jam vite search test 1
     case CONTROL('f'):
     {
       char sub[MAX_SEARCHNAME + 1] = {0}; // sub[] = NULL

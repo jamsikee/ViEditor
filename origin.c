@@ -834,6 +834,9 @@ void presskey()
             sub_len -= 1;
             sub[sub_len] = '\0';
             sub_matching(sub);
+          } else if(sub_len == 0){
+            sub = {0};
+            continue;
           }
         }
         else if(s_c == KEY_LEFT || s_c == KEY_RIGHT){

@@ -891,6 +891,7 @@ void presskey()
               mvprintw(rows - 1, 0, "%*s", cols, "");
               mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", sub);
               sub_matching(sub);
+              move(y,x);
             }
           }
         }

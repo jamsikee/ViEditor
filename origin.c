@@ -830,7 +830,6 @@ void presskey()
           move(y, x);
           scroll_clean_and_printing(0);
           status_bar();
-          refresh();
           break;
         }
         else if(s_c == BACKSPACE){
@@ -845,7 +844,6 @@ void presskey()
               mvprintw(rows - 1, 0, "%*s", cols, ""); // clear
               mvprintw(rows - 1, 0, "Search   (ESC/Arrows/Enter)");
               move(0, 0);
-              refresh();
               continue;
             } else{
               sub_matching(sub);

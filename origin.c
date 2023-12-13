@@ -860,13 +860,13 @@ void presskey()
         } // if end
               mvprintw(rows - 1, 0, "%*s", cols, "");
               mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", sub);
-              refresh();
               if(s_now >= 0 && s_now < s_pos->s_total){
               x = s_pos[s_now].s_x;
               y = s_pos[s_now].s_y;
               cursor_out = s_pos[s_now].s_out;
               move(y,x);
               scroll_clean_and_printing(0);
+              refresh();
               }
       } // while end
     }

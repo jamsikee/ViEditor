@@ -25,7 +25,7 @@
 #define INIT_LINE_SIZE 125
 #define MAX_FILENAME 50
 #define MAX_SEARCHNAME 20
-#define Search_SIZE 50
+#define Search_SIZE 10000
 
 // global
 int x = 0;
@@ -36,7 +36,6 @@ int cols = 0;
 int total = 0;
 int flag = 0;
 int q_press = 0;
-int mode_change = 0;
 
 // total suruct
 typedef struct Row
@@ -634,35 +633,34 @@ void save_file(char *filename)
   fclose(file);
 }
 
-void get_filename(char *filename)
-{
-  int ch, pos = 0;
-  mvprintw(rows - 1, 0, "%*s", cols, "");      // rows - 1 clear
-  mvprintw(rows - 1, 0, "ENTER FILE NAME : "); // rows - 1 write name
-  while ((ch = getch()) != '\n')
-  {
-    if (ch == BACKSPACE)
-    {
-      if (pos > 0)
-      {
-        pos -= 1;
-        filename[pos] = '\0';
-      }
+void get_filename(char *filename) {
+    int ch, pos = 0;
+    mvprintw(rows - 1, 0, "%*s", cols, "");      // rows - 1 clear
+    mvprintw(rows - 1, 0, "ENTER FILE NAME : "); // rows - 1 write name
+    while (1) {
+        ch = getch();
+        if (ch == ENTER){
+          break;
+        }
+        else if (ch == BACKSPACE) {
+            if (pos > 0) {
+                pos -= 1;
+                filename[pos] = '\0';
+            }
+        } else if (ch >= 32 && ch <= 126) { // 문자 및 숫자만 받기
+            if (pos < MAX_FILENAME - 1) { // filename's max size is 50
+                filename[pos++] = ch;
+                filename[pos] = '\0';
+            }
+        }
+        
+        mvprintw(rows - 1, 0, "%*s", cols, "");
+        mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", filename);
+        refresh();
     }
-    else
-    {
-      if (pos < MAX_FILENAME - 1) // filename's max size is 50
-      {
-        filename[pos++] = ch;
-        filename[pos] = '\0';
-      }
-    }
-    mvprintw(rows - 1, 0, "%*s", cols, "");
-    mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", filename);
-    refresh();
-  }
 }
 
+/*
 void get_searchname(char *Query)
 {
   int ch, pos = 0;
@@ -691,42 +689,56 @@ void get_searchname(char *Query)
     refresh();
   }
 }
+*/
 
-typedef struct {
-    int s_x;
-    int s_out;
+typedef struct
+{
+  int s_y;
+  int s_x;
+  int s_out;
 } SearchPosition;
-/*
-SearchPosition *s_pos = NULL;
+
+SearchPosition s_pos = NULL;
+
 int s_total = 0;
 int s_now = 0;
 int s_size = 0;
 
-void search_text(char *Query){
+void search_text(char *Query)
+{
   s_total = 0;
   s_now = 0;
   s_size = Search_SIZE;
-  s_pos = malloc(sizeof(s_pos)* s_size); // first malloc 50
+  s_pos = malloc(sizeof(SearchPosition) * s_size); // first malloc 10000
 
-  for(int i = 0; i < total; ++i){
-    char *data = Edit.line[i].c
+  for (int i = 0; i < total; ++i)
+  {
+    char *data = Edit.line[i].c;
     char *sub = strstr(data, Query);
 
-    while(sub){
-      if (s_total >= s_size){
+    while (sub)
+    {
+      if (s_total >= s_size)
+      {
         s_size *= 2;
-        s_pos = realloc(s_pos, s_size);
+        s_pos = realloc(s_pos, sizeof(SearchPosition) * s_size); // 메모리 재할당 수정
       }
       s_pos[s_total].s_x = sub - data;
-      if(i > rows -3) {
+      if (i > rows - 3)
+      {
         s_pos[s_total].s_out = i - (rows - 2);
-      } else if(){
-        
+        s_pos[s_total].s_y = 0;
       }
+      else if (i >= 0 && i <= rows - 3)
+      {
+        s_pos[s_total].s_out = 0;
+        s_pos[s_total].s_y = i;
+      }
+      s_total += 1;
+      sub = strstr(sub + 1, Query);
     }
   }
 }
-*/
 
 // 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐
 void presskey()
@@ -776,11 +788,33 @@ void presskey()
       flag = 0; // no modified
     }
     break;
-
+    /*
     case CONTROL('f'):
-      char Sub[MAX_SEARCHNAME + 1];
+    {
+      char Sub[MAX_SEARCHNAME + 1] = {0};
+      int s_c = 0;
+      
+      mvprintw(rows - 1, 0, "%*s", cols, ""); // clear
+      mvprintw(rows - 1, 0, "Search   (ESC/Arrows/Enter)");
+      while (1)
+      {
+        s_c = getch();
+        if(s_c == ENTER){
+          break;
+        }
+        if(s_c == 27){
+          break;
+        }
+        if(s_c == BACKSPACE){
+          if (strlen(Sub) > 0) {
+
+          }
+        }
+      }
       get_searchname(Sub);
-      break;
+    }
+    break;
+    */
 
     case KEY_LEFT:  // arrow_left
     case KEY_RIGHT: // arrow_right
@@ -899,12 +933,14 @@ int main(int argc, char *argv[])
   cbreak();             // no line break
   keypad(stdscr, TRUE); // can like special key like KEY_END
   x = 0;
-  y = 0;
-  rows = 0;
+  y = 0;          // 1 최대 54
+  cursor_out = 0; // +1
+  rows = 0;       // 54
   cols = 0;
   total = 0;
   flag = 0;
   q_press = 0;
+
   getmaxyx(stdscr, rows, cols); // get screen rows and cols
 
   if (argc >= 2)

@@ -815,6 +815,8 @@ void presskey()
       int sub_len = 0;  // strlen(sub);
       mvprintw(rows - 1, 0, "%*s", cols, ""); // clear
       mvprintw(rows - 1, 0, "Search   (ESC/Arrows/Enter)");
+      move(0, 0);
+      refresh();
       while (1)
       {
         s_c = getch();
@@ -838,6 +840,8 @@ void presskey()
               s_pos->s_total = 0;
               s_pos->s_x = 0;
               s_pos->s_y = 0;
+              move(0, 0);
+              refresh();
               continue;
             } else{
               sub_matching(sub);

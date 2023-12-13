@@ -662,7 +662,7 @@ void get_filename(char *filename)
   }
 }
 
-void get_searchname(char *search)
+void get_searchname(char *Query)
 {
   int ch, pos = 0;
   mvprintw(rows - 1, 0, "%*s", cols, ""); // clear
@@ -674,23 +674,28 @@ void get_searchname(char *search)
       if (pos > 0)
       {
         pos -= 1;
-        search[pos] = '\0';
+        Query[pos] = '\0';
       }
     }
     else
     {
-      if (pos < MAX_SEARCHNAME - 1) // Searchname's max size is 20
+      if (pos < MAX_SEARCHNAME - 1) // Query's max size is 20
       {
-        search[pos++] = ch;
-        search[pos] = '\0';
+        Query[pos++] = ch;
+        Query[pos] = '\0';
       }
     }
     mvprintw(rows - 1, 0, "%*s", cols, "");
-    mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", search);
+    mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", Query);
     refresh();
   }
 }
+int search_count = 0;
+int search_current = 0;
 
+void search_text(char *Query){
+  
+}
 
 
 // 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐

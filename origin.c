@@ -715,7 +715,12 @@ void sub_matching(char *Query)
   int s_size = 0;
   s_size = Search_SIZE;
   
-  free(s_pos);
+  if(s_pos != NULL){
+    s_pos ->s_out = 0;
+    s_pos->s_total = 0;
+    s_pos->s_x = 0;
+    s_pos->s_y = 0;
+  }
   s_pos = malloc(sizeof(SearchPosition) * s_size); // first malloc 10000
   for (int i = 0; i < total; ++i)
   {

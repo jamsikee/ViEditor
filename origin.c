@@ -840,7 +840,7 @@ void presskey()
           }
         } // if end
       } // while end
-      get_searchname(sub);
+      // get_searchname(sub);
     }
     break;
     

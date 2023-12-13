@@ -7,19 +7,18 @@
 #include <stdarg.h>
 
 #ifdef _WIN32
-    #include <curses.h>
-    #define BACKSPACE 8
-    #define ENTER 13
+#include <curses.h>
+#define BACKSPACE 8
+#define ENTER 13
 #elif __APPLE
-    #include <ncurses.h>
-    #define BACKSPACE 127
-    #define ENTER '\n'
+#include <ncurses.h>
+#define BACKSPACE 127
+#define ENTER '\n'
 #else
-    #include <ncurses.h>
-    #define BACKSPACE KEY_BACKSPACE
-    #define ENTER '\n'
+#include <ncurses.h>
+#define BACKSPACE KEY_BACKSPACE
+#define ENTER '\n'
 #endif
-
 
 #define CONTROL(k) ((k) & 0x1f) // control + k
 #define INIT_ROW_SIZE 1000
@@ -27,13 +26,12 @@
 #define MAX_FILENAME 50
 #define MAX_SEARCHNAME 20
 
+// global
 int x = 0;
-int y = 0;     // 1 최대 54
+int y = 0;          // 1 최대 54
 int cursor_out = 0; // +1
-int rows = 0;  // 54
+int rows = 0;       // 54
 int cols = 0;
-int move_rows = 0;
-int move_cols = 0;
 int total = 0;
 int flag = 0;
 int q_press = 0;
@@ -66,16 +64,16 @@ typedef struct
   // Store_File_Information
 } File_Inf;
 
-
-typedef struct {
-    char *filename;
-    char *content;
-    size_t content_size;
+typedef struct
+{
+  char *filename;
+  char *content;
+  size_t content_size;
 } File;
 
 struct Visual_Text_Editor Edit;
-// total function
 
+// total function
 void get_windows_size();
 Row *get_line(Row *line, int pos);
 void insert_row(int edit_y, char *line, int line_len);
@@ -108,14 +106,6 @@ Row *get_line(Row *line, int pos)
   // get line index
 }
 
-void welcome()
-{
-  const char *message = "Visual Text editor -- version 0.0.1";
-  int len = strlen(message);
-  int mid = (cols - len) / 2;
-  mvprintw(rows / 3, mid, "%s", message);
-}
-
 void insert_row(int edit_y, char *line, int line_len)
 {
   if (edit_y < 0)
@@ -145,26 +135,30 @@ void insert_row(int edit_y, char *line, int line_len)
   Edit.line[edit_y].len = line_len;
   Edit.line[edit_y].c = malloc(INIT_LINE_SIZE + 1);
   Edit.line[edit_y].line_capacity = INIT_LINE_SIZE;
-
-    if (line_len > Edit.line[edit_y].line_capacity) {
-        while (line_len > Edit.line[edit_y].line_capacity) {
-            Edit.line[edit_y].line_capacity *= 2;
-        }
-        Edit.line[edit_y].c = realloc(Edit.line[edit_y].c, Edit.line[edit_y].line_capacity + 1);
-        if (Edit.line[edit_y].c == NULL) {
-            // 메모리 할당 실패 처리
-            return;
-        }
-    } else {
-        Edit.line[edit_y].c = malloc(Edit.line[edit_y].line_capacity + 1);
+  // Line_capacity is (Edit.line[y].c)'s size = 125
+  if (line_len > Edit.line[edit_y].line_capacity)
+  {
+    while (line_len > Edit.line[edit_y].line_capacity)
+    {
+      Edit.line[edit_y].line_capacity *= 2;
     }
-  // Line_capacity is (Edit.line[y].c)'s size
+    Edit.line[edit_y].c = realloc(Edit.line[edit_y].c, Edit.line[edit_y].line_capacity + 1);
+    if (Edit.line[edit_y].c == NULL)
+    {
+      // error
+      return;
+    }
+  }
+  else
+  {
+    Edit.line[edit_y].c = malloc(Edit.line[edit_y].line_capacity + 1);
+  }
+  // realloc (125)*2
   memcpy(Edit.line[edit_y].c, line, line_len);
   Edit.line[edit_y].c[line_len] = '\0';
   // The end of the string is null
   total += 1;
 }
-
 
 void free_row(Row *line)
 { // Efficient method for free memory
@@ -227,7 +221,7 @@ void row_del_char(Row *line, int pos)
     return;
   }
   /*
-  If x < 0 or x >= line's len then return 
+  If x < 0 or x >= line's len then return
   It means The cursor moved out of its intended position
   */
   memmove(&line->c[pos], &line->c[pos + 1], line->len - pos);
@@ -249,12 +243,12 @@ void row_insert_char(Row *line, char word, int pos)
     line->line_capacity *= 2;
     line->c = realloc(line->c, line->line_capacity);
   }
-
-  // it seems like row_insert_remined capacity*2
+  // it seems like row_insert_char capacity*2
   memmove(&line->c[pos + 1], &line->c[pos], line->len - pos + 1);
   // memory move line->len - pos + 1 size
   line->len += 1;
   line->c[pos] = word;
+  // pos = x
 }
 
 void empty_new_line(int pos)
@@ -306,14 +300,16 @@ void new_line()
       y += 1;
     }
     x = 0;
-
+    // scroll if y > screen_rows then cursor out += 1;
     if (y == rows - 3)
     {
       scroll_clean_and_printing(0);
+      // if y == rows - 3 then scroll
     }
     else
     {
       scroll_clean_and_printing(y - 1);
+      // if y == !rows-3 then no scroll and cursor y-1 ~ rows-3 clear and printing
     }
   }
   else
@@ -328,14 +324,17 @@ void new_line()
     {
       y += 1;
     }
+    // scroll plus 
     x = 0;
     if (y == rows - 3)
     {
       scroll_clean_and_printing(0);
+      // if y == rows - 3 then scroll
     }
     else
     {
       scroll_clean_and_printing(y - 1);
+      // if y == !rows-3 then no scroll and cursor y-1 ~ rows-3 clear and printing
     }
   }
 }
@@ -357,11 +356,12 @@ void del_current_line()
   x = Edit.line[y - 1 + cursor_out].len;
   row_insert_remined(&Edit.line[y - 1 + cursor_out], line->c, line->len);
   del_row(y + cursor_out);
-
+  // if current row is delete then remained string positioning y-1 line's len
   if (y == 0 && cursor_out > 0)
   {
     y = 0;
     cursor_out -= 1;
+    // scroll
   }
   else
   {
@@ -383,6 +383,7 @@ void delete_char()
   {
     return;
   }
+  // return 0, 0, 0
 
   if (x > 0)
   {
@@ -394,6 +395,7 @@ void delete_char()
     del_current_line();
     scroll_clean_and_printing(y);
   }
+  // printing y to rows-3
 }
 
 void Visual_Text_editor__version()
@@ -410,6 +412,7 @@ void Visual_Text_editor__version()
   {
     mvprintw(rows / 3, mid, "                                   ");
   }
+  // if total == 0 print else NULL
 }
 
 void status_bar()
@@ -420,30 +423,40 @@ void status_bar()
   snprintf(total_len, sizeof(total_len), "%d", total);
   snprintf(st_y, sizeof(st_y), "%d", y + cursor_out + 1);
 
-  int left_len = strlen(total_len) + strlen(Edit.filename) + 13;
-  int right_len = strlen(total_len) + strlen(st_y) + 11; // 9은 "no ft | "의 길이
+  int left_len = strlen(total_len) + strlen(Edit.filename) + 13;  // 13 is [] spacing - spacing lines len
+  int right_len = strlen(total_len) + strlen(st_y) + 11; // 11 is "no ft | "'s len
 
-  init_pair(2, COLOR_WHITE, COLOR_BLACK); // Define a color pair for reverse color
-  attron(COLOR_PAIR(2) | A_REVERSE);      // Enable the defined reverse color pair
-if(flag == 1){
-  left_len += 11;
-}
+  init_pair(2, COLOR_WHITE, COLOR_BLACK); 
+  // white and black
+  attron(COLOR_PAIR(2) | A_REVERSE);     
+  // reverse
+  if (flag == 1)  
+  {
+    left_len += 11;
+  }
+  // if modified then len += 11 becuase [spacing and (modified)] is 11
   for (int i = left_len - 2; i < cols - right_len; i++)
   {
     mvprintw(rows - 2, i, " ");
     refresh();
-  }
-  if (flag == 1) {
+  } 
+  // status_bar clean
+  if (flag == 1)
+  {
     mvprintw(rows - 2, 0, "[%s] - %d lines (modified)", Edit.filename, total);
+    // if modified print modified
   }
-  else {
+  else
+  {
     mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
+    // else do not print modified
   }
-  // 왼쪽에 텍스트 출력
-  // 오른쪽에 텍스트 출력
-  mvprintw(rows - 2, cols - right_len, "no ft | %d / %d", y + cursor_out + 1, total);
 
-  attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
+  mvprintw(rows - 2, cols - right_len, "no ft | %d / %d", y + cursor_out + 1, total);
+  // no ft and y+cursor_out +1 and total
+
+  attroff(COLOR_PAIR(2) | A_REVERSE);
+  // turn off reverse
 }
 
 void end_message(const char *format, ...)
@@ -451,9 +464,10 @@ void end_message(const char *format, ...)
   va_list args;
   va_start(args, format);
   mvprintw(rows - 1, 0, "%*s", cols, "");
-  mvprintw(rows - 1, 0, format, args); // 가변 인자들을 printf 형태로 특정 위치에 출력
+  mvprintw(rows - 1, 0, format, args);
   va_end(args);
   refresh();
+  // end message like "Help:"
 }
 
 void Move(int key)
@@ -470,6 +484,7 @@ void Move(int key)
     {
       y -= 1;
       x = Edit.line[y + cursor_out].len;
+      // x is -y's len
     }
     else if (x == 0 && y == 0)
     {
@@ -478,6 +493,7 @@ void Move(int key)
         y = 0;
         cursor_out -= 1;
         x = Edit.line[y + cursor_out].len;
+        // scroll
       }
     }
     move(y, x);
@@ -500,6 +516,7 @@ void Move(int key)
           cursor_out += 1;
           y = rows - 3;
           x = 0;
+          // scroll
         }
         else
         {
@@ -507,10 +524,12 @@ void Move(int key)
           {
             y += 1;
             x = 0;
+            // no scroll
           }
           else
           {
             y = rows - 3;
+            // y doesn't go out rows - 3 
           }
         }
       }
@@ -525,6 +544,7 @@ void Move(int key)
     else if (y == 0 && cursor_out > 0)
     {
       cursor_out -= 1;
+      // scroll
     }
     if (x > Edit.line[y + cursor_out].len)
     {
@@ -567,10 +587,10 @@ void open_file(char *store_file)
   Edit.store_file = malloc(strlen(store_file) + 1);
   strcpy(Edit.store_file, store_file);
 
-  FILE *file = fopen(store_file, "r");
+  FILE *file = fopen(Edit.store_file, "rt");
   if (!file)
   {
-    fprintf(stderr, "Cannot open file: %s\n", store_file);
+    fprintf(stderr, "Cannot open file: %s\n", Edit.store_file);
     exit(EXIT_FAILURE);
   }
 
@@ -583,80 +603,100 @@ void open_file(char *store_file)
   {
     while (Inf.length > 0 && (Inf.temp[Inf.length - 1] == '\r' || Inf.temp[Inf.length - 1] == '\n'))
     {
-      Inf.length-= 1;
+      Inf.length -= 1;
     }
     int read = Inf.length;
-    insert_row(total, Inf.temp, read );
+    insert_row(total, Inf.temp, read);
   }
 
   free(Inf.temp);
   fclose(file);
   y = 0;
   cursor_out = total - rows - 2;
-  if(cursor_out < 0) cursor_out = 0;
-
+  if (cursor_out < 0)
+    cursor_out = 0;
 }
 
-void save_file(char *filename) {
-    FILE *file = fopen(filename, "w"); // "w" 모드로 파일을 쓰기 모드로 열기
-    if (!file) {
-        fprintf(stderr, "Cannot open file for writing: %s\n", filename);
-        return;
-    }
+void save_file(char *filename)
+{
+  FILE *file = fopen(filename, "w"); // "w" 모드로 파일을 쓰기 모드로 열기
+  if (!file)
+  {
+    fprintf(stderr, "Cannot open file for writing: %s\n", filename);
+    return;
+  }
 
-    for (int i = 0; i < total; ++i) {
-        if (Edit.line[i].c != NULL) {
-            fprintf(file, "%s\n", Edit.line[i].c); // 각 줄을 파일에 쓰기
-        } else {
-            fprintf(file, "\n"); // 비어있는 줄인 경우 개행 문자만 파일에 쓰기
-        }
+  for (int i = 0; i < total; ++i)
+  {
+    if (Edit.line[i].c != NULL)
+    {
+      fprintf(file, "%s\n", Edit.line[i].c); // 각 줄을 파일에 쓰기
     }
+    else
+    {
+      fprintf(file, "\n"); // 비어있는 줄인 경우 개행 문자만 파일에 쓰기
+    }
+  }
 
-    fclose(file); // 파일 닫기
+  fclose(file); // 파일 닫기
 }
 
-void get_filename(char *filename) {
-    int ch, pos = 0;
-    mvprintw(rows-1, 0, "%*s", cols, "");
-    mvprintw(rows - 1, 0, "ENTER FILE NAME : ");
-    while((ch = getch()) != '\n'){
-      if(ch == KEY_BACKSPACE){
-        if(pos > 0){
-          pos -= 1;
-          filename[pos] = '\0';
-        }
-      } else {
-        if(pos < MAX_FILENAME - 1){
-          filename[pos++] = ch;
-          filename[pos] = '\0';
-        }
+void get_filename(char *filename)
+{
+  int ch, pos = 0;
+  mvprintw(rows - 1, 0, "%*s", cols, "");
+  mvprintw(rows - 1, 0, "ENTER FILE NAME : ");
+  while ((ch = getch()) != '\n')
+  {
+    if (ch == KEY_BACKSPACE)
+    {
+      if (pos > 0)
+      {
+        pos -= 1;
+        filename[pos] = '\0';
       }
-      mvprintw(rows-1, 0, "%*s", cols, "");
-      mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", filename);
-      refresh();
     }
+    else
+    {
+      if (pos < MAX_FILENAME - 1)
+      {
+        filename[pos++] = ch;
+        filename[pos] = '\0';
+      }
+    }
+    mvprintw(rows - 1, 0, "%*s", cols, "");
+    mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", filename);
+    refresh();
+  }
 }
 
-void get_searchname(char *search) {
-    int ch, pos = 0;
-    mvprintw(rows-1, 0, "%*s", cols, "");
-    mvprintw(rows - 1, 0, "ENTER Query : ");
-    while((ch = getch()) != '\n'){
-      if(ch == KEY_BACKSPACE){
-        if(pos > 0){
-          pos -= 1;
-          search[pos] = '\0';
-        }
-      } else {
-        if(pos < MAX_FILENAME - 1){
-          search[pos++] = ch;
-          search[pos] = '\0';
-        }
+void get_searchname(char *search)
+{
+  int ch, pos = 0;
+  mvprintw(rows - 1, 0, "%*s", cols, "");
+  mvprintw(rows - 1, 0, "ENTER Query : ");
+  while ((ch = getch()) != '\n')
+  {
+    if (ch == KEY_BACKSPACE)
+    {
+      if (pos > 0)
+      {
+        pos -= 1;
+        search[pos] = '\0';
       }
-      mvprintw(rows-1, 0, "%*s", cols, "");
-      mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", search);
-      refresh();
     }
+    else
+    {
+      if (pos < MAX_FILENAME - 1)
+      {
+        search[pos++] = ch;
+        search[pos] = '\0';
+      }
+    }
+    mvprintw(rows - 1, 0, "%*s", cols, "");
+    mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", search);
+    refresh();
+  }
 }
 
 // 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐
@@ -675,7 +715,7 @@ void presskey()
     {
     case CONTROL('q'):
       if (flag == 1)
-      { 
+      {
         q_press += 1;
         if (q_press == 2)
         {
@@ -693,20 +733,21 @@ void presskey()
       break;
 
     case CONTROL('s'):
-    {   
-      if(flag == 1){
+    {
+      if (flag == 1)
+      {
         char filename[MAX_FILENAME + 1];
         get_filename(filename);
-        Edit.filename = malloc(strlen(filename) + 1);  // 메모리 할당
-        strcpy(Edit.filename, filename);  
+        Edit.filename = malloc(strlen(filename) + 1); // 메모리 할당
+        strcpy(Edit.filename, filename);
         save_file(filename);
-        mvprintw(rows-1, 0, "%*s", cols, "");
+        mvprintw(rows - 1, 0, "%*s", cols, "");
         q_press = 0;
-    }
-    flag = 0;
+      }
+      flag = 0;
     }
 
-      break;
+    break;
 
     case CONTROL('f'):
       char Sub_Matching[MAX_SEARCHNAME + 1];
@@ -717,19 +758,22 @@ void presskey()
     case KEY_RIGHT: // 오른쪽 화살표 키
     case KEY_UP:    // 위쪽 화살표 키
     case KEY_DOWN:  // 아래쪽 화살표 키
-    
-      if(total == 0) return;
+
+      if (total == 0)
+        return;
       Move(c);
       scroll_clean_and_printing(0);
       break;
     case KEY_END: // End 키
-    if(total == 0) return;
+      if (total == 0)
+        return;
       x = Edit.line[y + cursor_out].len;
       move(y, x);
       break;
 
     case KEY_HOME: // Home 키
-    if(total == 0) return;
+      if (total == 0)
+        return;
       x = 0;
       move(y, x);
       break;
@@ -737,8 +781,9 @@ void presskey()
     case KEY_NPAGE: // Page Down 키
     case KEY_PPAGE: // Page Up 키
     {
-      if(total == 0) return;
-      int temprows = rows -3;
+      if (total == 0)
+        return;
+      int temprows = rows - 3;
       while (temprows--)
       {
         if (c == KEY_PPAGE)
@@ -746,7 +791,7 @@ void presskey()
         else if (c == KEY_NPAGE)
           Move(KEY_DOWN);
       }
-      
+
       scroll_clean_and_printing(0);
     }
     break;
@@ -832,7 +877,7 @@ int main(int argc, char *argv[])
   flag = 0;
   q_press = 0;
   getmaxyx(stdscr, rows, cols); // rows cols
-  
+
   if (argc >= 2)
   {
     Edit.filename = argv[1];
@@ -852,20 +897,19 @@ int main(int argc, char *argv[])
     refresh();
   }
 
-
   while (true)
   {
     curs_set(0);
     status_bar();
-    if(q_press == 1){
+    if (q_press == 1)
+    {
       end_message("Warning!!! File has unsaved changes. Press Ctrl-Q 1 more times to quit.");
     }
     move(y, x);
     refresh();
     curs_set(1);
     presskey();
-    mvprintw(rows-1, 0, "%*s", cols, "");
-    
+    mvprintw(rows - 1, 0, "%*s", cols, "");
   }
 
   endwin();

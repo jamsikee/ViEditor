@@ -324,7 +324,7 @@ void new_line()
     {
       y += 1;
     }
-    // scroll plus 
+    // scroll plus
     x = 0;
     if (y == rows - 3)
     {
@@ -423,14 +423,14 @@ void status_bar()
   snprintf(total_len, sizeof(total_len), "%d", total);
   snprintf(st_y, sizeof(st_y), "%d", y + cursor_out + 1);
 
-  int left_len = strlen(total_len) + strlen(Edit.filename) + 13;  // 13 is [] spacing - spacing lines len
-  int right_len = strlen(total_len) + strlen(st_y) + 11; // 11 is "no ft | "'s len
+  int left_len = strlen(total_len) + strlen(Edit.filename) + 13; // 13 is [] spacing - spacing lines len
+  int right_len = strlen(total_len) + strlen(st_y) + 11;         // 11 is "no ft | "'s len
 
-  init_pair(2, COLOR_WHITE, COLOR_BLACK); 
+  init_pair(2, COLOR_WHITE, COLOR_BLACK);
   // white and black
-  attron(COLOR_PAIR(2) | A_REVERSE);     
+  attron(COLOR_PAIR(2) | A_REVERSE);
   // reverse
-  if (flag == 1)  
+  if (flag == 1)
   {
     left_len += 11;
   }
@@ -439,7 +439,7 @@ void status_bar()
   {
     mvprintw(rows - 2, i, " ");
     refresh();
-  } 
+  }
   // status_bar clean
   if (flag == 1)
   {
@@ -529,7 +529,7 @@ void Move(int key)
           else
           {
             y = rows - 3;
-            // y doesn't go out rows - 3 
+            // y doesn't go out rows - 3
           }
         }
       }
@@ -549,6 +549,7 @@ void Move(int key)
     if (x > Edit.line[y + cursor_out].len)
     {
       x = Edit.line[y + cursor_out].len;
+      // if arrow up than if line's len is shorter than line+1's len move cursor
     }
     move(y, x);
     break;
@@ -562,6 +563,7 @@ void Move(int key)
       }
       cursor_out += 1;
       y = rows - 3;
+      // scroll and y doesn't go out
     }
     else
     {
@@ -573,6 +575,7 @@ void Move(int key)
     if (x > Edit.line[y + cursor_out].len)
     {
       x = Edit.line[y + cursor_out].len;
+      // // if arrow down than if line's len is shorter than line-1's len move cursor
     }
     move(y, x);
     break;
@@ -586,69 +589,65 @@ void open_file(char *store_file)
   free(Edit.store_file);
   Edit.store_file = malloc(strlen(store_file) + 1);
   strcpy(Edit.store_file, store_file);
+  // copy store_file to Edit.store_file
 
-  FILE *file = fopen(Edit.store_file, "rt");
+  FILE *file = fopen(Edit.store_file, "rt"); // read text
   if (!file)
   {
-    fprintf(stderr, "Cannot open file: %s\n", Edit.store_file);
+    fprintf(stderr, "no file");
     exit(EXIT_FAILURE);
   }
 
-  File_Inf Inf;
+  File_Inf Inf; // init file structure
   Inf.temp = NULL;
   Inf.size = 0;
   Inf.length = 0;
 
-  while ((Inf.length = getline(&(Inf.temp), &(Inf.size), file)) != -1)
+  while ((Inf.length = getline(&(Inf.temp), &(Inf.size), file)) != -1) // get line's string
   {
     while (Inf.length > 0 && (Inf.temp[Inf.length - 1] == '\r' || Inf.temp[Inf.length - 1] == '\n'))
-    {
+    { // if '\r' or '\n' then len - 1
       Inf.length -= 1;
     }
     int read = Inf.length;
-    insert_row(total, Inf.temp, read);
+    insert_row(total, Inf.temp, read); // insert my structure
   }
 
   free(Inf.temp);
   fclose(file);
   y = 0;
-  cursor_out = total - rows - 2;
+  cursor_out = total - rows - 2; // screen rows + cursor_out = total
   if (cursor_out < 0)
     cursor_out = 0;
 }
 
 void save_file(char *filename)
 {
-  FILE *file = fopen(filename, "w"); // "w" 모드로 파일을 쓰기 모드로 열기
-  if (!file)
-  {
-    fprintf(stderr, "Cannot open file for writing: %s\n", filename);
-    return;
-  }
+  FILE *file = fopen(filename, "wt"); // write text to file
 
   for (int i = 0; i < total; ++i)
   {
     if (Edit.line[i].c != NULL)
     {
-      fprintf(file, "%s\n", Edit.line[i].c); // 각 줄을 파일에 쓰기
+      fprintf(file, "%s\n", Edit.line[i].c); // Edit.line[i].c fprintf
     }
     else
     {
-      fprintf(file, "\n"); // 비어있는 줄인 경우 개행 문자만 파일에 쓰기
+      fprintf(file, "\n"); // if line is null then '\n'
     }
   }
 
-  fclose(file); // 파일 닫기
+  fclose(file);
 }
 
 void get_filename(char *filename)
 {
   int ch, pos = 0;
-  mvprintw(rows - 1, 0, "%*s", cols, "");
-  mvprintw(rows - 1, 0, "ENTER FILE NAME : ");
+  mvprintw(rows - 1, 0, "%*s", cols, "");      // rows - 1 clear
+  mvprintw(rows - 1, 0, "ENTER FILE NAME : "); // rows - 1 write name
   while ((ch = getch()) != '\n')
   {
-    if (ch == KEY_BACKSPACE)
+    if (ch == BACKSPACE)
     {
       if (pos > 0)
       {
@@ -658,7 +657,7 @@ void get_filename(char *filename)
     }
     else
     {
-      if (pos < MAX_FILENAME - 1)
+      if (pos < MAX_FILENAME - 1) // filename's max size is 50
       {
         filename[pos++] = ch;
         filename[pos] = '\0';
@@ -673,11 +672,11 @@ void get_filename(char *filename)
 void get_searchname(char *search)
 {
   int ch, pos = 0;
-  mvprintw(rows - 1, 0, "%*s", cols, "");
-  mvprintw(rows - 1, 0, "ENTER Query : ");
+  mvprintw(rows - 1, 0, "%*s", cols, ""); // clear
+  mvprintw(rows - 1, 0, "Search   (ESC/Arrows/Enter)");
   while ((ch = getch()) != '\n')
   {
-    if (ch == KEY_BACKSPACE)
+    if (ch == BACKSPACE)
     {
       if (pos > 0)
       {
@@ -687,7 +686,7 @@ void get_searchname(char *search)
     }
     else
     {
-      if (pos < MAX_FILENAME - 1)
+      if (pos < MAX_SEARCHNAME - 1) // Searchname's max size is 20
       {
         search[pos++] = ch;
         search[pos] = '\0';
@@ -702,7 +701,7 @@ void get_searchname(char *search)
 // 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐
 void presskey()
 {
-
+  // flag = 1 is modified
   int c = 0;
 
   if (c == 0)
@@ -716,12 +715,12 @@ void presskey()
     case CONTROL('q'):
       if (flag == 1)
       {
-        q_press += 1;
+        q_press += 1; // if modified press q
         if (q_press == 2)
         {
-          clear();
-          endwin();
-          exit(0);
+          clear();  // clear ncurses creen
+          endwin(); // turn off encurses
+          exit(0);  // exit
         }
       }
       else
@@ -738,15 +737,14 @@ void presskey()
       {
         char filename[MAX_FILENAME + 1];
         get_filename(filename);
-        Edit.filename = malloc(strlen(filename) + 1); // 메모리 할당
+        Edit.filename = malloc(strlen(filename) + 1);
         strcpy(Edit.filename, filename);
         save_file(filename);
         mvprintw(rows - 1, 0, "%*s", cols, "");
-        q_press = 0;
+        q_press = 0; // if save then init q_press
       }
-      flag = 0;
+      flag = 0; // no modified
     }
-
     break;
 
     case CONTROL('f'):
@@ -754,32 +752,32 @@ void presskey()
       get_searchname(Sub_Matching);
       break;
 
-    case KEY_LEFT:  // 왼쪽 화살표 키
-    case KEY_RIGHT: // 오른쪽 화살표 키
-    case KEY_UP:    // 위쪽 화살표 키
-    case KEY_DOWN:  // 아래쪽 화살표 키
+    case KEY_LEFT:  // arrow_left
+    case KEY_RIGHT: // arrow_right
+    case KEY_UP:    // arrow_up
+    case KEY_DOWN:  // arrow_down
 
       if (total == 0)
         return;
       Move(c);
       scroll_clean_and_printing(0);
       break;
-    case KEY_END: // End 키
+    case KEY_END: // end
       if (total == 0)
         return;
       x = Edit.line[y + cursor_out].len;
       move(y, x);
       break;
 
-    case KEY_HOME: // Home 키
+    case KEY_HOME: // home
       if (total == 0)
         return;
       x = 0;
       move(y, x);
       break;
 
-    case KEY_NPAGE: // Page Down 키
-    case KEY_PPAGE: // Page Up 키
+    case KEY_NPAGE: // pgUp
+    case KEY_PPAGE: // pgDn
     {
       if (total == 0)
         return;
@@ -791,17 +789,17 @@ void presskey()
         else if (c == KEY_NPAGE)
           Move(KEY_DOWN);
       }
-
       scroll_clean_and_printing(0);
     }
+    // pgUp and pgDn imitates visual studio code
     break;
     // 이부분 해결해야 될듯
-    case '\n':
+    case ENTER:
       new_line();
       flag = 1;
       break;
 
-    case KEY_BACKSPACE:
+    case BACKSPACE:
       delete_char();
       flag = 1;
       break;
@@ -823,7 +821,7 @@ void scroll_clean_and_printing(int pos)
   {
     mvprintw(i, 0, "%*s", cols, "");
   }
-
+  // pos to rows - 3 clear
   for (int i = 0; i < rows - 2; ++i)
   {
     if (Edit.line[i + cursor_out].c == NULL)
@@ -831,10 +829,13 @@ void scroll_clean_and_printing(int pos)
       mvprintw(i, 0, "%*s", cols, "");
       mvprintw(i, 0, "~");
       continue;
+      // if null print ~ and continue it like vim
     }
     else
     {
       mvprintw(i, 0, "%s", Edit.line[i + cursor_out].c);
+      // if cursor_out is zero then line[y].c
+      // if corsor_out is 1 or upper then line[y + cursor_out].c it likes scroll
     }
   }
 }
@@ -860,13 +861,13 @@ void all_refresh()
 
 int main(int argc, char *argv[])
 {
-  initscr();
-  raw();
-  start_color();
-  noecho();
-  clear();
-  cbreak();
-  keypad(stdscr, TRUE);
+  initscr();            // ncurses and curses init screen
+  raw();                // raw mode
+  start_color();        // can reverse color
+  noecho();             // no echo
+  clear();              // clear ncurses and curses screen
+  cbreak();             // no line break
+  keypad(stdscr, TRUE); // can like special key like KEY_END
   x = 0;
   y = 0;
   rows = 0;
@@ -874,7 +875,7 @@ int main(int argc, char *argv[])
   total = 0;
   flag = 0;
   q_press = 0;
-  getmaxyx(stdscr, rows, cols); // rows cols
+  getmaxyx(stdscr, rows, cols); // get screen rows and cols
 
   if (argc >= 2)
   {
@@ -897,20 +898,21 @@ int main(int argc, char *argv[])
 
   while (true)
   {
-    curs_set(0);
-    status_bar();
+    curs_set(0);  // curs_set(0) = hide cursor
+    status_bar(); // status_bar update
     if (q_press == 1)
     {
       end_message("Warning!!! File has unsaved changes. Press Ctrl-Q 1 more times to quit.");
+      // if editor is modified then printing
     }
-    move(y, x);
-    refresh();
-    curs_set(1);
-    presskey();
-    mvprintw(rows - 1, 0, "%*s", cols, "");
+    move(y, x);                             // move cursor
+    refresh();                              // refresh
+    curs_set(1);                            // curs_set(1) = show cursor
+    presskey();                             // getch()
+    mvprintw(rows - 1, 0, "%*s", cols, ""); // clear message bar
   }
 
-  endwin();
-  Edit.filename = NULL;
-  return 0;
+  endwin();             // turn off ncurses
+  Edit.filename = NULL; // init filename
+  return 0;             // return 0
 }

@@ -587,7 +587,7 @@ void open_file(char *store_file)
   FILE *file = fopen(Edit.store_file, "rt"); // read text
   if (!file)
   {
-    fprintf(stderr, "no file");
+    fprintf(stderr, "no file"); // if file is NULL then error
     exit(EXIT_FAILURE);
   }
 
@@ -654,10 +654,12 @@ void get_filename(char *filename)
       }
     }
     else if (ch >= 32 && ch <= 126)
-    { // 문자 및 숫자만 받기
+    { // get char or num
       if (pos < MAX_FILENAME - 1)
       { // filename's max size is 50
-        filename[pos++] = ch;
+
+        filename[pos] = ch;
+        pos += 1;
         filename[pos] = '\0';
       }
     }
@@ -724,17 +726,20 @@ void search_text(char *Query)
     char *data = Edit.line[i].c;
     char *sub = strstr(data, Query);  // strstr line[i].c to Query
 
-    while (sub)
-    {
+    while (1)
+    { 
+      if(sub == NULL){
+        break;
+      }
       if (s_total >= s_size)
       {
         s_size *= 2;
         s_pos = realloc(s_pos, sizeof(SearchPosition) * s_size); // realloc *2
       }
       s_pos[s_total].s_x = sub - data;  // s_x = data's head
-      if (i > rows - 3)
+      if (i > rows - 3) // rows - 3이 27이라면 i는 28 s_out은 28 - 28
       {
-        s_pos[s_total].s_out = i - (rows - 2);  // s_out = scroll
+        s_pos[s_total].s_out = i - (rows - 3);  // s_out = scroll
         s_pos[s_total].s_y = 0;                 // if s_out > 0 then s_y = 0
       }
       else if (i >= 0 && i <= rows - 3)

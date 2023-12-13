@@ -706,21 +706,22 @@ typedef struct
   int s_y;
   int s_x;
   int s_out;
+  int s_total;
 } SearchPosition;
 
 SearchPosition *s_pos;  // Dynamic memory
 
-int s_total = 0;
-int s_now = 0;
-int s_size = 0;
 
 void sub_matching(char *Query)
 {
-  s_total = 0;
-  s_now = 0;
+  int s_size = 0;
+  s_pos->s_total = 0;
   s_size = Search_SIZE;
+  s_pos->s_out = 0;
+  s_pos->s_x = 0;
+  s_pos->s_y = 0;
+  free(s_pos);
   s_pos = malloc(sizeof(SearchPosition) * s_size); // first malloc 10000
-
   for (int i = 0; i < total; ++i)
   {
     char *data = Edit.line[i].c;
@@ -731,23 +732,23 @@ void sub_matching(char *Query)
       if(sub == NULL){
         break;
       }
-      if (s_total >= s_size)
+      if (s_pos->s_total >= s_size)
       {
         s_size *= 2;
         s_pos = realloc(s_pos, sizeof(SearchPosition) * s_size); // realloc *2
       }
-      s_pos[s_total].s_x = sub - data;  // s_x = data's head
-      if (i > rows - 3) // rows - 3이 27이라면 i는 28 s_out은 28 - 28
+      s_pos[s_pos->s_total].s_x = sub - data;  // s_x = data's head
+      if (i > rows - 3) // if row-3 is 27 then i is 28 s_out is 28 - 28
       {
-        s_pos[s_total].s_out = i - (rows - 3);  // s_out = scroll
-        s_pos[s_total].s_y = 0;                 // if s_out > 0 then s_y = 0
+        s_pos[s_pos->s_total].s_out = i - (rows - 3);  // s_out = scroll
+        s_pos[s_pos->s_total].s_y = 0;                 // if s_out > 0 then s_y = 0
       }
       else if (i >= 0 && i <= rows - 3)
       {
-        s_pos[s_total].s_out = 0;               // if s_out = 0
-        s_pos[s_total].s_y = i;                 // s_y = i -> no scroll
+        s_pos[s_pos->s_total].s_out = 0;               // if s_out = 0
+        s_pos[s_pos->s_total].s_y = i;                 // s_y = i -> no scroll
       }
-      s_total += 1;
+      s_pos->s_total += 1;
       sub = strstr(sub + 1, Query);             // if line[y].c has more substring then while 
     }
   }
@@ -804,6 +805,10 @@ void presskey()
     // jam vite search test 1
     case CONTROL('f'):
     {
+      int s_now = 0;
+      int temp_x = x;
+      int temp_y = y;
+      int temp_y_cursor_out = cursor_out;
       char sub[MAX_SEARCHNAME + 1] = {0}; // sub[] = NULL
       int s_c = 0;  // search char
       int sub_len = 0;  // strlen(sub);
@@ -816,6 +821,11 @@ void presskey()
           break;
         }
         else if(s_c == 27){
+          x = temp_x;
+          y = temp_y;
+          cursor_out = temp_y_cursor_out;
+          move(y, x);
+          scroll_clean_and_printing(0);
           break;
         }
         else if(s_c == BACKSPACE){
@@ -826,6 +836,20 @@ void presskey()
           }
         }
         else if(s_c == KEY_LEFT || s_c == KEY_RIGHT){
+          if(s_c == KEY_LEFT){
+            if(s_now > 0){
+              s_now -= 1;
+            } else if(s_now == 0){
+              s_now = s_pos->s_total - 1;
+            }
+          }
+          else if(s_c == KEY_RIGHT){
+            if(s_now < s_pos->s_total - 1){
+              s_now += 1;
+            }else if(s_now == s_pos->s_total){
+              s_now = 0;
+            }
+          }
           break;
         }
         else{

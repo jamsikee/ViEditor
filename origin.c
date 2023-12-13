@@ -10,7 +10,7 @@
 #include <curses.h>
 #define BACKSPACE 8
 #define ENTER 13
-#elif __APPLE
+#elif __APPLE__
 #include <ncurses.h>
 #define BACKSPACE 127
 #define ENTER '\n'

@@ -802,7 +802,7 @@ void presskey()
       flag = 0; // no modified
     }
     break;
-    
+    /*
     case CONTROL('f'):
     {
       char sub[MAX_SEARCHNAME + 1] = {0}; // sub[] = NULL
@@ -839,10 +839,11 @@ void presskey()
             }
           }
         } // if end
-      } // while end
+      } //
       get_searchname(Sub);
     }
     break;
+    */
     
 
     case KEY_LEFT:  // arrow_left

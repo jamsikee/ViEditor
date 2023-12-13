@@ -683,48 +683,7 @@ void get_searchname(char *search)
   }
 }
 
-void search_text(char *searchText) {
-    int arraySize = 10;
-    searchCount = 0;
-    searchPositions = realloc(searchPositions, sizeof(SearchPosition) * arraySize);
 
-    for (int i = 0; i < total; ++i) {
-        char *lineText = Edit.line[i].c;
-        char *found = strstr(lineText, searchText);
-        while (found) {
-            if (searchCount >= arraySize) {
-                arraySize *= 2;
-                searchPositions = realloc(searchPositions, sizeof(SearchPosition) * arraySize);
-            }
-            searchPositions[searchCount].s_y = i;
-            searchPositions[searchCount].s_x = found - lineText;
-            searchPositions[searchCount].s_out = (i >= rows - 3) ? i - (rows - 3) : 0;
-            searchCount++;
-            found = strstr(found + 1, searchText);
-        }
-    }
-
-    if (searchCount > 0) {
-        currentPosition = 0;
-        cursor_out = searchPositions[0].s_out;
-        x = searchPositions[0].s_x;
-        scroll_clean_and_printing(0); // 화면을 새로 고침
-        move(0, x); // 커서를 첫 번째 검색 위치로 이동
-    }
-}
-
-void move_to_search_position(int direction) {
-    if (searchCount == 0) return;
-
-    currentPosition += direction;
-    if (currentPosition < 0) currentPosition = 0;
-    if (currentPosition >= searchCount) currentPosition = searchCount - 1;
-
-    cursor_out = searchPositions[currentPosition].s_out;
-    x = searchPositions[currentPosition].s_x;
-    scroll_clean_and_printing(0); // 화면을 새로 고침
-    move(0, x); // 새 검색 위치로 커서 이동
-}
 
 // 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐
 void presskey()

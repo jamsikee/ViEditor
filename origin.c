@@ -706,7 +706,7 @@ typedef struct
   int s_out;
 } SearchPosition;
 
-SearchPosition s_pos = NULL;
+SearchPosition s_pos;
 
 int s_total = 0;
 int s_now = 0;

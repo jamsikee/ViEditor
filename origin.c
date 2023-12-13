@@ -278,7 +278,6 @@ void contained_new_line(Row *line, int pos_y, int pos_x)
 
 void new_line()
 {
-
   Row *line = get_line(Edit.line, y + cursor_out);
   // get line Edit.line[y]
   if (x == 0)
@@ -365,7 +364,7 @@ void del_current_line()
 }
 
 void delete_char()
-{ // 수정 필요 백스페이스키 안먹는거 같음 !!
+{ 
 
   Row *line = get_line(Edit.line, y);
 
@@ -406,7 +405,6 @@ void Visual_Text_editor__version()
   {
     mvprintw(rows / 3, mid, "                                   ");
   }
-  // if total == 0 print else NULL
 }
 
 void status_bar()
@@ -711,7 +709,7 @@ void sub_matching(char *Query)
       s_pos[s_pos->s_total].s_x = sub - data; // s_x = data's head
       if (i > rows - 3)                       // if row-3 is 27 then i is 28 s_out is 28 - 28
       {
-        s_pos[s_pos->s_total].s_out = i - (rows - 3); // s_out = scroll
+        s_pos[s_pos->s_total].s_out = i; // s_out = scroll
         s_pos[s_pos->s_total].s_y = 0;                // if s_out > 0 then s_y = 0
       }
       else if (i >= 0 && i <= rows - 3)

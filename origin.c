@@ -871,8 +871,6 @@ int main(int argc, char *argv[])
   y = 0;
   rows = 0;
   cols = 0;
-  move_rows = 0;
-  move_cols = 0;
   total = 0;
   flag = 0;
   q_press = 0;

@@ -694,7 +694,7 @@ void presskey()
         Edit.filename = malloc(strlen(filename) + 1);  // 메모리 할당
         strcpy(Edit.filename, filename);  
         save_file(filename);
-        end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+        mvprintw(row-1, 0, "%*s", cols, "");
         q_press = 0;
     }
     flag = 0;
@@ -854,7 +854,7 @@ int main(int argc, char *argv[])
     if(q_press == 1){
       end_message("Warning!!! You have to save : Ctrl-S");
     } else{
-      end_message("Help: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F  = find");
+      mvprintw(row-1, 0, "%*s", cols, "");
     }
     move(y, x);
     refresh();

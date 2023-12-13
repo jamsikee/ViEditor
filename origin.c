@@ -874,8 +874,9 @@ void presskey()
           x = s_pos[s_now].s_x;
           y = s_pos[s_now].s_y;
           cursor_out = s_pos[s_now].s_out;
-          move(y,x);
           scroll_clean_and_printing(0);
+          move(y,x);
+          refresh();
         }
         }
         else

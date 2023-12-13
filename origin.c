@@ -50,7 +50,7 @@ typedef struct Row
 struct Visual_Text_Editor
 {
 
-  Row *line;
+  Row *line;  // "*" is Dynamic memory 
   char *filename;
   char *store_file;
 };
@@ -706,7 +706,7 @@ typedef struct
   int s_out;
 } SearchPosition;
 
-SearchPosition s_pos;
+SearchPosition *s_pos;  // Dynamic memory
 
 int s_total = 0;
 int s_now = 0;

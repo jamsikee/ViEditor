@@ -633,31 +633,39 @@ void save_file(char *filename)
   fclose(file);
 }
 
-void get_filename(char *filename) {
-    int ch, pos = 0;
-    mvprintw(rows - 1, 0, "%*s", cols, "");      // rows - 1 clear
-    mvprintw(rows - 1, 0, "ENTER FILE NAME : "); // rows - 1 write name
-    while (1) {
-        ch = getch();
-        if (ch == ENTER){
-          break;
-        }
-        else if (ch == BACKSPACE) {
-            if (pos > 0) {
-                pos -= 1;
-                filename[pos] = '\0';
-            }
-        } else if (ch >= 32 && ch <= 126) { // 문자 및 숫자만 받기
-            if (pos < MAX_FILENAME - 1) { // filename's max size is 50
-                filename[pos++] = ch;
-                filename[pos] = '\0';
-            }
-        }
-        
-        mvprintw(rows - 1, 0, "%*s", cols, "");
-        mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", filename);
-        refresh();
+void get_filename(char *filename)
+{
+  int ch, pos = 0;
+  mvprintw(rows - 1, 0, "%*s", cols, "");      // rows - 1 clear
+  mvprintw(rows - 1, 0, "ENTER FILE NAME : "); // rows - 1 write name
+  while (1)
+  {
+    ch = getch();
+    if (ch == ENTER)
+    {
+      break;
     }
+    else if (ch == BACKSPACE)
+    {
+      if (pos > 0)
+      {
+        pos -= 1;
+        filename[pos] = '\0';
+      }
+    }
+    else if (ch >= 32 && ch <= 126)
+    { // 문자 및 숫자만 받기
+      if (pos < MAX_FILENAME - 1)
+      { // filename's max size is 50
+        filename[pos++] = ch;
+        filename[pos] = '\0';
+      }
+    }
+
+    mvprintw(rows - 1, 0, "%*s", cols, "");
+    mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", filename);
+    refresh();
+  }
 }
 
 /*
@@ -714,28 +722,28 @@ void search_text(char *Query)
   for (int i = 0; i < total; ++i)
   {
     char *data = Edit.line[i].c;
-    char *sub = strstr(data, Query);
+    char *sub = strstr(data, Query);  // strstr line[i].c to Query
 
     while (sub)
     {
       if (s_total >= s_size)
       {
         s_size *= 2;
-        s_pos = realloc(s_pos, sizeof(SearchPosition) * s_size); // 메모리 재할당 수정
+        s_pos = realloc(s_pos, sizeof(SearchPosition) * s_size); // realloc *2
       }
-      s_pos[s_total].s_x = sub - data;
+      s_pos[s_total].s_x = sub - data;  // s_x = data's head
       if (i > rows - 3)
       {
-        s_pos[s_total].s_out = i - (rows - 2);
-        s_pos[s_total].s_y = 0;
+        s_pos[s_total].s_out = i - (rows - 2);  // s_out = scroll
+        s_pos[s_total].s_y = 0;                 // if s_out > 0 then s_y = 0
       }
       else if (i >= 0 && i <= rows - 3)
       {
-        s_pos[s_total].s_out = 0;
-        s_pos[s_total].s_y = i;
+        s_pos[s_total].s_out = 0;               // if s_out = 0
+        s_pos[s_total].s_y = i;                 // s_y = i -> no scroll
       }
       s_total += 1;
-      sub = strstr(sub + 1, Query);
+      sub = strstr(sub + 1, Query);             // if line[y].c has more substring then while 
     }
   }
 }

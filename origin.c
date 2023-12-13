@@ -878,7 +878,6 @@ void presskey()
           scroll_clean_and_printing(0);
         }
         }
-
         else
         {
           if (s_c >= 32 && s_c <= 126)

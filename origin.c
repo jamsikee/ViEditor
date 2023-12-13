@@ -658,14 +658,13 @@ void get_filename(char *filename)
       if (pos < MAX_FILENAME - 1)
       { // filename's max size is 50
 
-        filename[pos] = ch;
-        pos += 1;
+        filename[pos++] = ch;
         filename[pos] = '\0';
       }
     }
 
     mvprintw(rows - 1, 0, "%*s", cols, "");
-    mvprintw(rows - 1, 0, "ENTER FILE NAME : %s ", filename);
+    mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", filename);
     refresh();
   }
 }

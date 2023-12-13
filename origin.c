@@ -25,6 +25,7 @@
 #define INIT_LINE_SIZE 125
 #define MAX_FILENAME 50
 #define MAX_SEARCHNAME 20
+#define Search_SIZE 50
 
 // global
 int x = 0;
@@ -327,7 +328,7 @@ void new_line()
     else
     {
       scroll_clean_and_printing(y - 1);
-      // if y == !rows-3 then no scroll and cursor y-1 ~ rows-3 clear and printing
+      // if y == !rows-3 then no scroll and cursor y-1 to rows-3 clear and printing
     }
   }
 }
@@ -609,7 +610,7 @@ void open_file(char *store_file)
   free(Inf.temp);
   fclose(file);
   y = 0;
-  cursor_out = total - rows - 2; // screen rows + cursor_out = total
+  cursor_out = total - (rows - 2); // screen rows + cursor_out = total
   if (cursor_out < 0)
     cursor_out = 0;
 }
@@ -690,11 +691,38 @@ void get_searchname(char *Query)
     refresh();
   }
 }
-int search_count = 0;
-int search_current = 0;
+
+typedef struct {
+    int s_x;
+    int s_out;
+} SearchPosition;
+
+SearchPosition *s_pos = NULL;
+int s_total = 0;
+int s_now = 0;
 
 void search_text(char *Query){
-  
+  s_total = 0;
+  s_now = 0;
+  s_pos = malloc(sizeof(s_pos)* Search_SIZE); // first malloc 50 
+
+  for(int i = 0; i < total; ++i){
+    char *data = Edit.line[i].c
+    char *sub = strstr(data, Query);
+
+    while(sub){
+      if (s_total >= Search_SIZE){
+        Search_SIZE *= 2;
+        s_pos = realloc(s_pos, Search_SIZE);
+      }
+      s_pos[s_total].s_x = sub - data;
+      if(i > rows -3) {
+        s_pos[s_total].s_out = i - (rows - 2);
+      } else{
+
+      }
+    }
+  }
 }
 
 
@@ -748,8 +776,8 @@ void presskey()
     break;
 
     case CONTROL('f'):
-      char Sub_Matching[MAX_SEARCHNAME + 1];
-      get_searchname(Sub_Matching);
+      char Sub[MAX_SEARCHNAME + 1];
+      get_searchname(Sub);
       break;
 
     case KEY_LEFT:  // arrow_left

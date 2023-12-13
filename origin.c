@@ -665,7 +665,7 @@ void get_filename(char *filename)
     }
 
     mvprintw(rows - 1, 0, "%*s", cols, "");
-    mvprintw(rows - 1, 0, "ENTER FILE NAME : %s", filename);
+    mvprintw(rows - 1, 0, "ENTER FILE NAME : %s hello", filename);
     refresh();
   }
 }

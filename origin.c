@@ -696,35 +696,37 @@ typedef struct {
     int s_x;
     int s_out;
 } SearchPosition;
-
+/*
 SearchPosition *s_pos = NULL;
 int s_total = 0;
 int s_now = 0;
+int s_size = 0;
 
 void search_text(char *Query){
   s_total = 0;
   s_now = 0;
-  s_pos = malloc(sizeof(s_pos)* Search_SIZE); // first malloc 50 
+  s_size = Search_SIZE;
+  s_pos = malloc(sizeof(s_pos)* s_size); // first malloc 50
 
   for(int i = 0; i < total; ++i){
     char *data = Edit.line[i].c
     char *sub = strstr(data, Query);
 
     while(sub){
-      if (s_total >= Search_SIZE){
-        Search_SIZE *= 2;
-        s_pos = realloc(s_pos, Search_SIZE);
+      if (s_total >= s_size){
+        s_size *= 2;
+        s_pos = realloc(s_pos, s_size);
       }
       s_pos[s_total].s_x = sub - data;
       if(i > rows -3) {
         s_pos[s_total].s_out = i - (rows - 2);
-      } else{
-
+      } else if(){
+        
       }
     }
   }
 }
-
+*/
 
 // 화면 상의 커서는 옮겨 졌지만 데이터 상의 커서가 안옮겨짐
 void presskey()

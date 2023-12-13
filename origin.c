@@ -801,104 +801,77 @@ void presskey()
     }
     break;
       // jam vite search test 1
-    case CONTROL('f'):
+   case CONTROL('f'):
     {
-      int s_now = -1; // 검색 결과 인덱스 초기화
+      int s_now = 0;
       int temp_x = x;
       int temp_y = y;
       int temp_y_cursor_out = cursor_out;
-      char sub[MAX_SEARCHNAME + 1] = {0};
-      int s_c = 0;
-      int sub_len = 0;
-      mvprintw(rows - 1, 0, "%*s", cols, "");
+      char sub[MAX_SEARCHNAME + 1] = {0}; // sub[] = NULL
+      int s_c = 0;  // search char
+      int sub_len = 0;  // strlen(sub);
+      mvprintw(rows - 1, 0, "%*s", cols, ""); // clear
       mvprintw(rows - 1, 0, "Search   (ESC/Arrows/Enter)");
-
       while (1)
       {
         s_c = getch();
-        if (s_c == ENTER)
-        {
+        if(s_c == ENTER){
           break;
         }
-        else if (s_c == 27)
-        { // ESC 키 처리
+        else if(s_c == 27){
           x = temp_x;
           y = temp_y;
           cursor_out = temp_y_cursor_out;
           move(y, x);
           scroll_clean_and_printing(0);
-          refresh();
           break;
         }
-        else if (s_c == BACKSPACE)
-        {
-          if (sub_len > 0)
-          {
+        else if(s_c == BACKSPACE){
+          if (sub_len > 0) {
             sub_len -= 1;
-            sub[sub_len] = '\0'; // stirng[max] = NULL
-            mvprintw(rows - 1, 0, "%*s", cols, "");
-            mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", sub);
-            refresh();
+            sub[sub_len] = '\0';
             sub_matching(sub);
           }
         }
-        else if (s_c == KEY_LEFT || s_c == KEY_RIGHT)
-        {
-          if (s_now != -1)
-          { // no move at -1
-            if (s_c == KEY_LEFT)
-            {
-              if (s_now > 0)
-              {
-                s_now -= 1;
-              }
-              else
-              {
-                s_now = s_pos->s_total - 1;
-              }
-            }
-            else
-            { // KEY_RIGHT
-              if (s_now < s_pos->s_total - 1)
-              {
-                s_now += 1;
-              }
-              else
-              {
-                s_now = 0;
-              }
+        else if(s_c == KEY_LEFT || s_c == KEY_RIGHT){
+          if(s_c == KEY_LEFT){
+            if(s_now > 0){
+              s_now -= 1;
+            } else if(s_now == 0){
+              s_now = s_pos->s_total - 1;
             }
           }
-          if (s_now >= 0 && s_now < s_pos->s_total)
-        {
-          x = s_pos[s_now].s_x;
-          y = s_pos[s_now].s_y;
-          cursor_out = s_pos[s_now].s_out;
-          scroll_clean_and_printing(0);
-          move(y,x);
-          refresh();
+          else if(s_c == KEY_RIGHT){
+            if(s_now < s_pos->s_total - 1){
+              s_now += 1;
+            }else if(s_now == s_pos->s_total){
+              s_now = 0;
+            }
+          }
         }
-        }
-        else
-        {
-          if (s_c >= 32 && s_c <= 126)
-          {
-            if (sub_len < MAX_SEARCHNAME)
-            {
+        else{
+          if(s_c >= 32 && s_c <= 126){
+            if (sub_len < MAX_SEARCHNAME){
               sub[sub_len] = (char)s_c;
               sub_len += 1;
-              sub[sub_len] = '\0'; // string[max] = NULL
-              mvprintw(rows - 1, 0, "%*s", cols, "");
-              mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", sub);
+              sub[sub_len] == '\0';
               sub_matching(sub);
-              move(y,x);
             }
           }
-        }
-        refresh();
-      }
-      break;
+        } // if end
+              mvprintw(rows - 1, 0, "%*s", cols, "");
+              mvprintw(rows - 1, 0, "Search  %s (ESC/Arrows/Enter)", sub);
+              refresh();
+              if(s_now >= 0 && s_now < s_pos->s_total){
+              x = s_pos[s_now].s_x;
+              y = s_pos[s_now].s_y;
+              cursor_out = s_pos[s_now].s_out;
+              move(y,x);
+              scroll_clean_and_printing(0);
+              }
+      } // while end
     }
+    break;
 
     case KEY_LEFT:  // arrow_left
     case KEY_RIGHT: // arrow_right

@@ -227,7 +227,7 @@ void RowDeletechar(Row *line, int pos)
     return;
   }
   /*
-  If x < 0 or x >= line's len then return
+  If x < 0 or x >= line's len then return 
   It means The cursor moved out of its intended position
   */
   memmove(&line->c[pos], &line->c[pos + 1], line->len - pos);
@@ -414,6 +414,7 @@ void Visual_Text_editor__version()
 
 void status_bar()
 {
+  char modified[10];
   char total_len[20];
   char st_y[20];
   int y_1 = y + 1;
@@ -431,13 +432,20 @@ void status_bar()
     mvprintw(rows - 2, i, " ");
     refresh();
   }
+  if (flag == 1) {
+    left_len += 11;
+    modified = "(modified)";
+    mvprintw(rows - 2, 0, "[%s] - %d lines %s", Edit.filename, total, modified);
+  }
+  else {
+    mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
+  }
   // 왼쪽에 텍스트 출력
-
-  mvprintw(rows - 2, 0, "[%s] - %d lines", Edit.filename, total);
   // 오른쪽에 텍스트 출력
   mvprintw(rows - 2, cols - right_len, "no ft | %d / %d", y + cursor_out + 1, total);
 
   attroff(COLOR_PAIR(2) | A_REVERSE); // Turn off the reverse color pair
+  modified = NULL;
 }
 
 void end_message(const char *format, ...)
@@ -852,7 +860,7 @@ int main(int argc, char *argv[])
     curs_set(0);
     status_bar();
     if(q_press == 1){
-      end_message("Warning!!! You have to save : Ctrl-S");
+      end_message("Warning!!! File has unsaved changes. Press Ctrl-Q 1 more times to quit.");
     }
     move(y, x);
     refresh();

@@ -714,7 +714,6 @@ SearchPosition *s_pos; // Dynamic memory
 void sub_matching(char *Query)
 {
   int s_size = 0;
-  s_pos->s_total = 0;
   s_size = Search_SIZE;
   if (s_pos != NULL) {
     free(s_pos);
@@ -887,7 +886,7 @@ void presskey()
             }
           }
         }
-        /*
+        
         if (s_now >= 0 && s_now < s_pos->s_total)
         {
           x = s_pos[s_now].s_x;
@@ -896,7 +895,7 @@ void presskey()
           move(y, x);
           scroll_clean_and_printing(0);
         }
-        */
+        
       }
       break;
     }

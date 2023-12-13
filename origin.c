@@ -834,12 +834,12 @@ void presskey()
             sub_len -= 1;
             sub[sub_len] = '\0';
             if(sub_len == 0){
-              continue;
-            } else{
               s_pos ->s_out = 0;
               s_pos->s_total = 0;
               s_pos->s_x = 0;
               s_pos->s_y = 0;
+              continue;
+            } else{
               sub_matching(sub);
             }
           }

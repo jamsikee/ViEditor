@@ -836,6 +836,10 @@ void presskey()
             if(sub_len == 0){
               continue;
             } else{
+              s_pos ->s_out = 0;
+              s_pos->s_total = 0;
+              s_pos->s_x = 0;
+              s_pos->s_y = 0;
               sub_matching(sub);
             }
           }
